@@ -1,0 +1,254 @@
+// Prisma schema — Property Listing Platform
+// Run: npx prisma generate && npx prisma migrate dev --name init
+// Requires DATABASE_URL in .env pointing to a PostgreSQL database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BUYER
+  OWNER
+  BROKER
+  AREA_ADMIN
+  SUPER_ADMIN
+}
+
+enum Purpose {
+  SALE
+  RENT
+}
+
+enum PropertyType {
+  HOUSE
+  PLOT
+  FLAT
+  SHOP
+  SHOWROOM
+  GODOWN
+  OFFICE
+  PG
+}
+
+enum ListingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum FurnishingStatus {
+  UNFURNISHED
+  SEMI_FURNISHED
+  FULLY_FURNISHED
+}
+
+enum PossessionStatus {
+  READY_TO_MOVE
+  UNDER_CONSTRUCTION
+}
+
+enum OwnershipType {
+  FREEHOLD
+  LEASEHOLD
+  POWER_OF_ATTORNEY
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  phone         String    @unique
+  passwordHash  String
+  sessionVersion Int       @default(0)
+  role          Role      @default(BUYER)
+  verified      Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  notificationsEnabled Boolean @default(true)
+  // Area admin scope — which locality/city this admin moderates
+  adminArea     String?
+  // Public broker profile fields
+  brokerBio     String?
+  brokerAgency  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  listings      Listing[]
+  catalogLinks  CatalogLink[]
+  savedListings SavedListing[]
+  inquiries Inquiry[] @relation("InquirySender")
+  receivedInquiries Inquiry[] @relation("InquiryRecipient")
+  reports ListingReport[]
+  auditLogs AdminAudit[]
+  resetTokens PasswordResetToken[]
+  verificationTokens EmailVerificationToken[]
+}
+
+model Listing {
+  id                String            @id @default(cuid())
+  title             String
+  purpose           Purpose
+  propertyType      PropertyType
+  postedBy          Role              // OWNER or BROKER, copied from user at creation time
+  status            ListingStatus     @default(PENDING)
+
+  // Mandatory
+  city              String
+  area              String            // locality / colony name, e.g. "Buddhi Vihar"
+  price             Decimal
+  contactNumber     String
+
+  // Optional details
+  sizeValue         Float?
+  sizeUnit          String?           // sqft / sqyard / gaj / acre
+  plotLength         Float?
+  plotWidth          Float?
+  facing            String?           // North/South/East/West/etc
+  bedrooms          Int?
+  bathrooms         Int?
+  floorNumber       Int?
+  totalFloors       Int?
+  furnishing        FurnishingStatus?
+  propertyAgeYears  Int?
+  possession        PossessionStatus?
+  ownershipType     OwnershipType?
+  reraNumber        String?
+  authorityApproved Boolean?
+  amenities         String[]          @default([])
+  roadWidthFt       Float?
+  isCornerPlot      Boolean?
+  nearbyLandmark    String?
+  negotiable        Boolean?
+  loanAvailable     Boolean?
+  description       String?
+  mapLat            Float?
+  mapLng            Float?
+
+  photos            Photo[]
+  documents         Document[]
+
+  ownerId           String
+  owner             User              @relation(fields: [ownerId], references: [id])
+
+  catalogEntries    CatalogLinkListing[]
+  savedBy           SavedListing[]
+  inquiries         Inquiry[]
+  reports           ListingReport[]
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  expiresAt         DateTime?
+  rejectionReason   String?
+  blocked           Boolean           @default(false)
+
+  @@index([city, area, purpose, propertyType, status])
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  url       String
+  label     String?  // e.g. "Registry copy" — private, verification only
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+// A broker's shareable curated collection of listings (the "filtered link" feature)
+model CatalogLink {
+  id        String    @id @default(cuid())
+  slug      String    @unique // used in the public share URL
+  title     String?   // e.g. "Buddhi Vihar Plots"
+  brokerId  String
+  broker    User      @relation(fields: [brokerId], references: [id])
+  listings  CatalogLinkListing[]
+  createdAt DateTime  @default(now())
+}
+
+model CatalogLinkListing {
+  catalogLinkId String
+  listingId     String
+  catalogLink   CatalogLink @relation(fields: [catalogLinkId], references: [id], onDelete: Cascade)
+  listing       Listing     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([catalogLinkId, listingId])
+}
+
+model SavedListing {
+  userId    String
+  listingId String
+  user      User     @relation(fields: [userId], references: [id])
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, listingId])
+}
+
+model Inquiry {
+  id          String   @id @default(cuid())
+  message     String   @db.VarChar(1000)
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User     @relation("InquirySender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient   User     @relation("InquiryRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  @@index([recipientId, createdAt])
+}
+
+model ListingReport {
+  id         String   @id @default(cuid())
+  reason     String   @db.VarChar(500)
+  listingId  String
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  status     String   @default("OPEN")
+  createdAt  DateTime @default(now())
+  @@index([status, createdAt])
+}
+
+model AdminAudit {
+  id         String   @id @default(cuid())
+  adminId    String
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  @@index([createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, expiresAt])
+}

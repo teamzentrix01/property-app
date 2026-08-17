@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #16302b;
+  --ink-soft: #64736d;
+  --paper: #f5f0e6;
+  --paper-dim: #e9e1d2;
+  --moss: #2f7a59;
+  --moss-deep: #1c5740;
+  --gold: #c99328;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-moss: var(--moss);
+  --color-moss-deep: var(--moss-deep);
+  --color-gold: var(--gold);
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-work-sans);
+  --font-data: var(--font-jbmono);
+}
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+body { min-width: 320px; }
+input, select, textarea { outline-color: var(--moss); }
+input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(47, 122, 89, .13); }
+
+::selection {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.font-display { font-family: var(--font-display); }
+.font-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
