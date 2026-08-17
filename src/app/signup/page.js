@@ -9,6 +9,7 @@ export default function SignupPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", role: "BUYER" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -37,8 +38,12 @@ export default function SignupPage() {
           value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input required placeholder="Phone" className="w-full mb-3 rounded-lg px-3 py-2 border border-ink/10"
           value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <input required type="password" placeholder="Password" className="w-full mb-3 rounded-lg px-3 py-2 border border-ink/10"
-          value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <div className="mb-3">
+          <label className="mb-1 block text-sm font-medium">Password</label>
+          <div className="relative"><input required minLength="12" type={showPassword ? "text" : "password"} placeholder="At least 12 characters" className="w-full rounded-lg border border-ink/10 px-3 py-2 pr-14"
+            value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /><button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute inset-y-0 right-2 text-xs font-medium text-moss-deep">{showPassword ? "Hide" : "Show"}</button></div>
+          <p className="mt-1 text-xs text-ink-soft">Use at least 12 characters.</p>
+        </div>
         <label className="block text-sm text-ink/70 mb-1">I am a</label>
         <select className="w-full mb-5 rounded-lg px-3 py-2 border border-ink/10"
           value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>

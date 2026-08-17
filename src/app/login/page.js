@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ emailOrPhone: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -33,8 +34,11 @@ export default function LoginPage() {
         {error && <p className="text-red-700 text-sm mb-4">{error}</p>}
         <input required placeholder="Email or phone" className="w-full mb-3 rounded-lg px-3 py-2 border border-ink/10"
           value={form.emailOrPhone} onChange={(e) => setForm({ ...form, emailOrPhone: e.target.value })} />
-        <input required type="password" placeholder="Password" className="w-full mb-5 rounded-lg px-3 py-2 border border-ink/10"
-          value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <div className="mb-5">
+          <label className="mb-1 block text-sm font-medium">Password</label>
+          <div className="relative"><input required type={showPassword ? "text" : "password"} placeholder="Enter your password" className="w-full rounded-lg border border-ink/10 px-3 py-2 pr-14"
+            value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /><button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute inset-y-0 right-2 text-xs font-medium text-moss-deep">{showPassword ? "Hide" : "Show"}</button></div>
+        </div>
         <button disabled={loading} className="w-full bg-ink text-paper rounded-full py-3 font-medium hover:bg-moss-deep transition disabled:opacity-50">
           {loading ? "Logging in…" : "Log in"}
         </button>
