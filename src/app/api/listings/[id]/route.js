@@ -48,6 +48,11 @@ export async function PATCH(req, { params }) {
       isCornerPlot: typeof body.isCornerPlot === "boolean" ? body.isCornerPlot : undefined,
       status: "PENDING", rejectionReason: null,
     };
+    if (Array.isArray(body.photos)) {
+      const photos = [...new Set(body.photos)].filter((url) => typeof url === "string" && url.startsWith("https://res.cloudinary.com/dwvfedqrb/image/upload/"));
+      if (!photos.length || photos.length > 12 || photos.length !== body.photos.length) return NextResponse.json({ error: "Keep between 1 and 12 valid property photos" }, { status: 400 });
+      data.photos = { deleteMany: {}, create: photos.map((url) => ({ url })) };
+    }
     if (Object.values(data).some((value) => value === null)) return NextResponse.json({ error: "One or more property details are invalid" }, { status: 400 });
     const updated = await prisma.listing.update({ where: { id }, data });
     return NextResponse.json({ listing: updated });

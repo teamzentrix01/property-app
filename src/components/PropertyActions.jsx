@@ -44,6 +44,12 @@ export default function PropertyActions({ listing, compact = false }) {
     );
     if (res.ok) setTimeout(() => setOpen(false), 1600);
   }
+  async function share() {
+    const url = `${window.location.origin}/listings/${listing.id}`;
+    if (navigator.share) return navigator.share({ title: listing.title, text: `View ${listing.title} in ${listing.area}, ${listing.city}`, url }).catch(() => {});
+    await navigator.clipboard?.writeText(url);
+    setStatus("Property link copied.");
+  }
   if (compact)
     return (
       <button
@@ -89,13 +95,8 @@ export default function PropertyActions({ listing, compact = false }) {
             Schedule visit
           </button>
         </div>
-        <button
-          type="button"
-          onClick={save}
-          className="rounded-xl border border-moss/20 py-3 text-sm font-semibold text-moss-deep"
-        >
-          {saved ? "Saved ✓" : "Save property"}
-        </button>
+        <div className="grid grid-cols-2 gap-2"><button type="button" onClick={save} className="rounded-xl border border-moss/20 py-3 text-sm font-semibold text-moss-deep">{saved ? "Saved ✓" : "Save property"}</button><button type="button" onClick={share} className="rounded-xl border border-ink/15 py-3 text-sm font-semibold">Share</button></div>
+        {status && !open && <p className="text-center text-xs text-moss-deep">{status}</p>}
       </div>
       {open && (
         <div
