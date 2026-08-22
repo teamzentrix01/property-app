@@ -33,6 +33,8 @@ export default function NewListingPage() {
   const [flags, setFlags] = useState({});
   const [photos, setPhotos] = useState([]);
   const [location, setLocation] = useState(null);
+  const [mapInput, setMapInput] = useState("");
+  const [locationMessage, setLocationMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const update = (k, v) => setForm((o) => ({ ...o, [k]: v }));
@@ -41,6 +43,22 @@ export default function NewListingPage() {
   const isCommercial = ["SHOP", "SHOWROOM", "GODOWN", "OFFICE"].includes(
     form.propertyType,
   );
+  function detectLocation() {
+    setLocationMessage("Detecting your location…");
+    if (!navigator.geolocation) return setLocationMessage("Location detection is not supported. Enter coordinates or paste a Google Maps link below.");
+    navigator.geolocation.getCurrentPosition(
+      (position) => { setLocation({ mapLat: position.coords.latitude, mapLng: position.coords.longitude }); setLocationMessage(`Location pinned with ${Math.round(position.coords.accuracy)} m accuracy.`); setError(""); },
+      (reason) => { const messages = { 1: "Location permission is blocked. Allow Location from the address-bar settings, then retry—or paste a Maps link.", 2: "Your device could not determine its location. Paste a Maps link or enter coordinates.", 3: "Location request timed out. Retry or use the manual option." }; setLocationMessage(messages[reason.code] || "Location was unavailable. Use the manual option below."); },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+    );
+  }
+  function applyMapInput() {
+    const match = mapInput.trim().match(/(?:@|query=|q=)?(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/);
+    if (!match) return setLocationMessage("Coordinates not found. Paste a Maps link containing latitude/longitude, or enter: 28.6139, 77.2090");
+    const mapLat = Number(match[1]), mapLng = Number(match[2]);
+    if (Math.abs(mapLat) > 90 || Math.abs(mapLng) > 180) return setLocationMessage("Latitude or longitude is outside the valid range.");
+    setLocation({ mapLat, mapLng }); setLocationMessage("Manual location pinned successfully."); setError("");
+  }
   async function upload(e) {
     const files = [...(e.target.files || [])];
     if (!files.length) return;
@@ -238,7 +256,10 @@ export default function NewListingPage() {
                       />
                     </Field>
                     <div className="sm:col-span-2 rounded-2xl border border-ink/10 bg-paper-dim p-4">
-                      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">Property location pin</p><p className="mt-1 text-xs text-ink-soft">Use your device location while you are at the property. Exact coordinates stay tied to the listing.</p></div><button type="button" onClick={() => navigator.geolocation?.getCurrentPosition((p) => setLocation({ mapLat: p.coords.latitude, mapLng: p.coords.longitude }), () => setError("Location permission was not available."))} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-moss-deep">{location ? "Location pinned ✓" : "Use current location"}</button></div>
+                      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">Property location pin <span className="font-normal text-ink-soft">(optional)</span></p><p className="mt-1 text-xs text-ink-soft">Detect your device location or paste coordinates from Google Maps.</p></div><button type="button" onClick={detectLocation} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-moss-deep">{location ? "Location pinned ✓" : "Detect location"}</button></div>
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={mapInput} onChange={(e) => setMapInput(e.target.value)} placeholder="Paste Maps link or 28.6139, 77.2090" className="min-w-0 flex-1 rounded-xl border border-ink/10 bg-white px-3 py-2.5 text-sm"/><button type="button" onClick={applyMapInput} className="rounded-xl border border-moss/20 bg-white px-4 py-2.5 text-sm font-semibold text-moss-deep">Pin manually</button></div>
+                      {locationMessage && <p className={`mt-3 text-xs ${location ? "text-moss-deep" : "text-ink-soft"}`}>{locationMessage}</p>}
+                      {location && <a href={`https://www.google.com/maps?q=${location.mapLat},${location.mapLng}`} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-moss-deep underline">Preview pinned location ↗</a>}
                     </div>
                     <Field label="Area">
                       <input
