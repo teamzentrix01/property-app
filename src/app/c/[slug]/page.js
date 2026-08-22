@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import PropertyCard from "@/components/PropertyCard";
 import { notFound } from "next/navigation";
+import { serializeForClient } from "@/lib/formatters";
 
 // Public page a broker shares — shows only the properties they picked
 export default async function CatalogPage({ params }) {
@@ -25,7 +26,7 @@ export default async function CatalogPage({ params }) {
       <h1 className="font-display text-3xl mb-8">{link.title || "Selected properties"}</h1>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {link.listings.map(({ listing }) => (
-          <PropertyCard key={listing.id} listing={listing} />
+          <PropertyCard key={listing.id} listing={serializeForClient(listing)} />
         ))}
       </div>
       <a href={`tel:${link.broker.phone}`} className="inline-block mt-10 bg-gold text-ink px-6 py-3 rounded-full font-medium">

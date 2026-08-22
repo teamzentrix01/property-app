@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const router = useRouter();
   const [user, setUser] = useState(undefined);
   const [pending, setPending] = useState([]);
   const [myListings, setMyListings] = useState(undefined);
@@ -48,6 +50,12 @@ export default function Dashboard() {
     if (!confirm("Delete this listing?")) return;
     await fetch(`/api/listings/${id}`, { method: "DELETE" });
     setMyListings((ls) => ls.filter((l) => l.id !== id));
+  }
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+    router.refresh();
   }
 
   async function approve(id, status) {
@@ -113,7 +121,7 @@ export default function Dashboard() {
 
   return (
     <main className="flex-1 max-w-4xl mx-auto px-6 py-12 w-full">
-      <h1 className="font-display text-3xl mb-1">Hi, {user.name}</h1>
+      <div className="flex items-start justify-between gap-4"><h1 className="font-display text-3xl mb-1">Hi, {user.name}</h1><button onClick={logout} className="rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink-soft md:hidden">Log out</button></div>
       <p className="font-data text-xs uppercase tracking-wide text-gold mb-10">
         {user.role.replaceAll("_", " ")}
       </p>
@@ -246,7 +254,7 @@ export default function Dashboard() {
                 key={l.id}
                 className="bg-paper text-ink rounded-xl p-4 flex items-center justify-between"
               >
-                <div>
+                <Link href={`/listings/${l.id}/edit`} className="min-w-0 flex-1">
                   <p className="font-medium">{l.title}</p>
                   <p className="font-data text-xs text-ink-soft">
                     {l.area}, {l.city} ·{" "}
@@ -263,8 +271,9 @@ export default function Dashboard() {
                     </span>
                   </p>
                   {l.rejectionReason && <p className="mt-2 max-w-lg text-xs text-red-700">Reason: {l.rejectionReason}</p>}
-                </div>
-                <div className="flex gap-2">{l.status === "REJECTED" && <button onClick={() => resubmit(l.id)} className="rounded-full bg-moss px-3 py-1.5 text-sm text-white">Resubmit</button>}<button onClick={() => deleteListing(l.id)} className="border border-ink/20 text-sm px-3 py-1.5 rounded-full">Delete</button></div>
+                  <p className="mt-2 text-xs font-semibold text-moss-deep">Tap to edit →</p>
+                </Link>
+                <div className="ml-3 flex gap-2">{l.status === "REJECTED" && <button onClick={() => resubmit(l.id)} className="rounded-full bg-moss px-3 py-1.5 text-sm text-white">Resubmit</button>}<button onClick={() => deleteListing(l.id)} className="border border-ink/20 text-sm px-3 py-1.5 rounded-full">Delete</button></div>
               </li>
             ))}
           </ul>

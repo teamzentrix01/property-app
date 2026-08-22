@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { serializeForClient } from "./formatters";
 
 export async function getApprovedListings(where = {}) {
   const listings = await prisma.listing.findMany({
@@ -7,5 +8,5 @@ export async function getApprovedListings(where = {}) {
     orderBy: { createdAt: "desc" },
     take: 24,
   });
-  return { listings, demo: false };
+  return { listings: serializeForClient(listings), demo: false };
 }

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { currentUser, isScopedAreaAdmin } from "@/lib/serverAuth";
-import { formatPrice } from "@/components/PropertyCard";
+import { formatPrice } from "@/lib/formatters";
 import PropertyActions from "@/components/PropertyActions";
 const LABELS = {
   sizeValue: "Area",

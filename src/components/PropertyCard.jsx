@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import PropertyActions from "@/components/PropertyActions";
+import { formatPrice } from "@/lib/formatters";
 const TYPES = {
   HOUSE: "Independent House",
   PLOT: "Residential Plot",
@@ -11,16 +12,6 @@ const TYPES = {
   OFFICE: "Office Space",
   PG: "PG / Co-living",
 };
-export function formatPrice(price, purpose) {
-  const n = Number(price);
-  const val =
-    n >= 10000000
-      ? `₹${(n / 10000000).toFixed(n % 10000000 ? 2 : 0)} Cr`
-      : n >= 100000
-        ? `₹${(n / 100000).toFixed(n % 100000 ? 2 : 0)} L`
-        : `₹${n.toLocaleString("en-IN")}`;
-  return purpose === "RENT" ? `${val}/month` : val;
-}
 export default function PropertyCard({ listing }) {
   const photo = listing.photos?.[0]?.url;
   const facts =
