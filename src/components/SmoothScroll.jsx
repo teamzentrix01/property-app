@@ -1,24 +1,5 @@
-"use client";
-
-import { useEffect } from "react";
-import Lenis from "lenis";
-
+// Preserve the layout boundary while using native browser scrolling. Native
+// scroll is reliable across Windows wheels, touch devices and browser zoom.
 export default function SmoothScroll({ children }) {
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => 1 - Math.pow(1 - t, 3),
-      smoothWheel: true,
-    });
-
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    return () => lenis.destroy();
-  }, []);
-
   return children;
 }
