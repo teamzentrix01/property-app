@@ -53,12 +53,20 @@ export async function POST(req) {
   const optionalNumber = (key, options) => body[key] === undefined || body[key] === "" ? undefined : number(body[key], options);
   const data = {
     title, city, area, contactNumber, price, purpose, propertyType, postedBy: auth.user.role, ownerId: auth.user.id, status: "PENDING",
-    sizeValue: optionalNumber("sizeValue", { min: 0, max: 10000000 }), plotLength: optionalNumber("plotLength", { min: 0, max: 100000 }), plotWidth: optionalNumber("plotWidth", { min: 0, max: 100000 }), roadWidthFt: optionalNumber("roadWidthFt", { min: 0, max: 10000 }),
+    sizeValue: optionalNumber("sizeValue", { min: 0, max: 10000000 }), plotLength: optionalNumber("plotLength", { min: 0, max: 100000 }), plotWidth: optionalNumber("plotWidth", { min: 0, max: 100000 }), roadWidthFt: optionalNumber("roadWidthFt", { min: 0, max: 10000 }), mapLat: optionalNumber("mapLat", { min: -90, max: 90 }), mapLng: optionalNumber("mapLng", { min: -180, max: 180 }),
     bedrooms: optionalNumber("bedrooms", { min: 0, max: 100, integer: true }), bathrooms: optionalNumber("bathrooms", { min: 0, max: 100, integer: true }), floorNumber: optionalNumber("floorNumber", { min: 0, max: 500, integer: true }), totalFloors: optionalNumber("totalFloors", { min: 0, max: 500, integer: true }), propertyAgeYears: optionalNumber("propertyAgeYears", { min: 0, max: 500, integer: true }),
     sizeUnit: optionalText("sizeUnit", 20), facing: optionalText("facing", 30), reraNumber: optionalText("reraNumber", 100), nearbyLandmark: optionalText("nearbyLandmark", 160), description: optionalText("description", 5000),
     amenities: Array.isArray(body.amenities) ? body.amenities.filter((item) => typeof item === "string").map((item) => item.trim()).filter(Boolean).slice(0, 20).map((item) => item.slice(0, 60)) : [],
     isCornerPlot: typeof body.isCornerPlot === "boolean" ? body.isCornerPlot : undefined, negotiable: typeof body.negotiable === "boolean" ? body.negotiable : undefined, loanAvailable: typeof body.loanAvailable === "boolean" ? body.loanAvailable : undefined, authorityApproved: typeof body.authorityApproved === "boolean" ? body.authorityApproved : undefined,
   };
+  const enumFields = {
+    furnishing: ["UNFURNISHED", "SEMI_FURNISHED", "FULLY_FURNISHED"],
+    possession: ["READY_TO_MOVE", "UNDER_CONSTRUCTION"],
+    ownershipType: ["FREEHOLD", "LEASEHOLD", "POWER_OF_ATTORNEY"],
+  };
+  for (const [key, choices] of Object.entries(enumFields)) {
+    if (body[key]) data[key] = enumValue(body[key], choices);
+  }
   if (Object.values(data).some((value) => value === null)) return NextResponse.json({ error: "One or more optional fields are invalid" }, { status: 400 });
   const listing = await prisma.listing.create({ data: { ...data, photos: { create: photos.map((url) => ({ url })) } }, include: { photos: true } });
   const origin = new URL(req.url).origin;

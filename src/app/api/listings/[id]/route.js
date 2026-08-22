@@ -18,16 +18,23 @@ export async function GET(req, { params }) {
 }
 
 export async function PATCH(req, { params }) {
-  const auth = await requireUser(["AREA_ADMIN", "SUPER_ADMIN"]);
+  const auth = await requireUser();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
-  if (auth.user.role === "AREA_ADMIN" && !isScopedAreaAdmin(auth.user)) return NextResponse.json({ error: "Admin area assignment is required" }, { status: 403 });
   const { id } = await params;
   const listing = await prisma.listing.findUnique({ where: { id }, include: { owner: { select: { email: true } } } });
   if (!listing) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (isScopedAreaAdmin(auth.user) && auth.user.adminArea !== listing.city) return NextResponse.json({ error: "This listing is outside your assigned area" }, { status: 403 });
   const body = await req.json().catch(() => null);
+  if (body?.status === "PENDING") {
+    if (listing.ownerId !== auth.user.id || listing.status !== "REJECTED") return NextResponse.json({ error: "Only a rejected listing can be resubmitted by its owner" }, { status: 403 });
+    const updated = await prisma.listing.update({ where: { id }, data: { status: "PENDING", rejectionReason: null } });
+    return NextResponse.json({ listing: updated });
+  }
+  if (!["AREA_ADMIN", "SUPER_ADMIN"].includes(auth.user.role)) return NextResponse.json({ error: "Admin permission required" }, { status: 403 });
+  if (auth.user.role === "AREA_ADMIN" && !isScopedAreaAdmin(auth.user)) return NextResponse.json({ error: "Admin area assignment is required" }, { status: 403 });
+  if (isScopedAreaAdmin(auth.user) && auth.user.adminArea !== listing.city) return NextResponse.json({ error: "This listing is outside your assigned area" }, { status: 403 });
   if (!body || !["APPROVED", "REJECTED"].includes(body.status)) return NextResponse.json({ error: "Status must be APPROVED or REJECTED" }, { status: 400 });
-  const updated = await prisma.listing.update({ where: { id }, data: { status: body.status } });
+  const rejectionReason = body.status === "REJECTED" ? String(body.rejectionReason || "Property details could not be verified. Please correct the listing and resubmit.").slice(0, 500) : null;
+  const updated = await prisma.listing.update({ where: { id }, data: { status: body.status, rejectionReason } });
   notifyEmail({ to: listing.owner?.email, subject: `Listing ${body.status.toLowerCase()}`, heading: body.status === "APPROVED" ? "Your listing is now live" : "Your listing was not approved", message: `“${listing.title}” is now ${body.status.toLowerCase()}.`, action: { label: body.status === "APPROVED" ? "View listing" : "Open dashboard", url: `${new URL(req.url).origin}${body.status === "APPROVED" ? `/listings/${listing.id}` : "/dashboard"}` } });
   return NextResponse.json({ listing: updated });
 }

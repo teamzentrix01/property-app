@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 export async function getApprovedListings(where = {}) {
   const listings = await prisma.listing.findMany({
     where: { status: "APPROVED", ...where },
-    include: { photos: true },
+    include: { photos: true, owner: { select: { verified: true } } },
     orderBy: { createdAt: "desc" },
     take: 24,
   });

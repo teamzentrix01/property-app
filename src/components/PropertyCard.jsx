@@ -1,50 +1,121 @@
+"use client";
 import Link from "next/link";
-
-const TYPE_LABEL = {
-  HOUSE: "House", PLOT: "Plot", FLAT: "Flat", SHOP: "Shop",
-  SHOWROOM: "Showroom", GODOWN: "Godown", OFFICE: "Office", PG: "PG",
+import PropertyActions from "@/components/PropertyActions";
+const TYPES = {
+  HOUSE: "Independent House",
+  PLOT: "Residential Plot",
+  FLAT: "Apartment",
+  SHOP: "Shop",
+  SHOWROOM: "Showroom",
+  GODOWN: "Warehouse",
+  OFFICE: "Office Space",
+  PG: "PG / Co-living",
 };
-
-function formatPrice(price, purpose) {
+export function formatPrice(price, purpose) {
   const n = Number(price);
-  const val = n >= 10000000
-    ? `₹${(n / 10000000).toFixed(2)} Cr`
-    : n >= 100000
-    ? `₹${(n / 100000).toFixed(2)} L`
-    : `₹${n.toLocaleString("en-IN")}`;
-  return purpose === "RENT" ? `${val}/mo` : val;
+  const val =
+    n >= 10000000
+      ? `₹${(n / 10000000).toFixed(n % 10000000 ? 2 : 0)} Cr`
+      : n >= 100000
+        ? `₹${(n / 100000).toFixed(n % 100000 ? 2 : 0)} L`
+        : `₹${n.toLocaleString("en-IN")}`;
+  return purpose === "RENT" ? `${val}/month` : val;
 }
-
 export default function PropertyCard({ listing }) {
   const photo = listing.photos?.[0]?.url;
+  const facts =
+    listing.propertyType === "PLOT"
+      ? [
+          listing.sizeValue &&
+            `${listing.sizeValue} ${listing.sizeUnit || "sq ft"}`,
+          listing.roadWidthFt && `${listing.roadWidthFt} ft road`,
+          listing.facing,
+        ]
+      : [
+          listing.bedrooms && `${listing.bedrooms} BHK`,
+          listing.sizeValue &&
+            `${listing.sizeValue} ${listing.sizeUnit || "sq ft"}`,
+          listing.possession?.replaceAll("_", " "),
+        ];
   return (
-    <Link
-      href={`/listings/${listing.id}`}
-      className="group block rounded-2xl overflow-hidden bg-paper text-ink hover:-translate-y-1 transition-transform duration-300"
-    >
-      <div className="relative h-44 bg-paper-dim overflow-hidden">
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center font-data text-xs text-ink-soft">NO PHOTO</div>
-        )}
-        <span className="absolute top-3 left-3 text-[11px] font-data uppercase tracking-wide bg-ink text-paper px-2 py-1 rounded-full">
-          {listing.purpose === "SALE" ? "For Sale" : "For Rent"}
-        </span>
-        {listing.postedBy === "BROKER" && (
-          <span className="absolute top-3 right-3 text-[11px] font-data uppercase tracking-wide bg-gold text-ink px-2 py-1 rounded-full">
-            Broker
+    <article className="group overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-[0_8px_30px_rgba(22,48,43,.06)] transition hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(22,48,43,.12)]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-paper-dim">
+        <Link href={`/listings/${listing.id}`} className="block h-full">
+          {photo ? (
+            <img
+              src={photo}
+              alt={listing.title}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="grid h-full place-items-center text-xs text-ink-soft">
+              Photo coming soon
+            </div>
+          )}
+        </Link>
+        <div className="absolute left-3 top-3 flex gap-2">
+          <span className="rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-moss-deep shadow-sm">
+            {listing.owner?.verified ? "✓ Owner verified" : "✓ Listing reviewed"}
           </span>
-        )}
+          {listing.reraNumber && (
+            <span className="rounded-full bg-moss px-2.5 py-1 text-[10px] font-bold text-white">
+              RERA
+            </span>
+          )}
+        </div>
+        <div className="absolute right-3 top-3">
+          <PropertyActions listing={listing} compact />
+        </div>
+        <span className="absolute bottom-3 right-3 rounded-full bg-black/65 px-2 py-1 text-[10px] text-white">
+          {listing.photos?.length || 0} photos
+        </span>
       </div>
       <div className="p-4">
-        <p className="font-data text-[11px] uppercase tracking-wide text-moss-deep mb-1">
-          {TYPE_LABEL[listing.propertyType]} · {listing.area}, {listing.city}
+        <div className="mb-2 flex items-start justify-between gap-3">
+          <div>
+            <p className="font-display text-xl font-semibold">
+              {formatPrice(listing.price, listing.purpose)}
+            </p>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-moss-deep">
+              {TYPES[listing.propertyType]}
+            </p>
+          </div>
+          <span className="rounded-full bg-paper-dim px-2.5 py-1 text-[10px] font-semibold">
+            {listing.postedBy === "BROKER" ? "Agent" : "Owner"}
+          </span>
+        </div>
+        <Link href={`/listings/${listing.id}`}>
+          <h3 className="line-clamp-1 font-semibold text-ink group-hover:text-moss-deep">
+            {listing.title}
+          </h3>
+        </Link>
+        <p className="mt-1 line-clamp-1 text-sm text-ink-soft">
+          {listing.area}, {listing.city}
         </p>
-        <h3 className="font-display text-lg leading-snug mb-2">{listing.title}</h3>
-        <p className="font-data text-base font-medium">{formatPrice(listing.price, listing.purpose)}</p>
+        {facts.filter(Boolean).length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-y border-ink/8 py-2 text-xs text-ink-soft">
+            {facts.filter(Boolean).map((f) => (
+              <span key={f}>{f}</span>
+            ))}
+          </div>
+        )}
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <a
+            href={`tel:${listing.contactNumber || ""}`}
+            className="rounded-xl border border-moss/25 py-2 text-center text-xs font-semibold text-moss-deep"
+          >
+            Call
+          </a>
+          <a
+            href={`https://wa.me/91${String(listing.contactNumber || "")
+              .replace(/\D/g, "")
+              .slice(-10)}`}
+            className="rounded-xl bg-moss py-2 text-center text-xs font-semibold text-white"
+          >
+            WhatsApp
+          </a>
+        </div>
       </div>
-    </Link>
+    </article>
   );
 }

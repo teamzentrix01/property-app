@@ -30,6 +30,9 @@ html, body {
 }
 
 body { min-width: 320px; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, select { cursor: pointer; }
+img { color: transparent; }
 input, select, textarea { outline-color: var(--moss); }
 input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(47, 122, 89, .13); }
 
