@@ -14,13 +14,19 @@ function getTransporter() {
   return transporter;
 }
 
+function senderAddress() {
+  const configured = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const bracketed = configured.match(/<([^>]+)>/);
+  return bracketed ? bracketed[1].trim() : configured.trim();
+}
+
 export async function sendEmail({ to, subject, heading, message, action }) {
   if (!to) return;
   const safeHeading = escapeHtml(heading);
   const safeMessage = escapeHtml(message);
   const actionHtml = action ? `<p><a href="${escapeHtml(action.url)}" style="display:inline-block;background:#1c5740;color:#fffdf8;padding:12px 18px;border-radius:999px;text-decoration:none">${escapeHtml(action.label)}</a></p>` : "";
   await getTransporter().sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    from: { name: "noreply", address: senderAddress() },
     to,
     subject,
     text: `${heading}\n\n${message}${action ? `\n\n${action.label}: ${action.url}` : ""}`,

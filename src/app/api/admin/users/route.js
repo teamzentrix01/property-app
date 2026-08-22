@@ -29,5 +29,6 @@ export async function PATCH(req) {
   if (body.verified !== undefined) data.verified = body.verified;
   if (!Object.keys(data).length) return NextResponse.json({ error: "No changes supplied" }, { status: 400 });
   const user = await prisma.user.update({ where: { id: target.id }, data: { ...data, sessionVersion: { increment: target.id === auth.user.id ? 0 : 1 } }, select: safeUser });
+  await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: "USER_UPDATED", targetType: "USER", targetId: target.id, metadata: { changedFields: Object.keys(data), previousRole: target.role, nextRole: user.role, verified: user.verified } } });
   return NextResponse.json({ user });
 }

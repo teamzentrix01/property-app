@@ -68,6 +68,7 @@ export async function PATCH(req, { params }) {
   if (!body || !["APPROVED", "REJECTED"].includes(body.status)) return NextResponse.json({ error: "Status must be APPROVED or REJECTED" }, { status: 400 });
   const rejectionReason = body.status === "REJECTED" ? String(body.rejectionReason || "Property details could not be verified. Please correct the listing and resubmit.").slice(0, 500) : null;
   const updated = await prisma.listing.update({ where: { id }, data: { status: body.status, rejectionReason } });
+  await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: body.status === "APPROVED" ? "LISTING_APPROVED" : "LISTING_REJECTED", targetType: "LISTING", targetId: listing.id, metadata: { title: listing.title, city: listing.city, rejectionReason } } });
   notifyEmail({ to: listing.owner?.email, subject: `Listing ${body.status.toLowerCase()}`, heading: body.status === "APPROVED" ? "Your listing is now live" : "Your listing was not approved", message: `“${listing.title}” is now ${body.status.toLowerCase()}.`, action: { label: body.status === "APPROVED" ? "View listing" : "Open dashboard", url: `${new URL(req.url).origin}${body.status === "APPROVED" ? `/listings/${listing.id}` : "/dashboard"}` } });
   return NextResponse.json({ listing: updated });
 }
