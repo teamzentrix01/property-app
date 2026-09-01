@@ -1,161 +1,417 @@
 "use client";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import BhoomiMark from "@/components/BhoomiMark";
 
-const Icon = ({ name, className = "h-5 w-5" }) => {
-  const paths = {
-    home: (
-      <>
-        <path d="m3 11 9-8 9 8" />
-        <path d="M5 10v10h14V10M9 20v-6h6v6" />
-      </>
-    ),
-    search: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-4-4" />
-      </>
-    ),
-    plus: (
-      <>
-        <path d="M12 5v14M5 12h14" />
-      </>
-    ),
-    heart: (
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />
-    ),
-    user: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-  };
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      {paths[name]}
-    </svg>
-  );
-};
+import {
+  Search,
+  MapPin,
+  ChevronDown,
+  Menu,
+  X,
+  User,
+  Heart,
+  Plus,
+  Globe,
+  Phone,
+} from "lucide-react";
+
 export default function Navbar() {
   const [user, setUser] = useState(undefined);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     let active = true;
+
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : { user: null }))
-      .then((d) => active && setUser(d.user))
-      .catch(() => active && setUser(null));
+      .then((d) => {
+        if (active) setUser(d.user);
+      })
+      .catch(() => {
+        if (active) setUser(null);
+      });
+
     return () => {
       active = false;
     };
   }, [pathname]);
+
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", {
+      method: "POST",
+    });
+
     setUser(null);
     router.push("/");
     router.refresh();
   }
-  const nav = [
-    { href: "/listings?purpose=SALE", label: "Buy" },
-    { href: "/listings?purpose=RENT", label: "Rent" },
-    { href: "/listings?propertyType=PLOT", label: "Plots" },
-    { href: "/listings?propertyType=OFFICE", label: "Commercial" },
-  ];
+
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-ink/8 bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6">
-          <Link href="/" aria-label="Bhoomi home">
-            <BhoomiMark />
-          </Link>
-          <nav className="hidden items-center gap-1 lg:flex">
-            {nav.map((i) => (
-              <Link
-                key={i.label}
-                href={i.href}
-                className="rounded-full px-4 py-2 text-sm font-medium text-ink-soft transition hover:bg-paper-dim/70 hover:text-ink"
-              >
-                {i.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="ml-auto hidden items-center gap-2 md:flex">
+      {/* =====================================================
+          STICKY NAVBAR - PREMIUM DESIGN
+      ====================================================== */}
+
+      <header className="sticky top-0 z-50 w-full border-b border-amber-200 bg-gradient-to-b from-amber-50 to-white shadow-sm transition-all">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+
+          {/* ================= HEADER BAR ================= */}
+          <div className="flex h-20 items-center justify-between gap-5">
+
+            {/* Logo */}
             <Link
-              href="/listings/new"
-              className="rounded-full border border-moss/25 px-4 py-2 text-sm font-semibold text-moss-deep hover:bg-moss/5"
+              href="/"
+              aria-label="Bhoomi home"
+              className="shrink-0"
             >
-              Post property <span className="text-[10px] text-gold">FREE</span>
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white font-bold text-sm">
+                  ₹
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold tracking-tight text-amber-900">
+                    BHOOMI
+                  </h1>
+                  <p className="text-[9px] font-medium text-amber-700 tracking-widest leading-none">
+                    REAL ESTATE
+                  </p>
+                </div>
+              </div>
             </Link>
-            {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"
+
+            {/* Category Tabs - Hidden on Mobile */}
+            <div className="hidden lg:flex items-center gap-6">
+              {["Cities", "Apartments", "Branded", "Luxury", "Commercial", "Rental", "Villas"].map((category) => (
+                <button
+                  key={category}
+                  className="text-xs font-semibold text-amber-900 hover:text-red-600 transition whitespace-nowrap"
                 >
-                  Dashboard
-                </Link>
-                <button onClick={logout} className="px-2 text-sm text-ink-soft">
-                  Log out
+                  {category}
                 </button>
-              </>
-            ) : user === null ? (
+              ))}
+            </div>
+
+            {/* Desktop Right Section */}
+            <div className="hidden lg:flex items-center gap-3 ml-auto">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-900 hover:text-amber-700 transition">
+                <Globe size={16} />
+                <span>EN</span>
+                <ChevronDown size={12} />
+              </button>
+
               <Link
-                href="/login"
-                className="rounded-full bg-moss px-5 py-2 text-sm font-semibold text-white"
+                href="/listings/new"
+                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition whitespace-nowrap"
               >
-                Log in
+                <Plus size={14} />
+                Post Property
+                <span className="ml-1 bg-red-700 px-1.5 py-0.5 rounded text-[8px]">FREE</span>
               </Link>
-            ) : null}
+
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-amber-900 text-white text-xs font-semibold rounded-lg hover:bg-amber-800 transition"
+                  >
+                    <User size={14} />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="px-2.5 text-xs font-medium text-amber-900 hover:text-red-600"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : user === null ? (
+                <Link
+                  href="/login"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-green-700 text-white text-xs font-semibold rounded-lg hover:bg-green-800 transition"
+                >
+                  <User size={14} />
+                  Log in
+                </Link>
+              ) : null}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenu(!mobileMenu)}
+              className="grid h-10 w-10 place-items-center rounded-lg bg-amber-100 text-amber-900 lg:hidden"
+              aria-label="Menu"
+            >
+              {mobileMenu ? <X size={22} /> : <Menu size={22} />}
+            </button>
+
           </div>
-          <Link
-            href="/listings"
-            className="ml-auto grid h-10 w-10 place-items-center rounded-full bg-paper-dim text-ink md:hidden"
-            aria-label="Search"
-          >
-            <Icon name="search" />
-          </Link>
+
+          {/* ================= SEARCH BAR - SHOWS WHEN NOT SCROLLED ================= */}
+          {!scrolled && (
+            <div className="py-4 hidden lg:block border-t border-amber-200">
+              {/* Search Tabs */}
+              <div className="mb-3 flex items-center gap-6">
+                {["Cities", "Apartments", "Branded", "Luxury", "Commercial"].map((tab, idx) => (
+                  <button
+                    key={tab}
+                    className={`pb-2 text-xs font-semibold transition ${
+                      idx === 0
+                        ? "border-b-2 border-red-500 text-red-600"
+                        : "text-amber-900 hover:text-red-600"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Form */}
+              <form action="/listings" className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]">
+                {/* Location */}
+                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
+                  <MapPin className="text-red-600 shrink-0" size={18} />
+                  <input
+                    name="location"
+                    type="text"
+                    placeholder="Search City, Locality or Project..."
+                    className="text-xs font-semibold text-amber-900 bg-transparent outline-none placeholder:text-gray-400 w-full"
+                  />
+                </div>
+
+                {/* Property Type */}
+                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
+                  <span className="text-sm font-bold text-red-600 shrink-0">🏢</span>
+                  <select className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full">
+                    <option>All Types</option>
+                    <option>Apartments</option>
+                    <option>Villas</option>
+                    <option>Commercial</option>
+                  </select>
+                  <ChevronDown size={12} className="text-amber-700 shrink-0" />
+                </div>
+
+                {/* Budget */}
+                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
+                  <span className="text-sm font-bold text-red-600 shrink-0">₹</span>
+                  <select className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full">
+                    <option>Any Budget</option>
+                    <option>Below ₹50 Lakh</option>
+                    <option>₹50L - ₹1 Cr</option>
+                    <option>₹1 Cr - ₹5 Cr</option>
+                    <option>Above ₹5 Cr</option>
+                  </select>
+                  <ChevronDown size={12} className="text-amber-700 shrink-0" />
+                </div>
+
+                {/* Search Button */}
+                <button
+                  type="submit"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 font-semibold text-white text-xs hover:from-red-600 hover:to-red-700 transition"
+                >
+                  <Search size={16} />
+                  Search
+                </button>
+              </form>
+            </div>
+          )}
+
         </div>
+
+        {/* =====================================================
+            MOBILE MENU
+        ====================================================== */}
+
+        {mobileMenu && (
+          <div className="border-t border-amber-200 bg-white shadow-xl lg:hidden">
+
+            <div className="px-4 py-4 space-y-3">
+
+              {/* Mobile Search */}
+              <form action="/listings" className="space-y-2">
+                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2">
+                  <MapPin className="text-red-600 shrink-0" size={18} />
+                  <input
+                    name="location"
+                    placeholder="Search City, Locality..."
+                    className="flex-1 bg-transparent text-xs font-semibold text-amber-900 outline-none"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <select className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
+                    <option>All Types</option>
+                    <option>Apartments</option>
+                    <option>Villas</option>
+                  </select>
+                  <select className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
+                    <option>Any Budget</option>
+                    <option>Below ₹50L</option>
+                    <option>₹50L+</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 font-semibold text-white text-xs"
+                >
+                  <Search size={16} />
+                  Search
+                </button>
+              </form>
+
+              {/* Mobile Categories */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {["Apartments", "Branded", "Luxury", "Commercial", "Villas"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setMobileMenu(false)}
+                    className="px-3 py-1.5 text-[10px] font-semibold text-amber-900 bg-amber-100 rounded-lg hover:bg-amber-200"
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Mobile Links */}
+              <div className="space-y-1.5 pt-3 border-t border-amber-200">
+                <Link
+                  href="/listings"
+                  className="block px-4 py-2 text-xs font-semibold text-amber-900 hover:text-red-600"
+                  onClick={() => setMobileMenu(false)}
+                >
+                  All Projects
+                </Link>
+
+                <Link
+                  href="/listings/new"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg"
+                  onClick={() => setMobileMenu(false)}
+                >
+                  <Plus size={14} />
+                  Post Property FREE
+                </Link>
+
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-4 py-2 bg-amber-900 text-white text-xs font-semibold rounded-lg"
+                      onClick={() => setMobileMenu(false)}
+                    >
+                      <User size={14} />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMenu(false);
+                      }}
+                      className="w-full px-4 py-2 text-xs font-medium text-red-600"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white text-xs font-semibold rounded-lg"
+                    onClick={() => setMobileMenu(false)}
+                  >
+                    <User size={14} />
+                    Log in
+                  </Link>
+                )}
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
       </header>
-      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-ink/10 bg-white/97 px-2 pb-[max(.45rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgba(22,48,43,.08)] backdrop-blur-xl md:hidden">
-        {[
-          { href: "/", label: "Home", icon: "home" },
-          { href: "/listings", label: "Search", icon: "search" },
-          { href: "/listings/new", label: "Post", icon: "plus", post: true },
-          { href: "/dashboard#saved", label: "Saved", icon: "heart" },
-          {
-            href: user ? "/dashboard" : "/login",
-            label: "Profile",
-            icon: "user",
-          },
-        ].map((i) => (
-          <Link
-            key={i.label}
-            href={i.href}
-            className={`relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] font-medium ${pathname === i.href ? "text-moss-deep" : "text-ink-soft"}`}
+
+      {/* =====================================================
+          MOBILE BOTTOM NAV
+      ====================================================== */}
+
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-amber-200 bg-white/95 px-2 pb-[max(.45rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgba(0,0,0,.08)] backdrop-blur-xl lg:hidden">
+
+        {/* Home */}
+        <Link
+          href="/"
+          className={`flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] ${
+            pathname === "/"
+              ? "font-bold text-red-600"
+              : "text-amber-900"
+          }`}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            className="h-5 w-5"
           >
-            {i.post ? (
-              <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-moss text-white shadow-lg shadow-moss/25">
-                <Icon name="plus" className="h-7 w-7" />
-              </span>
-            ) : (
-              <Icon name={i.icon} />
-            )}
-            <span>{i.label}</span>
-          </Link>
-        ))}
+            <path d="m3 11 9-8 9 8" />
+            <path d="M5 10v10h14V10M9 20v-6h6v6" />
+          </svg>
+          Home
+        </Link>
+
+        {/* Search */}
+        <Link
+          href="/listings"
+          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-amber-900"
+        >
+          <Search size={20} />
+          Search
+        </Link>
+
+        {/* Post */}
+        <Link
+          href="/listings/new"
+          className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
+        >
+          <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
+            <Plus size={27} />
+          </span>
+          <span>Post</span>
+        </Link>
+
+        {/* Saved */}
+        <Link
+          href="/dashboard#saved"
+          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-amber-900"
+        >
+          <Heart size={20} />
+          Saved
+        </Link>
+
+        {/* Profile */}
+        <Link
+          href={user ? "/dashboard" : "/login"}
+          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-amber-900"
+        >
+          <User size={20} />
+          Profile
+        </Link>
+
       </nav>
     </>
   );

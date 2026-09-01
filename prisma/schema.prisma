@@ -135,6 +135,7 @@ model Listing {
   ownerId           String
   owner             User              @relation(fields: [ownerId], references: [id])
 
+  homepageSectionItems HomepageSectionItem[]
   catalogEntries    CatalogLinkListing[]
   savedBy           SavedListing[]
   inquiries         Inquiry[]
@@ -147,6 +148,31 @@ model Listing {
   blocked           Boolean           @default(false)
 
   @@index([city, area, purpose, propertyType, status])
+}
+
+model HomepageSection {
+  id        String                 @id @default(cuid())
+  title     String
+  subtitle  String?
+  sortOrder Int                    @default(0)
+  isActive  Boolean                @default(true)
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  items     HomepageSectionItem[]
+}
+
+model HomepageSectionItem {
+  id        String          @id @default(cuid())
+  sectionId String
+  section   HomepageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing         @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  label     String?
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now())
+
+  @@unique([sectionId, listingId])
+  @@index([sectionId, sortOrder])
 }
 
 model Photo {

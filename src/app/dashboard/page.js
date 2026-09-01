@@ -15,6 +15,9 @@ export default function Dashboard() {
   const [linkTitle, setLinkTitle] = useState("");
   const [savedListings, setSavedListings] = useState([]);
   const [inquiries, setInquiries] = useState([]);
+  const [recommendationSections, setRecommendationSections] = useState([]);
+  const [homepageListings, setHomepageListings] = useState([]);
+  const [recommendationForm, setRecommendationForm] = useState({ title: "", subtitle: "", listingIds: "" });
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -39,6 +42,14 @@ export default function Dashboard() {
       fetch("/api/catalog-links")
         .then((r) => r.json())
         .then((d) => setLinks(d.links || []));
+    }
+    if (user.role === "SUPER_ADMIN") {
+      fetch("/api/admin/homepage")
+        .then((r) => r.json())
+        .then((d) => {
+          setRecommendationSections(d.sections || []);
+          setHomepageListings(d.listings || []);
+        });
     }
     if (["OWNER", "BROKER"].includes(user.role)) {
       fetch("/api/listings?ownerId=me")
@@ -102,6 +113,51 @@ export default function Dashboard() {
     });
     const data = await res.json();
     if (res.ok) setUser(data.user);
+  }
+
+  async function createRecommendationSection() {
+    const listingIds = recommendationForm.listingIds
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    if (!recommendationForm.title.trim()) {
+      alert("Section title is required.");
+      return;
+    }
+    if (listingIds.length === 0) {
+      alert("Add at least one approved listing ID.");
+      return;
+    }
+
+    const res = await fetch("/api/admin/homepage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: recommendationForm.title,
+        subtitle: recommendationForm.subtitle,
+        listingIds,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Unable to create recommendation block");
+      return;
+    }
+
+    setRecommendationSections((items) => [data.section, ...items]);
+    setRecommendationForm({ title: "", subtitle: "", listingIds: "" });
+  }
+
+  async function removeRecommendationSection(sectionId) {
+    const res = await fetch("/api/admin/homepage", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sectionId }),
+    });
+    if (res.ok) {
+      setRecommendationSections((items) => items.filter((section) => section.id !== sectionId));
+    }
   }
 
   if (user === undefined)
@@ -326,6 +382,96 @@ export default function Dashboard() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {user.role === "SUPER_ADMIN" && (
+        <section className="mb-12 rounded-3xl border border-ink/10 bg-white p-6 shadow-sm">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="font-data text-xs uppercase tracking-[.16em] text-gold">Homepage control</p>
+              <h2 className="mt-2 font-display text-2xl">Recommendation blocks</h2>
+            </div>
+          </div>
+
+          <div className="mb-6 grid gap-4 rounded-2xl border border-ink/10 bg-paper-dim p-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink-soft">Section title</label>
+              <input
+                value={recommendationForm.title}
+                onChange={(e) => setRecommendationForm((prev) => ({ ...prev, title: e.target.value }))}
+                className="w-full rounded-xl border border-ink/10 bg-white px-3 py-2.5 text-sm"
+                placeholder="Trending homes in Gurgaon"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink-soft">Subtitle</label>
+              <input
+                value={recommendationForm.subtitle}
+                onChange={(e) => setRecommendationForm((prev) => ({ ...prev, subtitle: e.target.value }))}
+                className="w-full rounded-xl border border-ink/10 bg-white px-3 py-2.5 text-sm"
+                placeholder="Handpicked for you"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-ink-soft">Approved listing IDs</label>
+              <textarea
+                rows={3}
+                value={recommendationForm.listingIds}
+                onChange={(e) => setRecommendationForm((prev) => ({ ...prev, listingIds: e.target.value }))}
+                className="w-full rounded-xl border border-ink/10 bg-white px-3 py-2.5 text-sm"
+                placeholder="clx123, clx456, clx789"
+              />
+              <p className="mt-2 text-xs text-ink-soft">Use approved listing IDs. Each section will show on the homepage in the order it is created.</p>
+            </div>
+            <div className="md:col-span-2">
+              <button
+                onClick={createRecommendationSection}
+                className="rounded-full bg-moss px-5 py-2.5 text-sm font-semibold text-white"
+              >
+                Save recommendation block
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {recommendationSections.length === 0 && (
+              <p className="text-sm text-ink-soft">No recommendation blocks yet. Add one to populate homepage sections.</p>
+            )}
+            {recommendationSections.map((section) => (
+              <div key={section.id} className="rounded-2xl border border-ink/10 bg-paper p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-moss">{section.subtitle || "Recommendation section"}</p>
+                    <h3 className="mt-1 font-display text-xl">{section.title}</h3>
+                  </div>
+                  <button onClick={() => removeRecommendationSection(section.id)} className="rounded-full border border-ink/15 px-3 py-1.5 text-xs font-semibold text-ink-soft">Delete</button>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(section.items || []).map((item) => (
+                    <span key={item.id} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-ink-soft ring-1 ring-ink/10">
+                      {item.listing?.title || item.listingId}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {homepageListings.length > 0 && (
+            <div className="mt-6">
+              <h3 className="mb-3 font-display text-xl">Approved listings</h3>
+              <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+                {homepageListings.map((listing) => (
+                  <div key={listing.id} className="rounded-xl border border-ink/10 bg-white p-3 text-sm">
+                    <p className="font-semibold">{listing.title}</p>
+                    <p className="mt-1 text-ink-soft">{listing.area}, {listing.city}</p>
+                    <p className="mt-2 font-data text-[11px] uppercase tracking-wide text-moss">ID: {listing.id}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
