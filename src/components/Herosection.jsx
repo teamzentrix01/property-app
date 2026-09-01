@@ -64,11 +64,10 @@ export default function HeroSection() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`rounded-full px-6 py-2.5 text-sm font-semibold transition-all ${
-                  activeTab === tab
+                className={`rounded-full px-6 py-2.5 text-sm font-semibold transition-all ${activeTab === tab
                     ? "bg-[#111827] text-white shadow-md"
                     : "text-gray-600 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 {tab}
               </button>

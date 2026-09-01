@@ -163,73 +163,69 @@ export default function Navbar() {
           </div>
 
           {/* ================= SEARCH BAR - SHOWS WHEN NOT SCROLLED ================= */}
-          {!scrolled && (
-            <div className="py-4 hidden lg:block border-t border-amber-200">
-              {/* Search Tabs */}
-              <div className="mb-3 flex items-center gap-6">
-                {["Cities", "Apartments", "Branded", "Luxury", "Commercial"].map((tab, idx) => (
-                  <button
-                    key={tab}
-                    className={`pb-2 text-xs font-semibold transition ${
-                      idx === 0
-                        ? "border-b-2 border-red-500 text-red-600"
-                        : "text-amber-900 hover:text-red-600"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+         <div className="py-4 hidden lg:block border-t border-amber-200">
+  {/* Search Form */}
+  <form
+    action="/listings"
+    className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]"
+  >
+    {/* Location */}
+    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
+      <MapPin className="text-red-600 shrink-0" size={18} />
 
-              {/* Search Form */}
-              <form action="/listings" className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]">
-                {/* Location */}
-                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
-                  <MapPin className="text-red-600 shrink-0" size={18} />
-                  <input
-                    name="location"
-                    type="text"
-                    placeholder="Search City, Locality or Project..."
-                    className="text-xs font-semibold text-amber-900 bg-transparent outline-none placeholder:text-gray-400 w-full"
-                  />
-                </div>
+      <input
+        name="location"
+        type="text"
+        placeholder="Search City, Locality or Project..."
+        className="text-xs font-semibold text-amber-900 bg-transparent outline-none placeholder:text-gray-400 w-full"
+      />
+    </div>
 
-                {/* Property Type */}
-                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
-                  <span className="text-sm font-bold text-red-600 shrink-0">🏢</span>
-                  <select className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full">
-                    <option>All Types</option>
-                    <option>Apartments</option>
-                    <option>Villas</option>
-                    <option>Commercial</option>
-                  </select>
-                  <ChevronDown size={12} className="text-amber-700 shrink-0" />
-                </div>
+    {/* Property Type */}
+    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
+      <span className="text-sm font-bold text-red-600 shrink-0">🏢</span>
 
-                {/* Budget */}
-                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
-                  <span className="text-sm font-bold text-red-600 shrink-0">₹</span>
-                  <select className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full">
-                    <option>Any Budget</option>
-                    <option>Below ₹50 Lakh</option>
-                    <option>₹50L - ₹1 Cr</option>
-                    <option>₹1 Cr - ₹5 Cr</option>
-                    <option>Above ₹5 Cr</option>
-                  </select>
-                  <ChevronDown size={12} className="text-amber-700 shrink-0" />
-                </div>
+      <select
+        name="propertyType"
+        className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full"
+      >
+        <option>All Types</option>
+        <option>Apartments</option>
+        <option>Villas</option>
+        <option>Commercial</option>
+      </select>
 
-                {/* Search Button */}
-                <button
-                  type="submit"
-                  className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 font-semibold text-white text-xs hover:from-red-600 hover:to-red-700 transition"
-                >
-                  <Search size={16} />
-                  Search
-                </button>
-              </form>
-            </div>
-          )}
+      <ChevronDown size={12} className="text-amber-700 shrink-0" />
+    </div>
+
+    {/* Budget */}
+    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
+      <span className="text-sm font-bold text-red-600 shrink-0">₹</span>
+
+      <select
+        name="budget"
+        className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full"
+      >
+        <option>Any Budget</option>
+        <option>Below ₹50 Lakh</option>
+        <option>₹50L - ₹1 Cr</option>
+        <option>₹1 Cr - ₹5 Cr</option>
+        <option>Above ₹5 Cr</option>
+      </select>
+
+      <ChevronDown size={12} className="text-amber-700 shrink-0" />
+    </div>
+
+    {/* Search Button */}
+    <button
+      type="submit"
+      className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 font-semibold text-white text-xs hover:from-red-600 hover:to-red-700 transition"
+    >
+      <Search size={16} />
+      Search
+    </button>
+  </form>
+</div>
 
         </div>
 
