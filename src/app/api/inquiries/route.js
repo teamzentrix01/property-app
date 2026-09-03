@@ -17,7 +17,7 @@ export async function POST(req) {
   const body = await req.json().catch(() => null);
   const message = text(body?.message, { min: 5, max: 1000, required: true });
   if (!message || !body?.listingId) return NextResponse.json({ error: "Add a valid message" }, { status: 400 });
-  const listing = await prisma.listing.findFirst({ where: { id: body.listingId, status: "APPROVED", blocked: false }, include: { owner: { select: { email: true } } } });
+  const listing = await prisma.listing.findFirst({ where: { id: body.listingId, status: { in: ["APPROVED", "ACTIVE"] }, blocked: false }, include: { owner: { select: { email: true } } } });
   if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
   if (listing.ownerId === auth.user.id) return NextResponse.json({ error: "You cannot enquire on your own listing" }, { status: 400 });
   const inquiry = await prisma.inquiry.create({ data: { message, listingId: listing.id, senderId: auth.user.id, recipientId: listing.ownerId } });

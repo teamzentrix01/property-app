@@ -7,7 +7,7 @@ export async function getApprovedListings(where = {}) {
   }
 
   const listings = await prisma.listing.findMany({
-    where: { status: "APPROVED", ...where },
+    where: { status: { in: ["APPROVED", "ACTIVE"] }, ...where },
     include: { photos: true, owner: { select: { verified: true } } },
     orderBy: { createdAt: "desc" },
     take: 24,
@@ -45,7 +45,7 @@ export async function getHomepageSections() {
   const [sections, fallbackListings] = await Promise.all([
     sectionQuery,
     prisma.listing.findMany({
-      where: { status: "APPROVED" },
+      where: { status: { in: ["APPROVED", "ACTIVE"] } },
       include: { photos: true, owner: { select: { verified: true } } },
       orderBy: { createdAt: "desc" },
       take: 8,

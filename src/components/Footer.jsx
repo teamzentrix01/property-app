@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   MapPin,
@@ -18,7 +18,7 @@ const quickLinks = [
   { name: "About Us", href: "/about-us" },
   { name: "Properties", href: "/properties" },
   { name: "Projects", href: "/projects" },
-  { name: "Post Property", href: "/post-property" },
+  { name: "Post Property", href: "/listings/new" },
   { name: "Contact Us", href: "/contact-us" },
 ];
 
@@ -56,6 +56,8 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const [user, setUser] = useState(undefined);
+  useEffect(() => { fetch("/api/auth/me").then((response) => response.ok ? response.json() : { user: null }).then((data) => setUser(data.user)).catch(() => setUser(null)); }, []);
   return (
     <footer className="w-full bg-[#111111] text-white">
 
@@ -206,7 +208,7 @@ export default function Footer() {
 
             <div className="mt-6 space-y-3.5">
 
-              {quickLinks.map((link) => (
+              {quickLinks.filter((link) => user || link.name !== "Post Property").map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}

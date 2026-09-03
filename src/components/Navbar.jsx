@@ -123,14 +123,7 @@ export default function Navbar() {
                 <ChevronDown size={12} />
               </button>
 
-              <Link
-                href={user ? "/listings/new" : "/login?next=/listings/new"}
-                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition whitespace-nowrap"
-              >
-                <Plus size={14} />
-                Post Property
-                <span className="ml-1 bg-red-700 px-1.5 py-0.5 rounded text-[8px]">FREE</span>
-              </Link>
+              {user && <Link href="/listings/new" className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition whitespace-nowrap"><Plus size={14} />Post Property<span className="ml-1 bg-red-700 px-1.5 py-0.5 rounded text-[8px]">FREE</span></Link>}
 
               {user ? (
                 <>
@@ -308,14 +301,7 @@ export default function Navbar() {
                   All Projects
                 </Link>
 
-                <Link
-                  href={user ? "/listings/new" : "/login?next=/listings/new"}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg"
-                  onClick={() => setMobileMenu(false)}
-                >
-                  <Plus size={14} />
-                  Post Property FREE
-                </Link>
+                {user && <Link href="/listings/new" className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg" onClick={() => setMobileMenu(false)}><Plus size={14} />Post Property FREE</Link>}
 
                 {user ? (
                   <>
@@ -394,15 +380,7 @@ export default function Navbar() {
         </Link>
 
         {/* Post */}
-        <Link
-          href="/listings/new"
-          className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
-        >
-          <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
-            <Plus size={27} />
-          </span>
-          <span>Post</span>
-        </Link>
+        {user && <Link href="/listings/new" className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"><span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg"><Plus size={27} /></span><span>Post</span></Link>}
 
         {/* Saved */}
         <Link

@@ -18,5 +18,5 @@ export async function GET(req) {
   ]);
   const roles = Object.fromEntries(roleGroups.map((row) => [row.role, row._count._all]));
   const statuses = Object.fromEntries(statusGroups.map((row) => [row.status, row._count._all]));
-  return NextResponse.json({ metrics: { totalUsers, buyers: roles.BUYER || 0, owners: roles.OWNER || 0, brokers: roles.BROKER || 0, admins: (roles.AREA_ADMIN || 0) + (roles.SUPER_ADMIN || 0), totalListings, activeListings: statuses.APPROVED || 0, pendingListings: statuses.PENDING || 0, rejectedListings: statuses.REJECTED || 0, totalInquiries }, users, listings, audits, pagination: { page, take, total: totalListings, pages: Math.max(1, Math.ceil(totalListings / take)) } });
+  return NextResponse.json({ metrics: { totalUsers, buyers: roles.BUYER || 0, owners: roles.OWNER || 0, brokers: roles.BROKER || 0, admins: (roles.AREA_ADMIN || 0) + (roles.SUPER_ADMIN || 0), totalListings, activeListings: (statuses.APPROVED || 0) + (statuses.ACTIVE || 0), pendingListings: (statuses.PENDING || 0) + (statuses.UNDER_REVIEW || 0), rejectedListings: statuses.REJECTED || 0, totalInquiries }, users, listings, audits, pagination: { page, take, total: totalListings, pages: Math.max(1, Math.ceil(totalListings / take)) } });
 }

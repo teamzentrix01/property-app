@@ -12,9 +12,6 @@ import PopularBuilders from "@/components/PopularBuilders";
 import BHKLifestyle from "@/components/BHKLifestyle";
 import WhyChooseBhoomi from "@/components/WhyChooseBhoomi";
 import CustomerTestimonials from "@/components/CustomerTestimonials";
-import Footer from "@/components/Footer";
-
-import CitiesPage from "@/app/cities/page.jsx";
 
 export default function Page() {
   return (
@@ -32,10 +29,6 @@ export default function Page() {
       <BHKLifestyle/>
       <WhyChooseBhoomi/>
       <CustomerTestimonials/>
-      <Footer/>
-
-      <CitiesPage />
-
     </main>
   );
 }

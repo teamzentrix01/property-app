@@ -37,7 +37,7 @@ export async function GET() {
       },
     }),
     prisma.listing.findMany({
-      where: { status: "APPROVED" },
+      where: { status: { in: ["APPROVED", "ACTIVE"] } },
       orderBy: { createdAt: "desc" },
       take: 200,
       select: {
@@ -89,7 +89,7 @@ export async function POST(req) {
   const validListings = await prisma.listing.findMany({
     where: {
       id: { in: listingIds },
-      status: "APPROVED",
+      status: { in: ["APPROVED", "ACTIVE"] },
     },
     select: { id: true },
   });

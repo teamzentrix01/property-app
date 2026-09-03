@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   MapPin,
@@ -14,6 +14,11 @@ export default function HeroSection() {
   const [activeTab, setActiveTab] = useState("Buy");
   const [propertyType, setPropertyType] = useState("Property Type");
   const [location, setLocation] = useState("");
+  const [user, setUser] = useState(undefined);
+
+  useEffect(() => {
+    fetch("/api/auth/me").then((response) => response.ok ? response.json() : { user: null }).then((data) => setUser(data.user)).catch(() => setUser(null));
+  }, []);
 
   return (
     <section className="relative min-h-[650px] w-full overflow-hidden">
@@ -154,9 +159,7 @@ export default function HeroSection() {
             Resale Properties
           </button>
 
-          <button className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-lg transition hover:bg-[#e5a92f] hover:text-white">
-            Post Property FREE
-          </button>
+          {user && <button onClick={() => window.location.assign("/listings/new")} className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-lg transition hover:bg-[#e5a92f] hover:text-white">Post Property FREE</button>}
         </div>
 
         {/* Trust Stats */}

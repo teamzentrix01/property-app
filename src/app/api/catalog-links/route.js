@@ -35,7 +35,7 @@ export async function POST(req) {
 
   // Only allow linking the broker's own listings
   const owned = await prisma.listing.findMany({
-    where: { id: { in: listingIds }, ownerId: user.id, status: "APPROVED" },
+    where: { id: { in: listingIds }, ownerId: user.id, status: { in: ["APPROVED", "ACTIVE"] } },
     select: { id: true },
   });
   if (owned.length !== listingIds.length) {

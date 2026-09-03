@@ -24,7 +24,7 @@ function cloudinaryConfig() {
 }
 
 export async function POST(req) {
-  const auth = await requireUser(["OWNER", "BROKER"]);
+  const auth = await requireUser();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const formData = await req.formData().catch(() => null);
   if (!formData) return NextResponse.json({ error: "Invalid upload form" }, { status: 400 });

@@ -12,7 +12,7 @@ export default async function CatalogPage({ params }) {
       where: { slug },
       include: {
         broker: { select: { name: true, phone: true, brokerAgency: true } },
-        listings: { where: { listing: { status: "APPROVED" } }, include: { listing: { include: { photos: true } } } },
+        listings: { where: { listing: { status: { in: ["APPROVED", "ACTIVE"] } } }, include: { listing: { include: { photos: true } } } },
       },
     });
   } catch {

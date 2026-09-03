@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/formatters";
 import PropertyActions from "@/components/PropertyActions";
 import PropertyGallery from "@/components/PropertyGallery";
 import Link from "next/link";
+import StatusBadge, { statusLabel } from "@/components/StatusBadge";
 const LABELS = {
   sizeValue: "Area",
   sizeUnit: "Area unit",
@@ -111,6 +112,7 @@ export default async function ListingDetail({ params }) {
                 {unitPrice && <p className="mt-1 text-right text-xs font-semibold text-moss-deep">₹{Math.round(unitPrice).toLocaleString("en-IN")} / {listing.sizeUnit || "sq ft"}</p>}
               </div>
             </div>
+            <StatusTimeline status={listing.status} rejectionReason={listing.rejectionReason} />
             <div className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-ink/8 bg-ink/8 sm:grid-cols-4">
               {[
                 ["Property type", listing.propertyType.replaceAll("_", " ")],
@@ -181,7 +183,7 @@ export default async function ListingDetail({ params }) {
             {isOwner ? <>
               <p className="text-xs font-bold uppercase tracking-widest text-moss">Your property</p>
               <h2 className="mt-2 font-display text-2xl">Manage this listing</h2>
-              <div className="mt-5 rounded-2xl bg-paper-dim p-4"><p className="text-xs uppercase tracking-wide text-ink-soft">Current status</p><p className="mt-1 font-semibold capitalize">{listing.status.toLowerCase()}</p>{listing.rejectionReason && <p className="mt-2 text-xs text-red-700">{listing.rejectionReason}</p>}</div>
+              <div className="mt-5 rounded-2xl bg-paper-dim p-4"><p className="text-xs uppercase tracking-wide text-ink-soft">Current status</p><div className="mt-2"><StatusBadge status={listing.status} /></div>{listing.rejectionReason && <p className="mt-2 text-xs text-red-700">Reason for rejection: {listing.rejectionReason}</p>}</div>
               <Link href={`/listings/${listing.id}/edit`} className="mt-4 block rounded-xl bg-moss py-3 text-center text-sm font-bold text-white">Edit property details</Link>
               <Link href="/dashboard" className="mt-2 block rounded-xl border border-ink/15 py-3 text-center text-sm font-semibold">View enquiries & dashboard</Link>
               <p className="mt-4 text-center text-xs text-ink-soft">Update incomplete details to improve buyer response.</p>
@@ -237,4 +239,16 @@ function Block({ title, children }) {
       {children}
     </section>
   );
+}
+
+function StatusTimeline({ status, rejectionReason }) {
+  const steps = status === "DRAFT"
+    ? ["Draft"]
+    : status === "REJECTED"
+      ? ["Submitted", "Pending", "Under Review", "Rejected"]
+      : status === "INACTIVE"
+        ? ["Submitted", "Pending", "Under Review", "Approved", "Active", "Inactive"]
+        : ["Submitted", "Pending", "Under Review", "Approved", "Active"];
+  const statusIndex = { DRAFT: 0, PENDING: 1, UNDER_REVIEW: 2, APPROVED: 3, ACTIVE: 4, REJECTED: 3, INACTIVE: 5 }[status] ?? 0;
+  return <section className="mt-8 rounded-2xl border border-ink/10 bg-white p-5"><div className="flex items-center justify-between gap-3"><h2 className="font-display text-2xl">Listing status</h2><StatusBadge status={status} /></div><div className="mt-5 flex flex-wrap items-center gap-2">{steps.map((step, index) => <div key={step} className="flex items-center gap-2"><span className={`rounded-full px-3 py-2 text-xs font-semibold ${index === statusIndex ? "bg-ink text-white" : index < statusIndex ? "bg-moss/10 text-moss-deep" : "bg-paper-dim text-ink-soft"}`}>{step}</span>{index < steps.length - 1 && <span className="text-ink-soft">↓</span>}</div>)}</div>{status === "REJECTED" && rejectionReason && <p className="mt-4 text-sm text-red-700">Reason for rejection: {rejectionReason}</p>}</section>;
 }

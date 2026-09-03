@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AdminOverview from "@/components/AdminOverview";
 import { CONTENT_CATEGORIES } from "@/lib/contentCategories";
+import StatusBadge, { statusLabel } from "@/components/StatusBadge";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -20,6 +21,8 @@ export default function Dashboard() {
   const [homepageListings, setHomepageListings] = useState([]);
   const [recommendationForm, setRecommendationForm] = useState({ title: "", subtitle: "", listingIds: "" });
   const [listingCategories, setListingCategories] = useState({});
+  const [statusSaving, setStatusSaving] = useState({});
+  const [statusErrors, setStatusErrors] = useState({});
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -38,7 +41,11 @@ export default function Dashboard() {
     if (["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role)) {
       fetch("/api/admin/pending-listings")
         .then((r) => r.json())
-        .then((d) => setPending(d.listings || []));
+        .then((d) => {
+          const listings = d.listings || [];
+          setPending(listings);
+          setListingCategories(Object.fromEntries(listings.map((listing) => [listing.id, (listing.categories || []).map((item) => item.category)])));
+        });
     }
     if (user.role === "BROKER") {
       fetch("/api/catalog-links")
@@ -53,7 +60,7 @@ export default function Dashboard() {
           setHomepageListings(d.listings || []);
         });
     }
-    if (["OWNER", "BROKER"].includes(user.role)) {
+    if (user) {
       fetch("/api/listings?ownerId=me")
         .then((r) => r.json())
         .then((d) => setMyListings(d.listings || []));
@@ -66,6 +73,30 @@ export default function Dashboard() {
     setMyListings((ls) => ls.filter((l) => l.id !== id));
   }
 
+  async function changeListingStatus(listing, status) {
+    const previousStatus = listing.status;
+    if (status === previousStatus) return;
+    if (status === "REJECTED") {
+      const rejectionReason = prompt("Why is this listing being rejected?");
+      if (rejectionReason === null) return;
+      listing = { ...listing, rejectionReason };
+    }
+    setStatusErrors((current) => ({ ...current, [listing.id]: "" }));
+    setStatusSaving((current) => ({ ...current, [listing.id]: true }));
+    setMyListings((items) => items.map((item) => item.id === listing.id ? { ...item, status, rejectionReason: listing.rejectionReason } : item));
+    const response = await fetch(`/api/listings/${listing.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, rejectionReason: listing.rejectionReason }),
+    });
+    const data = await response.json().catch(() => ({}));
+    setStatusSaving((current) => ({ ...current, [listing.id]: false }));
+    if (!response.ok) {
+      setMyListings((items) => items.map((item) => item.id === listing.id ? { ...item, status: previousStatus } : item));
+      setStatusErrors((current) => ({ ...current, [listing.id]: data.error || "Could not update status" }));
+    }
+  }
+
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/");
@@ -75,13 +106,16 @@ export default function Dashboard() {
   async function approve(id, status) {
     const rejectionReason = status === "REJECTED" ? prompt("Why is this listing being rejected? The seller will see this message.") : undefined;
     if (status === "REJECTED" && rejectionReason === null) return;
-    await fetch(`/api/listings/${id}`, {
+    const response = await fetch(`/api/listings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, rejectionReason, categories: listingCategories[id] || [] }),
     });
-    setPending((p) => p.filter((l) => l.id !== id));
-    setListingCategories((current) => { const next = { ...current }; delete next[id]; return next; });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      return window.alert(data.error || "Could not update this listing");
+    }
+    setPending((items) => items.map((item) => item.id === id ? { ...item, status, rejectionReason: status === "REJECTED" ? rejectionReason : item.rejectionReason } : item));
   }
 
   function toggleCategory(listingId, category) {
@@ -296,7 +330,7 @@ export default function Dashboard() {
         </section>
       )}
 
-      {["OWNER", "BROKER"].includes(user.role) && (
+      {user && !["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role) && (
         <section className="mb-12">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-xl">Your listings</h2>
@@ -321,25 +355,17 @@ export default function Dashboard() {
                 key={l.id}
                 className="bg-paper text-ink rounded-xl p-4"
               >
-                <Link href={`/listings/${l.id}/edit`} className="min-w-0 flex-1">
-                  <p className="font-medium">{l.title}</p>
+                <div role="link" tabIndex={0} onClick={() => router.push(`/listings/${l.id}/edit`)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); router.push(`/listings/${l.id}/edit`); } }} className="min-w-0 flex-1 cursor-pointer">
+                  <div className="flex flex-wrap items-center gap-2"><p className="font-medium">{l.title}</p><StatusSelect listing={l} saving={!!statusSaving[l.id]} onChange={changeListingStatus} /></div>
+                  {statusErrors[l.id] && <p className="mt-1 text-xs text-red-700">{statusErrors[l.id]}</p>}
                   <p className="font-data text-xs text-ink-soft">
-                    {l.area}, {l.city} ·{" "}
-                    <span
-                      className={
-                        l.status === "APPROVED"
-                          ? "text-moss-deep"
-                          : l.status === "REJECTED"
-                            ? "text-red-700"
-                            : "text-gold"
-                      }
-                    >
-                      {l.status}
-                    </span>
+                    {l.area}, {l.city}
                   </p>
                   {l.rejectionReason && <p className="mt-2 max-w-lg text-xs text-red-700">Reason: {l.rejectionReason}</p>}
+                  {l.categories?.length > 0 && <div className="mt-2 flex flex-wrap gap-1.5">{l.categories.map((item) => <span key={item.category} className="rounded-full bg-moss/10 px-2 py-1 text-[10px] font-semibold text-moss-deep">{CONTENT_CATEGORIES.find((category) => category.value === item.category)?.label || item.category}</span>)}</div>}
+                  {l.categories?.length > 0 && <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">{l.categories.map((item) => { const category = CONTENT_CATEGORIES.find((entry) => entry.value === item.category); return category && <Link key={item.category} href={`/categories/${category.slug}`} className="rounded-xl border border-moss/20 bg-white px-3 py-2 text-center text-xs font-semibold text-moss-deep hover:bg-moss/10">View {category.label}</Link>; })}</div>}
                   <p className="mt-2 text-xs font-semibold text-moss-deep">Tap to edit →</p>
-                </Link>
+                </div>
                 <div className="ml-3 flex gap-2">{l.status === "REJECTED" && <button onClick={() => resubmit(l.id)} className="rounded-full bg-moss px-3 py-1.5 text-sm text-white">Resubmit</button>}<button onClick={() => deleteListing(l.id)} className="border border-ink/20 text-sm px-3 py-1.5 rounded-full">Delete</button></div>
               </li>
             ))}
@@ -520,21 +546,12 @@ export default function Dashboard() {
                   </p>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 border-t border-ink/10 pt-3">
-                  {CONTENT_CATEGORIES.map((category) => <label key={category.value} className="flex cursor-pointer items-center gap-1.5 text-xs text-ink-soft"><input type="checkbox" checked={(listingCategories[l.id] || []).includes(category.value)} onChange={() => toggleCategory(l.id, category.value)} /> {category.label}</label>)}
+                  {CONTENT_CATEGORIES.map((category) => <label key={category.value} className="flex cursor-pointer items-center gap-1.5 text-xs text-ink-soft"><input type="checkbox" checked={(listingCategories[l.id] || l.categories?.map((item) => item.category) || []).includes(category.value)} onChange={() => toggleCategory(l.id, category.value)} /> {category.label}</label>)}
                 </div>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => approve(l.id, "APPROVED")}
-                    className="bg-moss text-paper text-sm px-3 py-1.5 rounded-full"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => approve(l.id, "REJECTED")}
-                    className="border border-ink/20 text-sm px-3 py-1.5 rounded-full"
-                  >
-                    Reject
-                  </button>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <select value={l.status} onChange={(event) => approve(l.id, event.target.value)} className="rounded-xl border border-ink/15 bg-white px-3 py-2 text-xs font-semibold">
+                    {["PENDING", "UNDER_REVIEW", "APPROVED", "ACTIVE", "REJECTED", "INACTIVE"].map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
+                  </select>
                 </div>
               </li>
             ))}
@@ -543,4 +560,19 @@ export default function Dashboard() {
       )}
     </main>
   );
+}
+
+function StatusSelect({ listing, saving, onChange }) {
+  const colors = {
+    PENDING: "border-yellow-200 bg-yellow-100 text-yellow-800",
+    UNDER_REVIEW: "border-blue-200 bg-blue-100 text-blue-800",
+    APPROVED: "border-green-200 bg-green-100 text-green-800",
+    REJECTED: "border-red-200 bg-red-100 text-red-700",
+    ACTIVE: "border-green-300 bg-green-200 text-green-900",
+    INACTIVE: "border-gray-300 bg-gray-200 text-gray-700",
+  };
+  const statuses = ["PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED", "ACTIVE", "INACTIVE"];
+  return <select aria-label={`Change status for ${listing.title}`} value={listing.status} disabled={saving} onClick={(event) => event.stopPropagation()} onChange={(event) => onChange(listing, event.target.value)} className={`rounded-full border px-3 py-1 text-xs font-bold outline-none ${colors[listing.status] || "border-gray-200 bg-gray-100 text-gray-700"}`}>
+    {statuses.map((status) => <option key={status} value={status}>{statusLabel(status)}{saving && status === listing.status ? "..." : ""}</option>)}
+  </select>;
 }

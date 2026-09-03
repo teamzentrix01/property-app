@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/serverAuth";
-import { enumValue, number, PURPOSES, PROPERTY_TYPES, phone, text } from "@/lib/validation";
+import { enumValue, number, PURPOSES, PROPERTY_TYPES, text, validateListingRequiredFields } from "@/lib/validation";
 import { notifyEmail } from "@/lib/mailer";
 import { categoryFromSlug } from "@/lib/contentCategories";
-
-const MAX_PHOTOS = 12;
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -38,24 +36,25 @@ export async function GET(req) {
     if ((minPrice && min === null) || (maxPrice && max === null) || (min !== undefined && max !== undefined && min > max)) return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
     where.price = { ...(min !== undefined ? { gte: min } : {}), ...(max !== undefined ? { lte: max } : {}) };
   }
-  const listings = await prisma.listing.findMany({ where, include: { photos: true }, orderBy: { createdAt: "desc" }, take: 60 });
+  const listings = await prisma.listing.findMany({ where, include: { photos: true, categories: true }, orderBy: { createdAt: "desc" }, take: 60 });
   return NextResponse.json({ listings });
 }
 
 export async function POST(req) {
-  const auth = await requireUser(["OWNER", "BROKER"]);
+  const auth = await requireUser();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-  const title = text(body.title, { min: 5, max: 160, required: true });
-  const city = text(body.city, { min: 2, max: 80, required: true });
-  const area = text(body.area, { min: 2, max: 80, required: true });
-  const contactNumber = phone(body.contactNumber);
-  const price = number(body.price, { min: 1, max: 100000000000 });
-  const purpose = enumValue(body.purpose, PURPOSES);
-  const propertyType = enumValue(body.propertyType, PROPERTY_TYPES);
-  const photos = Array.isArray(body.photos) ? [...new Set(body.photos)] : [];
-  if (!title || !city || !area || !contactNumber || price === null || !purpose || !propertyType || !photos.length || photos.length > MAX_PHOTOS || photos.some((url) => typeof url !== "string" || !url.startsWith("https://res.cloudinary.com/dwvfedqrb/image/upload/"))) return NextResponse.json({ error: "Provide valid required listing fields and 1–12 uploaded photos" }, { status: 400 });
+  const normalized = validateListingRequiredFields(body, { validatePhotoUrls: true });
+  if (normalized.errors.length) return NextResponse.json({ error: normalized.errors[0], errors: normalized.errors }, { status: 400 });
+  const { fields } = normalized;
+  const { title, city, area, contactNumber, price, purpose, propertyType } = fields;
+  const photos = [...new Set(fields.photos)];
+  const allowedCategories = new Set(["CITIES", "APARTMENT", "LUXURY", "BRANDED", "VILLAS", "COMMERCIAL", "RENTAL"]);
+  const categories = Array.isArray(body.categories)
+    ? [...new Set(body.categories.map((category) => String(category).trim().toUpperCase()))]
+    : [];
+  if (categories.some((category) => !allowedCategories.has(category))) return NextResponse.json({ error: "One or more selected categories are invalid" }, { status: 400 });
   const optionalText = (key, max = 500) => text(body[key], { max });
   const optionalNumber = (key, options) => body[key] === undefined || body[key] === "" ? undefined : number(body[key], options);
   const data = {
@@ -75,7 +74,7 @@ export async function POST(req) {
     if (body[key]) data[key] = enumValue(body[key], choices);
   }
   if (Object.values(data).some((value) => value === null)) return NextResponse.json({ error: "One or more optional fields are invalid" }, { status: 400 });
-  const listing = await prisma.listing.create({ data: { ...data, photos: { create: photos.map((url) => ({ url })) } }, include: { photos: true } });
+  const listing = await prisma.listing.create({ data: { ...data, photos: { create: photos.map((url) => ({ url })) }, categories: { create: categories.map((category) => ({ category })) } }, include: { photos: true, categories: true } });
   const origin = new URL(req.url).origin;
   notifyEmail({ to: auth.user.email, subject: "Your property is under review", heading: "Listing submitted", message: `“${listing.title}” has been submitted for review. We will notify you when its status changes.`, action: { label: "View dashboard", url: `${origin}/dashboard` } });
   const reviewers = await prisma.user.findMany({ where: { OR: [{ role: "SUPER_ADMIN" }, { role: "AREA_ADMIN", adminArea: listing.city }] }, select: { email: true } });

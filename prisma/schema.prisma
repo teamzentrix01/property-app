@@ -36,9 +36,13 @@ enum PropertyType {
 }
 
 enum ListingStatus {
+  DRAFT
   PENDING
+  UNDER_REVIEW
   APPROVED
+  ACTIVE
   REJECTED
+  INACTIVE
   EXPIRED
 }
 
@@ -105,7 +109,7 @@ model Listing {
   purpose           Purpose
   propertyType      PropertyType
   postedBy          Role              // OWNER or BROKER, copied from user at creation time
-  status            ListingStatus     @default(PENDING)
+  status            ListingStatus     @default(DRAFT)
 
   // Mandatory
   city              String

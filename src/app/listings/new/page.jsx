@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
+import { PURPOSES, PROPERTY_TYPES, validateListingRequiredFields } from "@/lib/validation";
+import PropertyCategorySelector from "@/components/PropertyCategorySelector";
 const initial = {
   title: "",
   propertyType: "",
@@ -38,6 +40,7 @@ export default function NewListingPage() {
   const [locationMessage, setLocationMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -46,17 +49,13 @@ export default function NewListingPage() {
       .then(({ user }) => {
         if (!active) return;
         if (!user) {
-          router.replace("/login?next=/listings/new");
-          return;
-        }
-        if (!["OWNER", "BROKER"].includes(user.role)) {
-          router.replace("/dashboard");
+          router.replace("/login?next=/listings/new&redirect=/listings/new");
           return;
         }
         setAccess(true);
       })
       .catch(() => {
-        if (active) router.replace("/login?next=/listings/new");
+        if (active) router.replace("/login?next=/listings/new&redirect=/listings/new");
       });
     return () => { active = false; };
   }, [router]);
@@ -100,19 +99,30 @@ export default function NewListingPage() {
   }
   function next() {
     setError("");
-    if (step === 1 && (!form.propertyType || !form.title))
-      return setError("Choose a property type and add a listing title.");
-    if (step === 2 && (!form.city || !form.area))
-      return setError("Add the city and locality.");
-    if (step === 3 && (!form.price || !form.contactNumber))
-      return setError("Add the price and contact number.");
+    if (step === 1) {
+      if (!form.title.trim()) return setError("Title is required");
+      if (form.title.trim().length < 5) return setError("Title must be at least 5 characters");
+      if (!PROPERTY_TYPES.includes(form.propertyType)) return setError("Property type is required");
+      if (!PURPOSES.includes(purpose)) return setError("Purpose is required");
+    }
+    if (step === 2) {
+      if (!form.city.trim()) return setError("City is required");
+      if (!form.area.trim()) return setError("Locality is required");
+    }
+    if (step === 3) {
+      if (!Number.isFinite(Number(form.price)) || Number(form.price) < 1) return setError("Enter a valid price");
+      if (!/^[6-9]\d{9}$/.test(String(form.contactNumber).replace(/\D/g, "").replace(/^91(?=\d{10}$)/, ""))) return setError("Enter a valid 10-digit Indian mobile number");
+      if (!categories.length) return setError("Select at least one section for this property.");
+    }
     setStep((s) => Math.min(4, s + 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function submit(e) {
     e.preventDefault();
-    if (!photos.length)
-      return setError("Add at least one clear property photo.");
+    const validation = validateListingRequiredFields({ ...form, purpose, photos });
+    if (validation.errors.length) return setError(validation.errors[0]);
+    if (!categories.length)
+      return setError("Select at least one section for this property.");
     setLoading(true);
     setError("");
     const numeric = [
@@ -126,19 +136,24 @@ export default function NewListingPage() {
       "floorNumber",
       "totalFloors",
     ];
-    const payload = { ...form, ...flags, ...location, purpose, photos };
+    const payload = { ...form, ...flags, ...location, ...validation.fields, categories };
     numeric.forEach((k) => {
       payload[k] = form[k] === "" ? undefined : Number(form[k]);
     });
-    const res = await fetch("/api/listings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) return setError(data.error || "Could not submit listing");
-    router.push("/dashboard");
+    try {
+      const res = await fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      setLoading(false);
+      if (!res.ok) return setError(data.error || `Could not submit listing (${res.status})`);
+      router.push("/dashboard");
+    } catch {
+      setLoading(false);
+      setError("Could not reach the server. Check your connection and try again.");
+    }
   }
   return (
     <main className="flex-1 bg-[#f7f7f3] pb-28 md:pb-16">
@@ -259,6 +274,7 @@ export default function NewListingPage() {
                     copy="Accurate local details help buyers shortlist confidently."
                   />
                   <div className="mt-7 grid gap-5 sm:grid-cols-2">
+                    <PropertyCategorySelector value={categories} onChange={setCategories} required />
                     <Field label="City *">
                       <input
                         value={form.city}

@@ -14,7 +14,7 @@ export async function POST(req) {
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const body = await req.json().catch(() => null);
   if (!body?.listingId) return NextResponse.json({ error: "Listing is required" }, { status: 400 });
-  const listing = await prisma.listing.findFirst({ where: { id: body.listingId, status: "APPROVED", blocked: false }, select: { id: true } });
+  const listing = await prisma.listing.findFirst({ where: { id: body.listingId, status: { in: ["APPROVED", "ACTIVE"] }, blocked: false }, select: { id: true } });
   if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
   await prisma.savedListing.upsert({ where: { userId_listingId: { userId: auth.user.id, listingId: listing.id } }, update: {}, create: { userId: auth.user.id, listingId: listing.id } });
   return NextResponse.json({ saved: true });
