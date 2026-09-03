@@ -97,13 +97,13 @@ export default function Navbar() {
 
             {/* Category Tabs - Hidden on Mobile */}
             <div className="hidden lg:flex items-center gap-6">
-              {["Cities", "Apartments", "Branded", "Luxury", "Commercial", "Rental", "Villas"].map((category) => (
-                <button
+              {[["Cities","/cities"], ["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([category, href]) => (
+                <Link href={href}
                   key={category}
                   className="text-xs font-semibold text-amber-900 hover:text-red-600 transition whitespace-nowrap"
                 >
                   {category}
-                </button>
+                </Link>
               ))}
             </div>
 
@@ -273,14 +273,14 @@ export default function Navbar() {
 
               {/* Mobile Categories */}
               <div className="flex flex-wrap gap-2 pt-2">
-                {["Apartments", "Branded", "Luxury", "Commercial", "Villas"].map((cat) => (
-                  <button
+                {[["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([cat, href]) => (
+                  <Link href={href}
                     key={cat}
                     onClick={() => setMobileMenu(false)}
                     className="px-3 py-1.5 text-[10px] font-semibold text-amber-900 bg-amber-100 rounded-lg hover:bg-amber-200"
                   >
                     {cat}
-                  </button>
+                  </Link>
                 ))}
               </div>
 

@@ -487,12 +487,10 @@ export default function Dashboard() {
                 : "— all areas"}
             </h2>
             {user.role === "SUPER_ADMIN" && (
-              <Link
-                href="/admin/users"
-                className="font-data text-sm text-gold hover:underline"
-              >
-                Manage users →
-              </Link>
+              <div className="flex gap-4 font-data text-sm text-gold">
+                <Link href="/admin/content" className="hover:underline">Category pages →</Link>
+                <Link href="/admin/users" className="hover:underline">Manage users →</Link>
+              </div>
             )}
           </div>
           {pending.length === 0 && (

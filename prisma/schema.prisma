@@ -59,6 +59,16 @@ enum OwnershipType {
   POWER_OF_ATTORNEY
 }
 
+enum ContentCategory {
+  CITIES
+  APARTMENT
+  LUXURY
+  BRANDED
+  COMMERCIAL
+  RENTAL
+  VILLAS
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -148,6 +158,28 @@ model Listing {
   blocked           Boolean           @default(false)
 
   @@index([city, area, purpose, propertyType, status])
+}
+
+// Editorial content shown on the internal category pages. These posts are
+// managed by super admins and are intentionally separate from user listings.
+model CategoryPost {
+  id          String          @id @default(cuid())
+  category    ContentCategory
+  title       String
+  slug        String
+  excerpt     String?
+  description String?
+  imageUrl    String?
+  location    String?
+  priceLabel  String?
+  featured    Boolean         @default(false)
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@unique([category, slug])
+  @@index([category, isActive, sortOrder])
 }
 
 model HomepageSection {
