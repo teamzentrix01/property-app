@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/serverAuth";
 import { enumValue, number, PURPOSES, PROPERTY_TYPES, phone, text } from "@/lib/validation";
 import { notifyEmail } from "@/lib/mailer";
+import { categoryFromSlug } from "@/lib/contentCategories";
 
 const MAX_PHOTOS = 12;
 
@@ -19,12 +20,18 @@ export async function GET(req) {
   const area = text(searchParams.get("area"), { max: 80 });
   const purpose = searchParams.get("purpose");
   const propertyType = searchParams.get("propertyType");
+  const categorySlug = searchParams.get("category");
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   if (city) where.city = { contains: city, mode: "insensitive" };
   if (area) where.area = { contains: area, mode: "insensitive" };
   if (purpose) { if (!enumValue(purpose, PURPOSES)) return NextResponse.json({ error: "Invalid purpose" }, { status: 400 }); where.purpose = purpose; }
   if (propertyType) { if (!enumValue(propertyType, PROPERTY_TYPES)) return NextResponse.json({ error: "Invalid property type" }, { status: 400 }); where.propertyType = propertyType; }
+  if (categorySlug) {
+    const category = categoryFromSlug(categorySlug);
+    if (!category) return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+    where.categories = { some: { category: category.value } };
+  }
   if (minPrice || maxPrice) {
     const min = minPrice ? number(minPrice, { min: 0 }) : undefined;
     const max = maxPrice ? number(maxPrice, { min: 0 }) : undefined;

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AdminOverview from "@/components/AdminOverview";
+import { CONTENT_CATEGORIES } from "@/lib/contentCategories";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [recommendationSections, setRecommendationSections] = useState([]);
   const [homepageListings, setHomepageListings] = useState([]);
   const [recommendationForm, setRecommendationForm] = useState({ title: "", subtitle: "", listingIds: "" });
+  const [listingCategories, setListingCategories] = useState({});
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -76,9 +78,17 @@ export default function Dashboard() {
     await fetch(`/api/listings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, rejectionReason }),
+      body: JSON.stringify({ status, rejectionReason, categories: listingCategories[id] || [] }),
     });
     setPending((p) => p.filter((l) => l.id !== id));
+    setListingCategories((current) => { const next = { ...current }; delete next[id]; return next; });
+  }
+
+  function toggleCategory(listingId, category) {
+    setListingCategories((current) => {
+      const selectedCategories = current[listingId] ?? [];
+      return { ...current, [listingId]: selectedCategories.includes(category) ? selectedCategories.filter((item) => item !== category) : [...selectedCategories, category] };
+    });
   }
 
   async function resubmit(id) {
@@ -309,7 +319,7 @@ export default function Dashboard() {
             {myListings?.map((l) => (
               <li
                 key={l.id}
-                className="bg-paper text-ink rounded-xl p-4 flex items-center justify-between"
+                className="bg-paper text-ink rounded-xl p-4"
               >
                 <Link href={`/listings/${l.id}/edit`} className="min-w-0 flex-1">
                   <p className="font-medium">{l.title}</p>
@@ -509,7 +519,10 @@ export default function Dashboard() {
                     {l.owner?.role})
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 border-t border-ink/10 pt-3">
+                  {CONTENT_CATEGORIES.map((category) => <label key={category.value} className="flex cursor-pointer items-center gap-1.5 text-xs text-ink-soft"><input type="checkbox" checked={(listingCategories[l.id] || []).includes(category.value)} onChange={() => toggleCategory(l.id, category.value)} /> {category.label}</label>)}
+                </div>
+                <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => approve(l.id, "APPROVED")}
                     className="bg-moss text-paper text-sm px-3 py-1.5 rounded-full"

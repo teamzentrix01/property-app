@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { findCategoryPosts } from "@/lib/categoryPosts";
 import { categoryFromSlug } from "@/lib/contentCategories";
+import { getApprovedListings } from "@/lib/getListings";
+import PropertyCard from "@/components/PropertyCard";
 
 export default async function CategoryLanding({ slug }) {
   const category = categoryFromSlug(slug);
   if (!category) return null;
   let posts = [];
+  let listings = [];
   if (process.env.DATABASE_URL) {
-    posts = await findCategoryPosts({ category: category.value }).catch(() => []);
+    [posts, { listings }] = await Promise.all([
+      findCategoryPosts({ category: category.value }).catch(() => []),
+      getApprovedListings({ categories: { some: { category: category.value } } }).catch(() => ({ listings: [] })),
+    ]);
   }
   return (
     <main className="flex-1">
@@ -19,7 +25,8 @@ export default async function CategoryLanding({ slug }) {
         </div>
       </section>
       <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
-        {posts.length === 0 ? (
+        {listings.length > 0 && <div className="mb-12"><div className="mb-6 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-moss">Live properties</p><h2 className="mt-1 font-display text-3xl">Browse {category.label.toLowerCase()}</h2></div><Link href={`/listings?category=${category.slug}`} className="text-sm font-semibold text-moss-deep">View all →</Link></div><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{listings.map((listing) => <PropertyCard key={listing.id} listing={listing} />)}</div></div>}
+        {posts.length === 0 && listings.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-ink/20 bg-white px-6 py-16 text-center">
             <h2 className="font-display text-2xl">More {category.label.toLowerCase()} are coming soon</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-ink-soft">Our editorial team is preparing verified guides and opportunities for this category.</p>
