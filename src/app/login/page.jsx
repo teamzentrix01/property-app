@@ -2,11 +2,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [form, setForm] = useState({
     name: "",
@@ -65,7 +66,10 @@ export default function LoginPage() {
   }
 
   function handleChange(e) {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+    if (name === "name") value = value.replace(/[^A-Za-z ]/g, "").slice(0, 80);
+    if (name === "email") value = value.replace(/\s/g, "");
 
     setForm((prev) => ({
       ...prev,
@@ -97,7 +101,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, emailOrPhone: form.email.trim() || form.mobile.trim() }),
       });
 
       const data = await res.json();
@@ -110,7 +114,8 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      const next = searchParams.get("next");
+      router.push(next?.startsWith("/") ? next : "/dashboard");
       router.refresh();
     } catch (error) {
       setErrors({
@@ -148,6 +153,9 @@ export default function LoginPage() {
           <input
             type="text"
             name="name"
+            maxLength={80}
+            pattern="[A-Za-z ]+"
+            title="Use letters and spaces only"
             placeholder="Enter your name"
             value={form.name}
             onChange={handleChange}
@@ -174,6 +182,7 @@ export default function LoginPage() {
           <input
             type="email"
             name="email"
+            inputMode="email"
             placeholder="Enter your email"
             value={form.email}
             onChange={handleChange}
@@ -200,6 +209,9 @@ export default function LoginPage() {
           <input
             type="tel"
             name="mobile"
+            inputMode="numeric"
+            maxLength={10}
+            pattern="[6-9][0-9]{9}"
             placeholder="Enter 10-digit mobile number"
             value={form.mobile}
             onChange={(e) => {

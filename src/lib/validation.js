@@ -9,14 +9,18 @@ export function text(value, { min = 0, max = 255, required = false } = {}) {
   return trimmed;
 }
 
+export function personName(value) {
+  const normalized = text(value, { min: 2, max: 80, required: true });
+  return normalized && /^[A-Za-z]+(?: [A-Za-z]+)*$/.test(normalized) ? normalized : null;
+}
+
 export function email(value) {
   const normalized = text(value, { min: 3, max: 254, required: true })?.toLowerCase();
-  return normalized && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized) ? normalized : null;
+  return normalized && /^[a-z0-9][a-z0-9._%+-]{0,63}@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/.test(normalized) ? normalized : null;
 }
 
 export function phone(value) {
-  const normalized = typeof value === "string" ? value.replace(/[\s-]/g, "") : "";
-  return /^\+?[1-9]\d{7,14}$/.test(normalized) ? normalized : null;
+  return typeof value === "string" && /^[6-9]\d{9}$/.test(value) ? value : null;
 }
 
 export function number(value, { min = 0, max = Number.MAX_SAFE_INTEGER, integer = false } = {}) {

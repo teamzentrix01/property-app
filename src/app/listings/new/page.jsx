@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
 const initial = {
@@ -27,6 +27,7 @@ const initial = {
 };
 export default function NewListingPage() {
   const router = useRouter();
+  const [access, setAccess] = useState(null);
   const [step, setStep] = useState(1);
   const [purpose, setPurpose] = useState("SALE");
   const [form, setForm] = useState(initial);
@@ -37,6 +38,32 @@ export default function NewListingPage() {
   const [locationMessage, setLocationMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/auth/me")
+      .then((response) => (response.ok ? response.json() : { user: null }))
+      .then(({ user }) => {
+        if (!active) return;
+        if (!user) {
+          router.replace("/login?next=/listings/new");
+          return;
+        }
+        if (!["OWNER", "BROKER"].includes(user.role)) {
+          router.replace("/dashboard");
+          return;
+        }
+        setAccess(true);
+      })
+      .catch(() => {
+        if (active) router.replace("/login?next=/listings/new");
+      });
+    return () => { active = false; };
+  }, [router]);
+
+  if (access !== true) {
+    return <main className="flex flex-1 items-center justify-center px-6 py-16 text-sm text-ink-soft">Checking your account…</main>;
+  }
   const update = (k, v) => setForm((o) => ({ ...o, [k]: v }));
   const isPlot = form.propertyType === "PLOT";
   const isHome = ["FLAT", "HOUSE", "PG"].includes(form.propertyType);

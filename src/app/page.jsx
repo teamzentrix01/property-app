@@ -14,7 +14,7 @@ import WhyChooseBhoomi from "@/components/WhyChooseBhoomi";
 import CustomerTestimonials from "@/components/CustomerTestimonials";
 import Footer from "@/components/Footer";
 
-import cities from "@/app/cities/page.jsx";
+import CitiesPage from "@/app/cities/page.jsx";
 
 export default function Page() {
   return (
@@ -34,7 +34,7 @@ export default function Page() {
       <CustomerTestimonials/>
       <Footer/>
 
-      <cities/>
+      <CitiesPage />
 
     </main>
   );

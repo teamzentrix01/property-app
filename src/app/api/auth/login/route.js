@@ -5,12 +5,15 @@ import { email, phone } from "@/lib/validation";
 
 export async function POST(req) {
   const body = await req.json().catch(() => null);
-  if (!body || typeof body.password !== "string" || !body.emailOrPhone) {
+  // The login form previously sent `email` and `mobile`, whereas this endpoint
+  // expected `emailOrPhone`. Support both shapes so valid credentials work.
+  const identifier = body?.emailOrPhone || body?.email || body?.mobile;
+  if (!body || typeof body.password !== "string" || !identifier) {
     return NextResponse.json({ error: "Email/phone and password are required" }, { status: 400 });
   }
 
-  const safeEmail = email(body.emailOrPhone);
-  const safePhone = phone(body.emailOrPhone);
+  const safeEmail = email(identifier);
+  const safePhone = phone(identifier);
   const user = await prisma.user.findFirst({
     where: { OR: [{ email: safeEmail || "" }, { phone: safePhone || "" }] },
   });

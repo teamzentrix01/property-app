@@ -97,7 +97,15 @@ export default function Navbar() {
 
             {/* Category Tabs - Hidden on Mobile */}
             <div className="hidden lg:flex items-center gap-6">
-              {[["Cities","/cities"], ["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([category, href]) => (
+              <div className="group relative">
+                <button type="button" className="flex items-center gap-1 text-xs font-semibold text-amber-900 transition hover:text-red-600">
+                  Cities <ChevronDown size={13} />
+                </button>
+                <div className="invisible absolute left-0 top-full z-50 mt-2 w-40 rounded-lg border border-amber-200 bg-white p-1.5 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                  {[["Moradabad", "/listings?city=Moradabad"], ["Bareilly", "/listings?city=Bareilly"], ["Rampur", "/listings?city=Rampur"]].map(([city, href]) => <Link key={city} href={href} className="block rounded-md px-3 py-2 text-xs font-semibold text-amber-900 hover:bg-amber-50 hover:text-red-600">{city}</Link>)}
+                </div>
+              </div>
+              {[["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([category, href]) => (
                 <Link href={href}
                   key={category}
                   className="text-xs font-semibold text-amber-900 hover:text-red-600 transition whitespace-nowrap"
@@ -116,7 +124,7 @@ export default function Navbar() {
               </button>
 
               <Link
-                href="/listings/new"
+                href={user ? "/listings/new" : "/login?next=/listings/new"}
                 className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition whitespace-nowrap"
               >
                 <Plus size={14} />
@@ -273,6 +281,12 @@ export default function Navbar() {
 
               {/* Mobile Categories */}
               <div className="flex flex-wrap gap-2 pt-2">
+                <details className="relative">
+                  <summary className="cursor-pointer list-none rounded-lg bg-amber-100 px-3 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-200">Cities ▾</summary>
+                  <div className="absolute left-0 z-50 mt-1 w-36 rounded-lg border border-amber-200 bg-white p-1 shadow-lg">
+                    {[["Moradabad", "/listings?city=Moradabad"], ["Bareilly", "/listings?city=Bareilly"], ["Rampur", "/listings?city=Rampur"]].map(([city, href]) => <Link key={city} href={href} onClick={() => setMobileMenu(false)} className="block rounded px-2 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-50">{city}</Link>)}
+                  </div>
+                </details>
                 {[["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([cat, href]) => (
                   <Link href={href}
                     key={cat}
@@ -295,7 +309,7 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  href="/listings/new"
+                  href={user ? "/listings/new" : "/login?next=/listings/new"}
                   className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg"
                   onClick={() => setMobileMenu(false)}
                 >

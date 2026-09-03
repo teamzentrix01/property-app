@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, signToken, AUTH_COOKIE, AUTH_COOKIE_OPTIONS } from "@/lib/auth";
-import { email, phone, text } from "@/lib/validation";
+import { email, personName, phone } from "@/lib/validation";
 import { notifyEmail } from "@/lib/mailer";
 
 export async function POST(req) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-  const name = text(body.name, { min: 2, max: 80, required: true });
+  const name = personName(body.name);
   const safeEmail = email(body.email);
   const safePhone = phone(body.phone);
   const { password, role } = body;
