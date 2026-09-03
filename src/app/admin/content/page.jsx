@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CONTENT_CATEGORIES, toSlug } from "@/lib/contentCategories";
-
 const empty = { category: "CITIES", title: "", slug: "", excerpt: "", description: "", imageUrl: "", location: "", priceLabel: "", featured: false, isActive: true };
 export default function AdminContentPage() {
   const [posts, setPosts] = useState(); const [form, setForm] = useState(empty); const [editing, setEditing] = useState(null); const [error, setError] = useState(""); const [saving, setSaving] = useState(false);
