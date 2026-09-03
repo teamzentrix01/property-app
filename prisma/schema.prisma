@@ -141,6 +141,7 @@ model Listing {
 
   photos            Photo[]
   documents         Document[]
+  categories        ListingCategory[]
 
   ownerId           String
   owner             User              @relation(fields: [ownerId], references: [id])
@@ -158,6 +159,15 @@ model Listing {
   blocked           Boolean           @default(false)
 
   @@index([city, area, purpose, propertyType, status])
+}
+
+model ListingCategory {
+  listingId String
+  category  ContentCategory
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([listingId, category])
+  @@index([category, listingId])
 }
 
 // Editorial content shown on the internal category pages. These posts are
