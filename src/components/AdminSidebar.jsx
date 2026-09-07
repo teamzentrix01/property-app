@@ -7,6 +7,7 @@ import { BarChart3, Users, UserCheck, FileCheck2, Building2, X, Menu, LogOut } f
 
 const links = [["/admin", "Dashboard", BarChart3], ["/admin/users/pending", "Pending Users", Users], ["/admin/users/active", "Active Users", UserCheck], ["/admin/documents", "Documents", FileCheck2], ["/admin/properties", "Properties", Building2]];
 
+
 export default function AdminSidebar() {
   const [open, setOpen] = useState(false);
   const [counts, setCounts] = useState({});
