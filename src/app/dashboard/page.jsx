@@ -118,7 +118,6 @@ export default function Dashboard() {
     }
     setPending((items) => items.map((item) => item.id === id ? { ...item, status, rejectionReason: status === "REJECTED" ? rejectionReason : item.rejectionReason } : item));
   }
-
   function toggleCategory(listingId, category) {
     setListingCategories((current) => {
       const selectedCategories = current[listingId] ?? [];
