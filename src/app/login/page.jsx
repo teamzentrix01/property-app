@@ -24,33 +24,17 @@ function LoginForm() {
   function validateForm() {
     const newErrors = {};
 
-    // Name validation
-    const nameRegex = /^[A-Za-z ]{2,50}$/;
-
-    if (!form.name.trim()) {
-      newErrors.name = "Please enter your name";
-    } else if (!nameRegex.test(form.name.trim())) {
-      newErrors.name = "Name should contain only letters";
-    }
-
-    // Email validation
-    const emailRegex =
-      /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-
-    if (!form.email.trim()) {
-      newErrors.email = "Please enter your email";
-    } else if (!emailRegex.test(form.email.trim())) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    // Mobile validation
+    const emailValue = form.email.trim();
+    const mobileValue = form.mobile.replace(/\D/g, "");
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     const mobileRegex = /^[6-9]\d{9}$/;
 
-    if (!form.mobile.trim()) {
-      newErrors.mobile = "Please enter your mobile number";
-    } else if (!mobileRegex.test(form.mobile.trim())) {
-      newErrors.mobile =
-        "Please enter a valid 10-digit Indian mobile number";
+    if (!emailValue && !mobileValue) {
+      newErrors.email = "Enter your email or mobile number";
+    } else if (emailValue && !emailRegex.test(emailValue) && !mobileValue) {
+      newErrors.email = "Please enter a valid email address";
+    } else if (mobileValue && !mobileRegex.test(mobileValue) && !emailValue) {
+      newErrors.mobile = "Please enter a valid 10-digit Indian mobile number";
     }
 
     // Password validation
@@ -114,9 +98,8 @@ function LoginForm() {
         return;
       }
 
-      const next = searchParams.get("next");
-      router.push(next?.startsWith("/") ? next : "/dashboard");
-      router.refresh();
+      const next = searchParams.get("next") || searchParams.get("redirect");
+      router.replace(next?.startsWith("/") ? next : "/dashboard");
     } catch (error) {
       setErrors({
         form: "Something went wrong. Please try again.",

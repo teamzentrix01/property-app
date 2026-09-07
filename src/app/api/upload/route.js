@@ -26,6 +26,7 @@ function cloudinaryConfig() {
 export async function POST(req) {
   const auth = await requireUser();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (auth.user.verificationStatus !== "ACTIVE") return NextResponse.json({ error: "Your account must be verified before uploading property files" }, { status: 403 });
   const formData = await req.formData().catch(() => null);
   if (!formData) return NextResponse.json({ error: "Invalid upload form" }, { status: 400 });
   const files = formData.getAll("files").filter((file) => file instanceof File);

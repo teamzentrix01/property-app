@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AdminOverview from "@/components/AdminOverview";
 import { CONTENT_CATEGORIES } from "@/lib/contentCategories";
 import StatusBadge, { statusLabel } from "@/components/StatusBadge";
+import UserDocuments from "@/components/UserDocuments";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -226,6 +227,7 @@ export default function Dashboard() {
       <p className="font-data text-xs uppercase tracking-wide text-gold mb-10">
         {user.role.replaceAll("_", " ")}
       </p>
+      {!['AREA_ADMIN', 'SUPER_ADMIN'].includes(user.role) && <UserDocuments />}
 
       {user.role === "BUYER" && (
         <section className="mb-12 space-y-5">
@@ -334,12 +336,7 @@ export default function Dashboard() {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-xl">Your listings</h2>
-            <Link
-              href="/listings/new"
-              className="font-data text-sm text-gold hover:underline"
-            >
-              + Post new
-            </Link>
+            {user?.verificationStatus === "ACTIVE" && <Link href="/listings/new" className="font-data text-sm text-gold hover:underline">+ Post new</Link>}
           </div>
           {myListings === undefined && (
             <p className="text-ink-soft text-sm">Loading…</p>

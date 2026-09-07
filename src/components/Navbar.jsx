@@ -14,7 +14,6 @@ import {
   User,
   Heart,
   Plus,
-  Globe,
   Phone,
 } from "lucide-react";
 
@@ -32,6 +31,7 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -81,14 +81,16 @@ export default function Navbar() {
               className="shrink-0"
             >
               <div className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white font-bold text-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-amber-700 text-sm font-bold text-white">
                   ₹
                 </div>
+
                 <div>
                   <h1 className="text-lg font-bold tracking-tight text-amber-900">
                     BHOOMI
                   </h1>
-                  <p className="text-[9px] font-medium text-amber-700 tracking-widest leading-none">
+
+                  <p className="text-[9px] font-medium leading-none tracking-widest text-amber-700">
                     REAL ESTATE
                   </p>
                 </div>
@@ -96,44 +98,94 @@ export default function Navbar() {
             </Link>
 
             {/* Category Tabs - Hidden on Mobile */}
-            <div className="hidden lg:flex items-center gap-6">
+            <div className="hidden items-center gap-6 lg:flex">
+
+              {/* Cities */}
               <div className="group relative">
-                <button type="button" className="flex items-center gap-1 text-xs font-semibold text-amber-900 transition hover:text-red-600">
-                  Cities <ChevronDown size={13} />
+                <button
+                  type="button"
+                  className="flex items-center gap-1 text-xs font-semibold text-amber-900 transition hover:text-red-600"
+                >
+                  Cities
+                  <ChevronDown size={13} />
                 </button>
+
                 <div className="invisible absolute left-0 top-full z-50 mt-2 w-40 rounded-lg border border-amber-200 bg-white p-1.5 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                  {[["Moradabad", "/listings?city=Moradabad"], ["Bareilly", "/listings?city=Bareilly"], ["Rampur", "/listings?city=Rampur"]].map(([city, href]) => <Link key={city} href={href} className="block rounded-md px-3 py-2 text-xs font-semibold text-amber-900 hover:bg-amber-50 hover:text-red-600">{city}</Link>)}
+                  {[
+                    ["Moradabad", "/listings?city=Moradabad"],
+                    ["Bareilly", "/listings?city=Bareilly"],
+                    ["Rampur", "/listings?city=Rampur"],
+                  ].map(([city, href]) => (
+                    <Link
+                      key={city}
+                      href={href}
+                      className="block rounded-md px-3 py-2 text-xs font-semibold text-amber-900 hover:bg-amber-50 hover:text-red-600"
+                    >
+                      {city}
+                    </Link>
+                  ))}
                 </div>
               </div>
-              {[["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([category, href]) => (
-                <Link href={href}
+
+              {/* Categories */}
+              {[
+                ["Apartments", "/categories/apartment"],
+                ["Branded", "/categories/branded"],
+                ["Luxury", "/categories/luxury"],
+                ["Commercial", "/categories/commercial"],
+                ["Rental", "/categories/rental"],
+                ["Villas", "/categories/villas"],
+              ].map(([category, href]) => (
+                <Link
+                  href={href}
                   key={category}
-                  className="text-xs font-semibold text-amber-900 hover:text-red-600 transition whitespace-nowrap"
+                  className="whitespace-nowrap text-xs font-semibold text-amber-900 transition hover:text-red-600"
                 >
                   {category}
                 </Link>
               ))}
             </div>
 
-            {/* Desktop Right Section */}
-            <div className="hidden lg:flex items-center gap-3 ml-auto">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-900 hover:text-amber-700 transition">
-                <Globe size={16} />
-                <span>EN</span>
-                <ChevronDown size={12} />
-              </button>
+            {/* =================================================
+                DESKTOP RIGHT SECTION
+            ================================================= */}
+            <div className="ml-auto hidden items-center gap-3 lg:flex">
 
-              {user && <Link href="/listings/new" className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg hover:from-red-600 hover:to-red-700 transition whitespace-nowrap"><Plus size={14} />Post Property<span className="ml-1 bg-red-700 px-1.5 py-0.5 rounded text-[8px]">FREE</span></Link>}
+              {/* CONTACT NUMBER */}
+              <a
+                href="tel:+91 63970 36898"
+                className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-amber-900 transition hover:text-red-600"
+                aria-label="Call Bhoomi Real Estate"
+              >
+                <Phone size={16} />
+                <span>+91 63970 36898</span>
+              </a>
 
+              {/* POST PROPERTY */}
+              {user?.verificationStatus === "ACTIVE" && (
+                <Link
+                  href="/listings/new"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:from-red-600 hover:to-red-700"
+                >
+                  <Plus size={14} />
+                  Post Property
+                  <span className="ml-1 rounded bg-red-700 px-1.5 py-0.5 text-[8px]">
+                    FREE
+                  </span>
+                </Link>
+              )}
+
+              {/* LOGGED IN */}
               {user ? (
                 <>
                   <Link
                     href="/dashboard"
-                    className="flex items-center gap-1.5 px-3 py-2 bg-amber-900 text-white text-xs font-semibold rounded-lg hover:bg-amber-800 transition"
+                    className="flex items-center gap-1.5 rounded-lg bg-amber-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-amber-800"
                   >
                     <User size={14} />
                     Dashboard
                   </Link>
+
                   <button
                     onClick={logout}
                     className="px-2.5 text-xs font-medium text-amber-900 hover:text-red-600"
@@ -144,7 +196,7 @@ export default function Navbar() {
               ) : user === null ? (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 px-3 py-2 bg-green-700 text-white text-xs font-semibold rounded-lg hover:bg-green-800 transition"
+                  className="flex items-center gap-1.5 rounded-lg bg-green-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-800"
                 >
                   <User size={14} />
                   Log in
@@ -160,74 +212,87 @@ export default function Navbar() {
             >
               {mobileMenu ? <X size={22} /> : <Menu size={22} />}
             </button>
-
           </div>
 
-          {/* ================= SEARCH BAR - SHOWS WHEN NOT SCROLLED ================= */}
-         <div className="py-4 hidden lg:block border-t border-amber-200">
-  {/* Search Form */}
-  <form
-    action="/listings"
-    className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]"
-  >
-    {/* Location */}
-    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
-      <MapPin className="text-red-600 shrink-0" size={18} />
+          {/* =================================================
+              SEARCH BAR
+          ================================================== */}
+          <div className="hidden border-t border-amber-200 py-4 lg:block">
 
-      <input
-        name="location"
-        type="text"
-        placeholder="Search City, Locality or Project..."
-        className="text-xs font-semibold text-amber-900 bg-transparent outline-none placeholder:text-gray-400 w-full"
-      />
-    </div>
+            <form
+              action="/listings"
+              className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]"
+            >
+              {/* Location */}
+              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 transition focus-within:border-red-500">
+                <MapPin
+                  className="shrink-0 text-red-600"
+                  size={18}
+                />
 
-    {/* Property Type */}
-    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
-      <span className="text-sm font-bold text-red-600 shrink-0">🏢</span>
+                <input
+                  name="location"
+                  type="text"
+                  placeholder="Search City, Locality or Project..."
+                  className="w-full bg-transparent text-xs font-semibold text-amber-900 outline-none placeholder:text-gray-400"
+                />
+              </div>
 
-      <select
-        name="propertyType"
-        className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full"
-      >
-        <option>All Types</option>
-        <option>Apartments</option>
-        <option>Villas</option>
-        <option>Commercial</option>
-      </select>
+              {/* Property Type */}
+              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 transition focus-within:border-red-500">
+                <span className="shrink-0 text-sm font-bold text-red-600">
+                  🏢
+                </span>
 
-      <ChevronDown size={12} className="text-amber-700 shrink-0" />
-    </div>
+                <select
+                  name="propertyType"
+                  className="w-full bg-transparent text-xs font-semibold text-amber-900 outline-none"
+                >
+                  <option>All Types</option>
+                  <option>Apartments</option>
+                  <option>Villas</option>
+                  <option>Commercial</option>
+                </select>
 
-    {/* Budget */}
-    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 focus-within:border-red-500 transition">
-      <span className="text-sm font-bold text-red-600 shrink-0">₹</span>
+                <ChevronDown
+                  size={12}
+                  className="shrink-0 text-amber-700"
+                />
+              </div>
 
-      <select
-        name="budget"
-        className="text-xs font-semibold text-amber-900 bg-transparent outline-none w-full"
-      >
-        <option>Any Budget</option>
-        <option>Below ₹50 Lakh</option>
-        <option>₹50L - ₹1 Cr</option>
-        <option>₹1 Cr - ₹5 Cr</option>
-        <option>Above ₹5 Cr</option>
-      </select>
+              {/* Budget */}
+              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 transition focus-within:border-red-500">
+                <span className="shrink-0 text-sm font-bold text-red-600">
+                  ₹
+                </span>
 
-      <ChevronDown size={12} className="text-amber-700 shrink-0" />
-    </div>
+                <select
+                  name="budget"
+                  className="w-full bg-transparent text-xs font-semibold text-amber-900 outline-none"
+                >
+                  <option>Any Budget</option>
+                  <option>Below ₹50 Lakh</option>
+                  <option>₹50L - ₹1 Cr</option>
+                  <option>₹1 Cr - ₹5 Cr</option>
+                  <option>Above ₹5 Cr</option>
+                </select>
 
-    {/* Search Button */}
-    <button
-      type="submit"
-      className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 font-semibold text-white text-xs hover:from-red-600 hover:to-red-700 transition"
-    >
-      <Search size={16} />
-      Search
-    </button>
-  </form>
-</div>
+                <ChevronDown
+                  size={12}
+                  className="shrink-0 text-amber-700"
+                />
+              </div>
 
+              {/* Search Button */}
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 text-xs font-semibold text-white transition hover:from-red-600 hover:to-red-700"
+              >
+                <Search size={16} />
+                Search
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* =====================================================
@@ -237,12 +302,17 @@ export default function Navbar() {
         {mobileMenu && (
           <div className="border-t border-amber-200 bg-white shadow-xl lg:hidden">
 
-            <div className="px-4 py-4 space-y-3">
+            <div className="space-y-3 px-4 py-4">
 
               {/* Mobile Search */}
               <form action="/listings" className="space-y-2">
+
                 <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2">
-                  <MapPin className="text-red-600 shrink-0" size={18} />
+                  <MapPin
+                    className="shrink-0 text-red-600"
+                    size={18}
+                  />
+
                   <input
                     name="location"
                     placeholder="Search City, Locality..."
@@ -255,7 +325,9 @@ export default function Navbar() {
                     <option>All Types</option>
                     <option>Apartments</option>
                     <option>Villas</option>
+                    <option>Commercial</option>
                   </select>
+
                   <select className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
                     <option>Any Budget</option>
                     <option>Below ₹50L</option>
@@ -265,26 +337,64 @@ export default function Navbar() {
 
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 font-semibold text-white text-xs"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white"
                 >
                   <Search size={16} />
                   Search
                 </button>
               </form>
 
+              {/* MOBILE CONTACT NUMBER */}
+              <a
+                href="tel:+919876543210"
+                className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
+              >
+                <Phone
+                  size={17}
+                  className="text-red-600"
+                />
+                <span>+91 98765 43210</span>
+              </a>
+
               {/* Mobile Categories */}
               <div className="flex flex-wrap gap-2 pt-2">
+
                 <details className="relative">
-                  <summary className="cursor-pointer list-none rounded-lg bg-amber-100 px-3 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-200">Cities ▾</summary>
+                  <summary className="cursor-pointer list-none rounded-lg bg-amber-100 px-3 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-200">
+                    Cities ▾
+                  </summary>
+
                   <div className="absolute left-0 z-50 mt-1 w-36 rounded-lg border border-amber-200 bg-white p-1 shadow-lg">
-                    {[["Moradabad", "/listings?city=Moradabad"], ["Bareilly", "/listings?city=Bareilly"], ["Rampur", "/listings?city=Rampur"]].map(([city, href]) => <Link key={city} href={href} onClick={() => setMobileMenu(false)} className="block rounded px-2 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-50">{city}</Link>)}
+                    {[
+                      ["Moradabad", "/listings?city=Moradabad"],
+                      ["Bareilly", "/listings?city=Bareilly"],
+                      ["Rampur", "/listings?city=Rampur"],
+                    ].map(([city, href]) => (
+                      <Link
+                        key={city}
+                        href={href}
+                        onClick={() => setMobileMenu(false)}
+                        className="block rounded px-2 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-50"
+                      >
+                        {city}
+                      </Link>
+                    ))}
                   </div>
                 </details>
-                {[["Apartments","/categories/apartment"], ["Branded","/categories/branded"], ["Luxury","/categories/luxury"], ["Commercial","/categories/commercial"], ["Rental","/categories/rental"], ["Villas","/categories/villas"]].map(([cat, href]) => (
-                  <Link href={href}
+
+                {[
+                  ["Apartments", "/categories/apartment"],
+                  ["Branded", "/categories/branded"],
+                  ["Luxury", "/categories/luxury"],
+                  ["Commercial", "/categories/commercial"],
+                  ["Rental", "/categories/rental"],
+                  ["Villas", "/categories/villas"],
+                ].map(([cat, href]) => (
+                  <Link
+                    href={href}
                     key={cat}
                     onClick={() => setMobileMenu(false)}
-                    className="px-3 py-1.5 text-[10px] font-semibold text-amber-900 bg-amber-100 rounded-lg hover:bg-amber-200"
+                    className="rounded-lg bg-amber-100 px-3 py-1.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-200"
                   >
                     {cat}
                   </Link>
@@ -292,7 +402,8 @@ export default function Navbar() {
               </div>
 
               {/* Mobile Links */}
-              <div className="space-y-1.5 pt-3 border-t border-amber-200">
+              <div className="space-y-1.5 border-t border-amber-200 pt-3">
+
                 <Link
                   href="/listings"
                   className="block px-4 py-2 text-xs font-semibold text-amber-900 hover:text-red-600"
@@ -301,24 +412,36 @@ export default function Navbar() {
                   All Projects
                 </Link>
 
-                {user && <Link href="/listings/new" className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold rounded-lg" onClick={() => setMobileMenu(false)}><Plus size={14} />Post Property FREE</Link>}
+                {/* Mobile Post Property */}
+                {user?.verificationStatus === "ACTIVE" && (
+                  <Link
+                    href="/listings/new"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white"
+                    onClick={() => setMobileMenu(false)}
+                  >
+                    <Plus size={14} />
+                    Post Property FREE
+                  </Link>
+                )}
 
+                {/* Logged In Mobile */}
                 {user ? (
                   <>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 bg-amber-900 text-white text-xs font-semibold rounded-lg"
+                      className="flex items-center gap-2 rounded-lg bg-amber-900 px-4 py-2 text-xs font-semibold text-white"
                       onClick={() => setMobileMenu(false)}
                     >
                       <User size={14} />
                       Dashboard
                     </Link>
+
                     <button
                       onClick={() => {
                         logout();
                         setMobileMenu(false);
                       }}
-                      className="w-full px-4 py-2 text-xs font-medium text-red-600"
+                      className="w-full px-4 py-2 text-left text-xs font-medium text-red-600"
                     >
                       Logout
                     </button>
@@ -326,7 +449,7 @@ export default function Navbar() {
                 ) : (
                   <Link
                     href="/login"
-                    className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white text-xs font-semibold rounded-lg"
+                    className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-semibold text-white"
                     onClick={() => setMobileMenu(false)}
                   >
                     <User size={14} />
@@ -334,12 +457,9 @@ export default function Navbar() {
                   </Link>
                 )}
               </div>
-
             </div>
-
           </div>
         )}
-
       </header>
 
       {/* =====================================================
@@ -380,7 +500,18 @@ export default function Navbar() {
         </Link>
 
         {/* Post */}
-        {user && <Link href="/listings/new" className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"><span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg"><Plus size={27} /></span><span>Post</span></Link>}
+        {user?.verificationStatus === "ACTIVE" && (
+          <Link
+            href="/listings/new"
+            className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
+          >
+            <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
+              <Plus size={27} />
+            </span>
+
+            <span>Post</span>
+          </Link>
+        )}
 
         {/* Saved */}
         <Link
@@ -399,7 +530,6 @@ export default function Navbar() {
           <User size={20} />
           Profile
         </Link>
-
       </nav>
     </>
   );

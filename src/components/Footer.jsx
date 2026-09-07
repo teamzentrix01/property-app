@@ -208,7 +208,7 @@ export default function Footer() {
 
             <div className="mt-6 space-y-3.5">
 
-              {quickLinks.filter((link) => user || link.name !== "Post Property").map((link) => (
+              {quickLinks.filter((link) => user?.verificationStatus === "ACTIVE" || link.name !== "Post Property").map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -292,12 +292,14 @@ export default function Footer() {
 
               <input
                 type="email"
+                suppressHydrationWarning
                 placeholder="Your email address"
                 className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
               />
 
               <button
                 type="button"
+                suppressHydrationWarning
                 aria-label="Subscribe"
                 className="flex w-12 shrink-0 items-center justify-center bg-[#b58a3a] transition hover:bg-[#c69d50]"
               >

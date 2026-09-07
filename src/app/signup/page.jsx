@@ -19,6 +19,8 @@ export default function SignupPage() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [documents, setDocuments] = useState({ aadhaarDocument: null, panDocument: null, addressProofDocument: null });
+  const documentsReady = Object.values(documents).every((file) => file && ["application/pdf", "image/jpeg", "image/png"].includes(file.type) && file.size <= 5 * 1024 * 1024);
 
   // =========================
   // VALIDATION
@@ -92,6 +94,21 @@ export default function SignupPage() {
     }
   }
 
+  function handleDocumentChange(event, field) {
+    const file = event.target.files?.[0] || null;
+    const validTypes = ["application/pdf", "image/jpeg", "image/png"];
+    if (file && !validTypes.includes(file.type)) {
+      setErrors((current) => ({ ...current, [field]: "Only PDF, JPG, JPEG and PNG files are allowed." }));
+      return;
+    }
+    if (file && file.size > 5 * 1024 * 1024) {
+      setErrors((current) => ({ ...current, [field]: "File size must be less than 5 MB." }));
+      return;
+    }
+    setDocuments((current) => ({ ...current, [field]: file }));
+    setErrors((current) => ({ ...current, [field]: "" }));
+  }
+
   // =========================
   // SUBMIT
   // =========================
@@ -102,17 +119,25 @@ export default function SignupPage() {
     if (!validateForm()) {
       return;
     }
+    const documentErrors = {};
+    if (!documents.aadhaarDocument) documentErrors.aadhaarDocument = "Please upload your Aadhaar Card.";
+    if (!documents.panDocument) documentErrors.panDocument = "Please upload your PAN Card.";
+    if (!documents.addressProofDocument) documentErrors.addressProofDocument = "Please upload your Address Proof.";
+    if (Object.keys(documentErrors).length) {
+      setErrors(documentErrors);
+      return;
+    }
 
     setLoading(true);
     setErrors({});
 
     try {
+      const payload = new FormData();
+      Object.entries(form).forEach(([key, value]) => payload.set(key, value));
+      Object.entries(documents).forEach(([key, file]) => payload.set(key, file));
       const res = await fetch("/api/auth/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        body: payload,
       });
 
       // Read response safely
@@ -141,6 +166,8 @@ export default function SignupPage() {
       }
 
       // Successful signup
+      setErrors({ form: "Your account has been created successfully. Your documents are under verification. You will be notified once your account is verified." });
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
@@ -344,10 +371,29 @@ export default function SignupPage() {
           </option>
         </select>
 
+        <section className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <h2 className="text-lg font-semibold text-gray-900">Identity Documents</h2>
+          <p className="mt-1 text-xs text-gray-500">Please upload the following documents. PDF, JPG, JPEG and PNG files up to 5 MB.</p>
+          <div className="mt-4 space-y-4">
+            {[
+              ["aadhaarDocument", "Aadhaar Card"],
+              ["panDocument", "PAN Card"],
+              ["addressProofDocument", "Address Proof"],
+            ].map(([field, label]) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700">{label} <span className="text-red-600">*</span></label>
+                <input type="file" required accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={(event) => handleDocumentChange(event, field)} className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-900 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white" />
+                {documents[field] && !errors[field] && <div className="mt-2 flex items-center justify-between gap-2 text-xs text-green-700"><span>Upload successful ✓ {documents[field].name}</span><div className="flex gap-2"><a href={URL.createObjectURL(documents[field])} target="_blank" rel="noreferrer" className="font-semibold underline">Preview</a><button type="button" onClick={() => setDocuments((current) => ({ ...current, [field]: null }))} className="font-semibold underline">Replace</button></div></div>}
+                {errors[field] && <p className="mt-1 text-xs text-red-600">⚠ {errors[field]}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* ================= SUBMIT ================= */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !documentsReady}
           className="w-full bg-gray-900 text-white rounded-full py-3 font-medium hover:bg-green-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Creating..." : "Create account"}

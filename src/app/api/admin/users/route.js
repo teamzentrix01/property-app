@@ -26,7 +26,7 @@ export async function PATCH(req) {
   const data = {};
   if (body.role) data.role = body.role;
   if (body.adminArea !== undefined) data.adminArea = body.role === "AREA_ADMIN" || target.role === "AREA_ADMIN" ? text(body.adminArea, { min: 2, max: 80 }) : null;
-  if (body.verified !== undefined) data.verified = body.verified;
+  if (body.verified !== undefined) { data.verified = body.verified; data.verificationStatus = body.verified ? "ACTIVE" : "PENDING"; data.verifiedAt = body.verified ? new Date() : null; }
   if (!Object.keys(data).length) return NextResponse.json({ error: "No changes supplied" }, { status: 400 });
   const user = await prisma.user.update({ where: { id: target.id }, data: { ...data, sessionVersion: { increment: target.id === auth.user.id ? 0 : 1 } }, select: safeUser });
   await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: "USER_UPDATED", targetType: "USER", targetId: target.id, metadata: { changedFields: Object.keys(data), previousRole: target.role, nextRole: user.role, verified: user.verified } } });

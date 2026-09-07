@@ -21,6 +21,10 @@ export async function requireUser(roles = []) {
   return { user, status: null, error: null };
 }
 
+export async function requireAdmin() {
+  return requireUser(["AREA_ADMIN", "SUPER_ADMIN"]);
+}
+
 export function isScopedAreaAdmin(user) {
   return user.role === "AREA_ADMIN" && Boolean(user.adminArea?.trim());
 }

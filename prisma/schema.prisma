@@ -73,12 +73,49 @@ enum ContentCategory {
   VILLAS
 }
 
+enum VerificationStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  EXPIRED
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
   email         String    @unique
   phone         String    @unique
   passwordHash  String
+  aadhaarDocumentUrl String?
+  panDocumentUrl     String?
+  voterIdDocumentUrl String?
+  verificationStatus VerificationStatus @default(PENDING)
+  verificationSubmittedAt DateTime?
+  verificationDeadline DateTime?
+  verifiedAt DateTime?
+  rejectedAt DateTime?
+  rejectionReason String?
+  aadhaarStatus DocumentStatus @default(PENDING)
+  panStatus DocumentStatus @default(PENDING)
+  voterIdStatus DocumentStatus @default(PENDING)
+  aadhaarVerifiedAt DateTime?
+  panVerifiedAt DateTime?
+  voterIdVerifiedAt DateTime?
+  aadhaarVerifiedBy String?
+  panVerifiedBy String?
+  voterIdVerifiedBy String?
+  aadhaarRejectionReason String?
+  panRejectionReason String?
+  voterIdRejectionReason String?
+  aadhaarRejectedAt DateTime?
+  panRejectedAt DateTime?
+  voterIdRejectedAt DateTime?
   sessionVersion Int       @default(0)
   role          Role      @default(BUYER)
   verified      Boolean   @default(false)
@@ -101,6 +138,27 @@ model User {
   auditLogs AdminAudit[]
   resetTokens PasswordResetToken[]
   verificationTokens EmailVerificationToken[]
+  documents         UserDocument[]
+}
+
+model UserDocument {
+  id                 String         @id @default(cuid())
+  userId             String
+  documentType       String
+  originalName       String
+  cloudinaryUrl      String
+  cloudinaryPublicId String
+  fileType           String
+  verificationStatus DocumentStatus @default(PENDING)
+  rejectionReason    String?
+  uploadedAt         DateTime       @default(now())
+  verifiedAt         DateTime?
+  verifiedBy         String?
+  replacedDocumentId String?
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, verificationStatus])
+  @@index([documentType, verificationStatus])
 }
 
 model Listing {
@@ -160,6 +218,12 @@ model Listing {
   updatedAt         DateTime          @updatedAt
   expiresAt         DateTime?
   rejectionReason   String?
+  approvedAt        DateTime?
+  approvedBy        String?
+  activatedAt       DateTime?
+  activatedBy       String?
+  rejectedAt        DateTime?
+  rejectedBy        String?
   blocked           Boolean           @default(false)
 
   @@index([city, area, purpose, propertyType, status])

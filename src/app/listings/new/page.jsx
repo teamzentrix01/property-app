@@ -52,6 +52,10 @@ export default function NewListingPage() {
           router.replace("/login?next=/listings/new&redirect=/listings/new");
           return;
         }
+        if (user.verificationStatus !== "ACTIVE") {
+          router.replace("/dashboard");
+          return;
+        }
         setAccess(true);
       })
       .catch(() => {
