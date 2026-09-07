@@ -15,6 +15,7 @@ export default function AdminSidebar() {
   useEffect(() => { fetch("/api/admin/dashboard").then((response) => response.ok ? response.json() : null).then((data) => data && setCounts(data.stats)).catch(() => {}); }, []);
   async function logout() { await fetch("/api/auth/logout", { method: "POST" }); router.push("/login"); router.refresh(); }
   return <>
+  
     <button aria-label="Open admin menu" onClick={() => setOpen(true)} className="fixed left-4 top-24 z-40 rounded-lg bg-amber-700 p-2 text-white lg:hidden"><Menu size={20} /></button>
     {open && <button aria-label="Close admin menu" onClick={() => setOpen(false)} className="fixed inset-0 z-40 bg-black/30 lg:hidden" />}
     <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-amber-100 bg-white p-5 shadow-xl transition-transform lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
