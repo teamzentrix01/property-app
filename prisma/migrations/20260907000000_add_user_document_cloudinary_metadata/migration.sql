@@ -1,0 +1,4 @@
+-- The UserDocument Cloudinary metadata columns were introduced with the
+-- UserDocument table migration (20260905090000_add_user_documents).
+-- This migration directory was retained without its required SQL file; keep a
+-- no-op migration so Prisma can consistently validate migration history.

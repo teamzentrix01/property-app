@@ -166,7 +166,11 @@ export default function SignupPage() {
       }
 
       // Successful signup
-      setErrors({ form: "Your account has been created successfully. Your documents are under verification. You will be notified once your account is verified." });
+      setErrors({
+        form: data.documentsUploadPending
+          ? "Your account has been created. Document upload is temporarily unavailable; please upload the documents from your dashboard once your connection is restored."
+          : "Your account has been created successfully. Your documents are under verification. You will be notified once your account is verified.",
+      });
       await new Promise((resolve) => setTimeout(resolve, 1200));
       router.push("/dashboard");
       router.refresh();

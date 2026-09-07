@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -19,6 +19,7 @@ function LoginForm() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const submitting = useRef(false);
 
   // Validation
   function validateForm() {
@@ -72,12 +73,18 @@ function LoginForm() {
   async function onSubmit(e) {
     e.preventDefault();
 
+    // React state updates are asynchronous; use a ref as the immediate guard
+    // so a double click/Enter cannot send two competing login requests.
+    if (submitting.current) return;
+
     // First validate
     if (!validateForm()) {
       return;
     }
 
+    submitting.current = true;
     setLoading(true);
+    setErrors({});
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -85,25 +92,31 @@ function LoginForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...form, emailOrPhone: form.email.trim() || form.mobile.trim() }),
+        cache: "no-store",
+        body: JSON.stringify({
+          emailOrPhone: form.email.trim() || form.mobile.trim(),
+          password: form.password,
+        }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         setErrors({
-          form: data.error || "Login failed",
+          form: res.status === 401 ? "Invalid email or password" : (data.error || "Login failed. Please try again."),
         });
-        setLoading(false);
         return;
       }
 
       const next = searchParams.get("next") || searchParams.get("redirect");
       router.replace(next?.startsWith("/") ? next : "/dashboard");
+      router.refresh();
     } catch (error) {
       setErrors({
         form: "Something went wrong. Please try again.",
       });
+    } finally {
+      submitting.current = false;
       setLoading(false);
     }
   }

@@ -246,6 +246,8 @@ export async function POST(req) {
 
     let uploads;
 
+    let documentUploadPending = false;
+
     try {
       uploads =
         await Promise.all(
@@ -276,46 +278,20 @@ export async function POST(req) {
         error?.stack
       );
 
-      /* -----------------------------------------------------
-         Delete user if upload fails
-      ----------------------------------------------------- */
-
-      await prisma.user
-        .delete({
-          where: {
-            id: user.id,
-          },
-        })
-        .catch(
-          (deleteError) => {
-            console.error(
-              "User rollback failed:",
-              deleteError
-            );
-          }
-        );
-
-      return NextResponse.json(
-        {
-          error:
-            "Identity document upload could not be completed",
-
-          details:
-            process.env.NODE_ENV ===
-            "development"
-              ? error?.message
-              : undefined,
-        },
-        { status: 502 }
-      );
+      // A temporary Cloudinary/network outage must not discard a valid new
+      // account. The account remains PENDING and the user can upload/retry
+      // documents later from the dashboard.
+      documentUploadPending = true;
+      uploads = null;
     }
 
     /* =======================================================
        SAVE DOCUMENT RECORDS
     ======================================================= */
 
-    try {
-      await prisma.userDocument.createMany(
+    if (uploads) {
+      try {
+        await prisma.userDocument.createMany(
         {
           data:
             uploads.map(
@@ -344,8 +320,8 @@ export async function POST(req) {
               })
             ),
         }
-      );
-    } catch (error) {
+        );
+      } catch (error) {
       console.error(
         "USER DOCUMENT DATABASE ERROR"
       );
@@ -360,34 +336,10 @@ export async function POST(req) {
         error?.stack
       );
 
-      await prisma.user
-        .delete({
-          where: {
-            id: user.id,
-          },
-        })
-        .catch(
-          (deleteError) => {
-            console.error(
-              "User rollback failed:",
-              deleteError
-            );
-          }
-        );
-
-      return NextResponse.json(
-        {
-          error:
-            "Documents uploaded but could not be saved",
-
-          details:
-            process.env.NODE_ENV ===
-            "development"
-              ? error?.message
-              : undefined,
-        },
-        { status: 500 }
-      );
+        // Preserve the account when a storage/database dependency is briefly
+        // unavailable. It stays unverified until documents are submitted.
+        documentUploadPending = true;
+      }
     }
 
     /* =======================================================
@@ -410,6 +362,7 @@ export async function POST(req) {
         id: user.id,
         name: user.name,
         role: user.role,
+        documentsUploadPending,
       });
 
     res.cookies.set(
