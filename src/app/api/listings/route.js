@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/serverAuth";
 import { enumValue, number, PURPOSES, PROPERTY_TYPES, text, validateListingRequiredFields } from "@/lib/validation";
 import { notifyEmail } from "@/lib/mailer";
 import { categoryFromSlug } from "@/lib/contentCategories";
+import { listingFilters } from "@/lib/listingFilters";
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -14,27 +15,14 @@ export async function GET(req) {
     if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
     where.ownerId = auth.user.id;
   } else where.status = "APPROVED";
-  const city = text(searchParams.get("city"), { max: 80 });
-  const area = text(searchParams.get("area"), { max: 80 });
-  const purpose = searchParams.get("purpose");
-  const propertyType = searchParams.get("propertyType");
   const categorySlug = searchParams.get("category");
-  const minPrice = searchParams.get("minPrice");
-  const maxPrice = searchParams.get("maxPrice");
-  if (city) where.city = { contains: city, mode: "insensitive" };
-  if (area) where.area = { contains: area, mode: "insensitive" };
-  if (purpose) { if (!enumValue(purpose, PURPOSES)) return NextResponse.json({ error: "Invalid purpose" }, { status: 400 }); where.purpose = purpose; }
-  if (propertyType) { if (!enumValue(propertyType, PROPERTY_TYPES)) return NextResponse.json({ error: "Invalid property type" }, { status: 400 }); where.propertyType = propertyType; }
+  const { where: filters, error } = listingFilters(searchParams);
+  if (error) return NextResponse.json({ error }, { status: 400 });
+  Object.assign(where, filters);
   if (categorySlug) {
     const category = categoryFromSlug(categorySlug);
     if (!category) return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     where.categories = { some: { category: category.value } };
-  }
-  if (minPrice || maxPrice) {
-    const min = minPrice ? number(minPrice, { min: 0 }) : undefined;
-    const max = maxPrice ? number(maxPrice, { min: 0 }) : undefined;
-    if ((minPrice && min === null) || (maxPrice && max === null) || (min !== undefined && max !== undefined && min > max)) return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
-    where.price = { ...(min !== undefined ? { gte: min } : {}), ...(max !== undefined ? { lte: max } : {}) };
   }
   const listings = await prisma.listing.findMany({ where, include: { photos: true, categories: true }, orderBy: { createdAt: "desc" }, take: 60 });
   return NextResponse.json({ listings });

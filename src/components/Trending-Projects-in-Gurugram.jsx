@@ -9,6 +9,7 @@ import {
   ChevronRight,
   BadgeCheck,
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatters";
 
 const projects = [
   {
@@ -57,7 +58,8 @@ const projects = [
   },
 ];
 
-export default function TrendingProjects() {
+export default function TrendingProjects({ listings = [] }) {
+  const projects = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: `${listing.area}, ${listing.city}`, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, area: listing.sizeValue ? `${listing.sizeValue} ${listing.sizeUnit || "sq ft"}` : "Area on request", image: listing.photos?.[0]?.url || "/file.svg", tag: "Trending" }));
   const [liked, setLiked] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
 

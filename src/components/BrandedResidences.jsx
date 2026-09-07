@@ -12,6 +12,7 @@ import {
   ConciergeBell,
   Car,
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatters";
 
 const residences = [
   {
@@ -64,7 +65,8 @@ const residences = [
   },
 ];
 
-export default function BrandedResidences() {
+export default function BrandedResidences({ listings = [] }) {
+  const residences = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: listing.area, city: listing.city, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, image: listing.photos?.[0]?.url || "/file.svg", brand: listing.propertyType, tag: "Branded Residence" }));
   const [liked, setLiked] = useState([]);
 
   const toggleLike = (id) => {

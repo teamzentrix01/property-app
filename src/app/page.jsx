@@ -12,19 +12,42 @@ import PopularBuilders from "@/components/PopularBuilders";
 import BHKLifestyle from "@/components/BHKLifestyle";
 import WhyChooseBhoomi from "@/components/WhyChooseBhoomi";
 import CustomerTestimonials from "@/components/CustomerTestimonials";
+import { getApprovedListings } from "@/lib/getListings";
 
-export default function Page() {
+export default async function Page() {
+  let listings = [];
+  let commercialListings = [];
+  let luxuryListings = [];
+  let brandedListings = [];
+  let listingsError = false;
+
+  try {
+    const [latest, commercial, luxury, branded] = await Promise.all([
+      getApprovedListings(),
+      getApprovedListings({ propertyType: { in: ["SHOP", "SHOWROOM", "GODOWN", "OFFICE"] } }),
+      getApprovedListings({ categories: { some: { category: "LUXURY" } } }),
+      getApprovedListings({ categories: { some: { category: "BRANDED" } } }),
+    ]);
+    listings = latest.listings;
+    commercialListings = commercial.listings;
+    luxuryListings = luxury.listings;
+    brandedListings = branded.listings;
+  } catch (error) {
+    listingsError = true;
+    console.error("Homepage listings failed to load:", error);
+  }
+
   return (
     <main>
       <Herosection />
-      <RecommendedProperties />
-      <TrendingProjects />
-      <NewLaunchProjects />
+      <RecommendedProperties listings={listings} error={listingsError} />
+      <TrendingProjects listings={listings} />
+      <NewLaunchProjects listings={listings} />
       <FestivalOffer />
-      <BrandedResidences/>
-      <TopLuxuryProjects/>
-      <CommercialProjects/>
-      <SCOProjects/>
+      <BrandedResidences listings={brandedListings}/>
+      <TopLuxuryProjects listings={luxuryListings}/>
+      <CommercialProjects listings={commercialListings}/>
+      <SCOProjects listings={commercialListings}/>
       <PopularBuilders/>
       <BHKLifestyle/>
       <WhyChooseBhoomi/>

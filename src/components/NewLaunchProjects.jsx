@@ -9,6 +9,7 @@ import {
   ChevronRight,
   BadgeCheck,
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatters";
 
 const projects = [
   {
@@ -53,7 +54,8 @@ const projects = [
   },
 ];
 
-export default function NewLaunchProjects() {
+export default function NewLaunchProjects({ listings = [] }) {
+  const projects = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: `${listing.area}, ${listing.city}`, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, image: listing.photos?.[0]?.url || "/file.svg", tag: "New Launch" }));
   const [liked, setLiked] = useState([]);
 
   const toggleLike = (id) => {

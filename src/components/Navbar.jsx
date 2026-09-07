@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import BhoomiMark from "@/components/BhoomiMark";
 
 import {
@@ -24,6 +24,36 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  function submitListingSearch(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const params = new URLSearchParams();
+    const search = String(form.get("search") || "").trim();
+    const selectedType = String(form.get("propertyType") || "");
+    const propertyType = { Apartments: "FLAT", Villas: "HOUSE", Commercial: "COMMERCIAL" }[selectedType] || selectedType;
+    const budget = String(form.get("budget") || "");
+    if (search) params.set("search", search);
+    if (propertyType) params.set("propertyType", propertyType);
+    if (budget.startsWith("Below")) {
+      params.set("maxPrice", "5000000");
+    } else if (budget.startsWith("Above")) {
+      params.set("minPrice", "50000000");
+    } else if (budget.includes("50L -")) {
+      params.set("minPrice", "5000000");
+      params.set("maxPrice", "10000000");
+    } else if (budget.includes("1 Cr -")) {
+      params.set("minPrice", "10000000");
+      params.set("maxPrice", "50000000");
+    } else if (budget) {
+      const [minPrice, maxPrice] = budget.split("-");
+      if (minPrice) params.set("minPrice", minPrice);
+      if (maxPrice) params.set("maxPrice", maxPrice);
+    }
+    setMobileMenu(false);
+    router.push(`/listings${params.size ? `?${params.toString()}` : ""}`);
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -221,7 +251,8 @@ export default function Navbar() {
           <div className="hidden border-t border-amber-200 py-4 lg:block">
 
             <form
-              action="/listings"
+              key={`desktop-search-${searchParams.toString()}`}
+              onSubmit={submitListingSearch}
               className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]"
             >
               {/* Location */}
@@ -232,8 +263,9 @@ export default function Navbar() {
                 />
 
                 <input
-                  name="location"
+                  name="search"
                   type="text"
+                  defaultValue={searchParams.get("search") || ""}
                   placeholder="Search City, Locality or Project..."
                   className="w-full bg-transparent text-xs font-semibold text-amber-900 outline-none placeholder:text-gray-400"
                 />
@@ -249,10 +281,10 @@ export default function Navbar() {
                   name="propertyType"
                   className="w-full bg-transparent text-xs font-semibold text-amber-900 outline-none"
                 >
-                  <option>All Types</option>
-                  <option>Apartments</option>
-                  <option>Villas</option>
-                  <option>Commercial</option>
+                  <option value="">All Types</option>
+                  <option value="FLAT">Apartments</option>
+                  <option value="HOUSE">Villas / Houses</option>
+                  <option value="COMMERCIAL">Commercial</option>
                 </select>
 
                 <ChevronDown
@@ -306,7 +338,7 @@ export default function Navbar() {
             <div className="space-y-3 px-4 py-4">
 
               {/* Mobile Search */}
-              <form action="/listings" className="space-y-2">
+              <form key={`mobile-search-${searchParams.toString()}`} onSubmit={submitListingSearch} className="space-y-2">
 
                 <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2">
                   <MapPin
@@ -315,21 +347,22 @@ export default function Navbar() {
                   />
 
                   <input
-                    name="location"
+                    name="search"
+                    defaultValue={searchParams.get("search") || ""}
                     placeholder="Search City, Locality..."
                     className="flex-1 bg-transparent text-xs font-semibold text-amber-900 outline-none"
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  <select className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
+                  <select name="propertyType" className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
                     <option>All Types</option>
                     <option>Apartments</option>
                     <option>Villas</option>
                     <option>Commercial</option>
                   </select>
 
-                  <select className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
+                  <select name="budget" className="flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 outline-none">
                     <option>Any Budget</option>
                     <option>Below ₹50L</option>
                     <option>₹50L+</option>

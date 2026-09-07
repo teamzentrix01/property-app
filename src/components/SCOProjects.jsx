@@ -10,6 +10,7 @@ import {
   Store,
   BriefcaseBusiness,
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatters";
 
 const projects = [
   {
@@ -62,7 +63,8 @@ const projects = [
   },
 ];
 
-export default function SCOProjects() {
+export default function SCOProjects({ listings = [] }) {
+  const projects = listings.filter((listing) => ["SHOP", "SHOWROOM", "OFFICE"].includes(listing.propertyType)).slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: listing.area, city: listing.city, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, image: listing.photos?.[0]?.url || "/file.svg", tag: "Commercial", developer: listing.propertyType }));
   const [liked, setLiked] = useState([]);
 
   const toggleLike = (id) => {

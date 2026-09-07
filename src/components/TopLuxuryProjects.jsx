@@ -11,6 +11,7 @@ import {
   Crown,
   Star,
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatters";
 
 const projects = [
   {
@@ -67,7 +68,8 @@ const projects = [
   },
 ];
 
-export default function TopLuxuryProjects() {
+export default function TopLuxuryProjects({ listings = [] }) {
+  const projects = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: `${listing.area}, ${listing.city}`, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, area: listing.sizeValue ? `${listing.sizeValue} ${listing.sizeUnit || "sq ft"}` : "Area on request", image: listing.photos?.[0]?.url || "/file.svg", tag: "Luxury Choice", developer: listing.propertyType }));
   const [liked, setLiked] = useState([]);
 
   const toggleLike = (id) => {

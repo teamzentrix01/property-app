@@ -12,6 +12,7 @@ import {
   CalendarDays,
   Maximize,
 } from "lucide-react";
+import { formatPrice } from "@/lib/formatters";
 
 const properties = [
   {
@@ -100,7 +101,19 @@ const properties = [
   },
 ];
 
-export default function RecommendedProperties() {
+export default function RecommendedProperties({ listings = [], error = false }) {
+  const properties = listings.slice(0, 6).map((listing) => ({
+    id: listing.id,
+    name: listing.title,
+    location: listing.area,
+    city: listing.city,
+    price: formatPrice(listing.price, listing.purpose),
+    area: listing.sizeValue ? `${listing.sizeValue} ${listing.sizeUnit || "sq ft"}` : "Area on request",
+    possession: listing.possession?.replaceAll("_", " ") || (listing.bedrooms ? `${listing.bedrooms} BHK` : listing.propertyType),
+    image: listing.photos?.[0]?.url,
+    tag: listing.purpose === "RENT" ? "For Rent" : "For Sale",
+    rera: Boolean(listing.reraNumber),
+  }));
   const [activeCard, setActiveCard] = useState(0);
   const [liked, setLiked] = useState([]);
 
@@ -113,12 +126,14 @@ export default function RecommendedProperties() {
   };
 
   const nextSlide = () => {
+    if (!properties.length) return;
     setActiveCard((prev) =>
       prev >= properties.length - 1 ? 0 : prev + 1
     );
   };
 
   const previousSlide = () => {
+    if (!properties.length) return;
     setActiveCard((prev) =>
       prev <= 0 ? properties.length - 1 : prev - 1
     );
@@ -205,11 +220,7 @@ export default function RecommendedProperties() {
               ====================================== */}
               <div className="relative h-[245px] overflow-hidden">
 
-                <img
-                  src={property.image}
-                  alt={property.name}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
+                {property.image ? <img src={property.image} alt={property.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" /> : <div className="grid h-full place-items-center bg-stone-100 text-xs text-gray-500">Photo coming soon</div>}
 
                 {/* Image Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/20" />
@@ -333,6 +344,12 @@ export default function RecommendedProperties() {
             </div>
           ))}
         </div>
+
+        {!properties.length && (
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500">
+            {error ? "Properties could not be loaded right now. Please try again shortly." : "No properties available."}
+          </div>
+        )}
 
         {/* =========================================
             MOBILE SLIDER BUTTONS

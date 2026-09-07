@@ -2,6 +2,7 @@ import Link from "next/link";
 import PropertyCard from "@/components/PropertyCard";
 import { getApprovedListings } from "@/lib/getListings";
 import { PURPOSES, PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
+import { listingFilters } from "@/lib/listingFilters";
 const allTypes = [
   ...new Map(
     Object.values(PROPERTY_TYPES_BY_PURPOSE)
@@ -11,17 +12,8 @@ const allTypes = [
 ];
 export default async function ListingsPage({ searchParams }) {
   const sp = await searchParams;
-  const where = {};
-  if (sp.city) where.city = { contains: sp.city, mode: "insensitive" };
-  if (sp.area) where.area = { contains: sp.area, mode: "insensitive" };
-  if (sp.purpose) where.purpose = sp.purpose;
-  if (sp.propertyType) where.propertyType = sp.propertyType;
-  if (sp.minPrice || sp.maxPrice)
-    where.price = {
-      ...(sp.minPrice ? { gte: Number(sp.minPrice) } : {}),
-      ...(sp.maxPrice ? { lte: Number(sp.maxPrice) } : {}),
-    };
-  const { listings } = await getApprovedListings(where);
+  const { where, error } = listingFilters(sp);
+  const { listings } = error ? { listings: [] } : await getApprovedListings(where);
   return (
     <main className="min-h-screen flex-1 bg-[#f7f7f3] pb-24 md:pb-16">
       <section className="border-b border-ink/8 bg-white">
@@ -30,7 +22,7 @@ export default async function ListingsPage({ searchParams }) {
             <Link href="/">Home</Link> / Properties
           </p>
           <h1 className="mt-2 font-display text-3xl">
-            Properties for {sp.purpose === "RENT" ? "rent" : "sale"}
+            Properties{sp.purpose ? ` for ${String(sp.purpose).toUpperCase() === "RENT" ? "rent" : "sale"}` : ""}
             {sp.area ? ` in ${sp.area}` : " in India"}
           </h1>
           <p className="mt-1 text-sm text-ink-soft">
@@ -40,13 +32,12 @@ export default async function ListingsPage({ searchParams }) {
             <label className="flex min-w-0 flex-1 items-center rounded-xl border border-ink/15 bg-white px-4">
               <span className="mr-2 text-moss">⌖</span>
               <input
-                name="area"
-                defaultValue={sp.area || ""}
-                placeholder="Locality, sector or city"
+                name="search"
+                defaultValue={sp.search || ""}
+                placeholder="Property, locality, city or keyword"
                 className="w-full py-3 text-sm outline-none"
               />
             </label>
-            <input type="hidden" name="purpose" value={sp.purpose || "SALE"} />
             <button className="rounded-xl bg-moss px-6 text-sm font-bold text-white">
               Search
             </button>
@@ -79,6 +70,9 @@ export default async function ListingsPage({ searchParams }) {
             </Link>
           </div>
           <form className="space-y-6">
+            <Filter label="Search">
+              <input name="search" defaultValue={sp.search || ""} placeholder="Property or project name" />
+            </Filter>
             <Filter label="Looking to">
               <select name="purpose" defaultValue={sp.purpose || ""}>
                 <option value="">Buy or rent</option>
@@ -129,23 +123,18 @@ export default async function ListingsPage({ searchParams }) {
                 />
               </div>
             </Filter>
-            <div>
-              <p className="mb-3 text-sm font-semibold">Posted by</p>
-              {["Owner", "Broker", "Builder"].map((x) => (
-                <label
-                  key={x}
-                  className="mb-2 flex items-center gap-2 text-sm text-ink-soft"
-                >
-                  <input type="checkbox" /> {x}
-                </label>
-              ))}
-            </div>
+            <Filter label="Bedrooms / BHK"><input name="bedrooms" type="number" min="0" defaultValue={sp.bedrooms || ""} placeholder="Any" /></Filter>
+            <Filter label="Bathrooms"><input name="bathrooms" type="number" min="0" defaultValue={sp.bathrooms || ""} placeholder="Any" /></Filter>
+            <Filter label="Furnishing"><select name="furnishing" defaultValue={sp.furnishing || ""}><option value="">Any furnishing</option><option value="UNFURNISHED">Unfurnished</option><option value="SEMI_FURNISHED">Semi furnished</option><option value="FULLY_FURNISHED">Fully furnished</option></select></Filter>
+            <Filter label="Area"><div className="grid grid-cols-2 gap-2"><input name="minArea" type="number" min="0" defaultValue={sp.minArea || ""} placeholder="Min sq ft" /><input name="maxArea" type="number" min="0" defaultValue={sp.maxArea || ""} placeholder="Max sq ft" /></div></Filter>
+            <Filter label="Posted by"><select name="postedBy" defaultValue={sp.postedBy || ""}><option value="">Anyone</option><option value="OWNER">Owner</option><option value="BROKER">Broker</option></select></Filter>
             <button className="w-full rounded-xl bg-ink py-3 text-sm font-bold text-white">
               Apply filters
             </button>
           </form>
         </aside>
         <section>
+          {error && <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
           <div className="mb-5 flex items-center justify-between">
             <div className="flex gap-2">
               <span className="rounded-full bg-moss/10 px-3 py-2 text-xs font-semibold text-moss-deep">
@@ -168,7 +157,7 @@ export default async function ListingsPage({ searchParams }) {
             <div className="rounded-3xl border border-dashed border-ink/15 bg-white py-20 text-center">
               <div className="text-4xl">⌕</div>
               <h2 className="mt-4 font-display text-2xl">
-                No exact matches yet
+                No properties found for your selected filters.
               </h2>
               <p className="mt-2 text-sm text-ink-soft">
                 Try widening your locality or budget.
