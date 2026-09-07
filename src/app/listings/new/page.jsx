@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
 import { PURPOSES, PROPERTY_TYPES, validateListingRequiredFields } from "@/lib/validation";
 import PropertyCategorySelector from "@/components/PropertyCategorySelector";
@@ -29,6 +29,7 @@ const initial = {
 };
 export default function NewListingPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [access, setAccess] = useState(null);
   const [step, setStep] = useState(1);
   const [purpose, setPurpose] = useState("SALE");
@@ -49,20 +50,16 @@ export default function NewListingPage() {
       .then(({ user }) => {
         if (!active) return;
         if (!user) {
-          router.replace("/login?next=/listings/new&redirect=/listings/new");
-          return;
-        }
-        if (user.verificationStatus !== "ACTIVE") {
-          router.replace("/dashboard");
+          router.replace(`/login?next=${encodeURIComponent(pathname)}&redirect=${encodeURIComponent(pathname)}`);
           return;
         }
         setAccess(true);
       })
       .catch(() => {
-        if (active) router.replace("/login?next=/listings/new&redirect=/listings/new");
+        if (active) router.replace(`/login?next=${encodeURIComponent(pathname)}&redirect=${encodeURIComponent(pathname)}`);
       });
     return () => { active = false; };
-  }, [router]);
+  }, [pathname, router]);
 
   if (access !== true) {
     return <main className="flex flex-1 items-center justify-center px-6 py-16 text-sm text-ink-soft">Checking your account…</main>;

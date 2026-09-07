@@ -362,7 +362,7 @@ export async function POST(req) {
         id: user.id,
         name: user.name,
         role: user.role,
-        documentsUploadPending,
+        documentsUploadPending: documentUploadPending,
       });
 
     res.cookies.set(

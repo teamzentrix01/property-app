@@ -43,7 +43,6 @@ export async function GET(req) {
 export async function POST(req) {
   const auth = await requireUser();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
-  if (auth.user.verificationStatus !== "ACTIVE") return NextResponse.json({ error: "Your account must be verified before posting a property" }, { status: 403 });
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   const normalized = validateListingRequiredFields(body, { validatePhotoUrls: true });

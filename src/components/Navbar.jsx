@@ -150,31 +150,6 @@ export default function Navbar() {
                 DESKTOP RIGHT SECTION
             ================================================= */}
             <div className="ml-auto hidden items-center gap-3 lg:flex">
-
-              {/* CONTACT NUMBER */}
-              <a
-                href="tel:+91 63970 36898"
-                className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-amber-900 transition hover:text-red-600"
-                aria-label="Call Bhoomi Real Estate"
-              >
-                <Phone size={16} />
-                <span>+91 63970 36898</span>
-              </a>
-
-              {/* POST PROPERTY */}
-              {user?.verificationStatus === "ACTIVE" && (
-                <Link
-                  href="/listings/new"
-                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:from-red-600 hover:to-red-700"
-                >
-                  <Plus size={14} />
-                  Post Property
-                  <span className="ml-1 rounded bg-red-700 px-1.5 py-0.5 text-[8px]">
-                    FREE
-                  </span>
-                </Link>
-              )}
-
               {/* LOGGED IN */}
               {user ? (
                 <>
@@ -185,13 +160,6 @@ export default function Navbar() {
                     <User size={14} />
                     Dashboard
                   </Link>
-
-                  <button
-                    onClick={logout}
-                    className="px-2.5 text-xs font-medium text-amber-900 hover:text-red-600"
-                  >
-                    Logout
-                  </button>
                 </>
               ) : user === null ? (
                 <Link
@@ -202,6 +170,39 @@ export default function Navbar() {
                   Log in
                 </Link>
               ) : null}
+
+              {/* POST PROPERTY */}
+              {user && (
+                <Link
+                  href="/post-property"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:from-red-600 hover:to-red-700"
+                >
+                  <Plus size={14} />
+                  Post Property
+                  <span className="ml-1 rounded bg-red-700 px-1.5 py-0.5 text-[8px]">
+                    FREE
+                  </span>
+                </Link>
+              )}
+
+              {/* CONTACT NUMBER */}
+              <a
+                href="tel:+916397036898"
+                className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-amber-900 transition hover:text-red-600"
+                aria-label="Call Bhoomi Real Estate"
+              >
+                <Phone size={16} />
+                <span>+91 63970 36898</span>
+              </a>
+
+              {user && (
+                <button
+                  onClick={logout}
+                  className="px-2.5 text-xs font-medium text-amber-900 hover:text-red-600"
+                >
+                  Logout
+                </button>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -344,18 +345,6 @@ export default function Navbar() {
                 </button>
               </form>
 
-              {/* MOBILE CONTACT NUMBER */}
-              <a
-                href="tel:+919876543210"
-                className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
-              >
-                <Phone
-                  size={17}
-                  className="text-red-600"
-                />
-                <span>+91 98765 43210</span>
-              </a>
-
               {/* Mobile Categories */}
               <div className="flex flex-wrap gap-2 pt-2">
 
@@ -412,18 +401,6 @@ export default function Navbar() {
                   All Projects
                 </Link>
 
-                {/* Mobile Post Property */}
-                {user?.verificationStatus === "ACTIVE" && (
-                  <Link
-                    href="/listings/new"
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white"
-                    onClick={() => setMobileMenu(false)}
-                  >
-                    <Plus size={14} />
-                    Post Property FREE
-                  </Link>
-                )}
-
                 {/* Logged In Mobile */}
                 {user ? (
                   <>
@@ -435,16 +412,6 @@ export default function Navbar() {
                       <User size={14} />
                       Dashboard
                     </Link>
-
-                    <button
-                      onClick={() => {
-                        logout();
-                        setMobileMenu(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-xs font-medium text-red-600"
-                    >
-                      Logout
-                    </button>
                   </>
                 ) : (
                   <Link
@@ -455,6 +422,37 @@ export default function Navbar() {
                     <User size={14} />
                     Log in
                   </Link>
+                )}
+
+                {user && (
+                  <Link
+                    href="/post-property"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white"
+                    onClick={() => setMobileMenu(false)}
+                  >
+                    <Plus size={14} />
+                    Post Property FREE
+                  </Link>
+                )}
+
+                <a
+                  href="tel:+916397036898"
+                  className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
+                >
+                  <Phone size={17} className="text-red-600" />
+                  <span>+91 63970 36898</span>
+                </a>
+
+                {user && (
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-xs font-medium text-red-600"
+                  >
+                    Logout
+                  </button>
                 )}
               </div>
             </div>
@@ -500,9 +498,9 @@ export default function Navbar() {
         </Link>
 
         {/* Post */}
-        {user?.verificationStatus === "ACTIVE" && (
+        {user && (
           <Link
-            href="/listings/new"
+            href="/post-property"
             className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
           >
             <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
