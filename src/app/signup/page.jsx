@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -18,7 +18,10 @@ export default function SignupPage() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const submitting = useRef(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState(1);
   const [documents, setDocuments] = useState({ aadhaarDocument: null, panDocument: null, addressProofDocument: null });
   const documentsReady = Object.values(documents).every((file) => file && ["application/pdf", "image/jpeg", "image/png"].includes(file.type) && file.size <= 5 * 1024 * 1024);
 
@@ -109,11 +112,26 @@ export default function SignupPage() {
     setErrors((current) => ({ ...current, [field]: "" }));
   }
 
+  function continueToDocuments() {
+    if (validateForm()) {
+      setErrors({});
+      setStep(2);
+    }
+  }
+
   // =========================
   // SUBMIT
   // =========================
   async function onSubmit(e) {
     e.preventDefault();
+
+    if (step === 1) {
+      continueToDocuments();
+      return;
+    }
+
+    // State updates are asynchronous; this blocks rapid double submissions.
+    if (submitting.current) return;
 
     // Validate form first
     if (!validateForm()) {
@@ -128,8 +146,10 @@ export default function SignupPage() {
       return;
     }
 
+    submitting.current = true;
     setLoading(true);
     setErrors({});
+    setSuccess("");
 
     try {
       const payload = new FormData();
@@ -161,18 +181,14 @@ export default function SignupPage() {
           form: data.error || "Signup failed. Please try again.",
         });
 
-        setLoading(false);
         return;
       }
 
-      // Successful signup
-      setErrors({
-        form: data.documentsUploadPending
-          ? "Your account has been created. Document upload is temporarily unavailable; please upload the documents from your dashboard once your connection is restored."
-          : "Your account has been created successfully. Your documents are under verification. You will be notified once your account is verified.",
-      });
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      router.push("/dashboard");
+      // A 201 response is the only success path. New users sign in through the
+      // normal login page; signup no longer creates an implicit session.
+      setSuccess(data.message || "Account created successfully. Redirecting to login…");
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      router.replace("/login");
       router.refresh();
     } catch (error) {
       console.error("Signup error:", error);
@@ -181,20 +197,30 @@ export default function SignupPage() {
         form: "Something went wrong. Please try again.",
       });
 
+    } finally {
+      submitting.current = false;
       setLoading(false);
     }
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center px-6 py-16 bg-gray-50">
+    <main className="auth-shell flex-1 flex items-center justify-center px-6 py-16 bg-gray-50">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm bg-white text-gray-900 rounded-2xl p-8 shadow-lg"
+        className="auth-panel w-full max-w-sm bg-white text-gray-900 rounded-2xl p-8 shadow-lg"
       >
         {/* Heading */}
         <h1 className="font-display text-2xl mb-6 font-semibold">
           Create account
         </h1>
+
+        <div className="mb-6 flex items-center gap-2 text-xs font-semibold">
+          <span className={`grid h-6 w-6 place-items-center rounded-full ${step === 1 ? "bg-emerald-800 text-white" : "bg-emerald-100 text-emerald-800"}`}>1</span>
+          <span className={step === 1 ? "text-emerald-900" : "text-gray-400"}>Account Details</span>
+          <span className="h-px flex-1 bg-emerald-100" />
+          <span className={`grid h-6 w-6 place-items-center rounded-full ${step === 2 ? "bg-emerald-800 text-white" : "bg-gray-100 text-gray-500"}`}>2</span>
+          <span className={step === 2 ? "text-emerald-900" : "text-gray-400"}>Documents</span>
+        </div>
 
         {/* General Error */}
         {errors.form && (
@@ -205,6 +231,13 @@ export default function SignupPage() {
           </div>
         )}
 
+        {success && (
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
+            <p className="text-sm text-green-700">{success}</p>
+          </div>
+        )}
+
+        {step === 1 && <div className="animate-in fade-in slide-in-from-right-2 duration-200">
         {/* ================= NAME ================= */}
         <div className="mb-4">
           <label className="mb-1 block text-sm font-medium">
@@ -351,6 +384,16 @@ export default function SignupPage() {
           )}
         </div>
 
+        <button
+          type="button"
+          onClick={continueToDocuments}
+          className="mt-2 w-full rounded-xl bg-emerald-800 py-3 font-semibold text-white shadow-sm shadow-emerald-950/15 hover:bg-emerald-900"
+        >
+          Next: Documents
+        </button>
+        </div>}
+
+        {step === 2 && <div className="animate-in fade-in slide-in-from-right-2 duration-200">
         {/* ================= ROLE ================= */}
         <label className="block text-sm text-gray-600 mb-1">
           I am a
@@ -363,16 +406,15 @@ export default function SignupPage() {
           onChange={handleChange}
         >
           <option value="BUYER">
-            Buyer / Renter
+            Buyer 
           </option>
 
           <option value="OWNER">
-            Owner
+            Owner/Seller
           </option>
 
-          <option value="BROKER">
-            Broker / Dealer
-          </option>
+          
+          
         </select>
 
         <section className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
@@ -395,13 +437,22 @@ export default function SignupPage() {
         </section>
 
         {/* ================= SUBMIT ================= */}
+        <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="w-1/3 rounded-xl border border-emerald-200 py-3 font-medium text-emerald-800 hover:bg-emerald-50"
+        >
+          Back
+        </button>
         <button
           type="submit"
           disabled={loading || !documentsReady}
-          className="w-full bg-gray-900 text-white rounded-full py-3 font-medium hover:bg-green-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-2/3 rounded-xl bg-emerald-800 py-3 font-medium text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Creating..." : "Create account"}
         </button>
+        </div>
 
         {/* ================= LOGIN ================= */}
         <p className="text-sm text-gray-600 mt-4">
@@ -413,6 +464,7 @@ export default function SignupPage() {
             Log in
           </Link>
         </p>
+        </div>}
       </form>
     </main>
   );

@@ -42,6 +42,13 @@ signup/login/posting need the real database.
   `/c/<slug>` link to share; only shows what was selected (`src/app/api/catalog-links`)
 
 ## What's also built now
+
+- **Admin password authentication** (`/admin/login`) — set these server-only
+  variables in `.env` (never use a `NEXT_PUBLIC_` prefix):
+  `ADMIN_EMAIL=admin@example.com` and a unique 12+ character
+  `ADMIN_PASSWORD`. Run `npm run admin:promote -- admin@example.com` for an
+  existing user, or `node --env-file=.env scripts/create-super-admin.mjs` to
+  provision the matching super-admin record.
 - **Image upload** (`/api/upload`) — real file upload to `public/uploads`,
   wired into the create-listing form with previews and remove buttons.
   Swap the `writeFile` call for S3/Cloudinary/UploadThing when you're ready

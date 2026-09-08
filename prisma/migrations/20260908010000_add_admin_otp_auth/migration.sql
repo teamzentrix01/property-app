@@ -1,0 +1,20 @@
+ALTER TABLE "User" ADD COLUMN "adminSessionVersion" INTEGER NOT NULL DEFAULT 0;
+
+CREATE TABLE "AdminOtp" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "otpHash" TEXT NOT NULL,
+  "expiresAt" TIMESTAMP(3) NOT NULL,
+  "attempts" INTEGER NOT NULL DEFAULT 0,
+  "usedAt" TIMESTAMP(3),
+  "lastSentAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "requestWindowStartedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "requestCount" INTEGER NOT NULL DEFAULT 1,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "AdminOtp_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "AdminOtp_userId_key" ON "AdminOtp"("userId");
+CREATE INDEX "AdminOtp_expiresAt_idx" ON "AdminOtp"("expiresAt");
+ALTER TABLE "AdminOtp" ADD CONSTRAINT "AdminOtp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

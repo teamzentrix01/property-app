@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 
-const cards = [["totalUsers", "Total Users"], ["pendingUsers", "Pending Users"], ["activeUsers", "Active Users"], ["rejectedUsers", "Rejected Users"], ["pendingDocuments", "Pending Documents"], ["verifiedDocuments", "Verified Documents"], ["rejectedDocuments", "Rejected Documents"], ["totalListings", "Total Properties"]];
+const cards = [["totalUsers", "Total Users"], ["activeUsers", "Active Users"], ["totalListings", "Total Properties"], ["pendingListings", "Pending Properties"], ["approvedListings", "Approved Properties"], ["rejectedListings", "Rejected Properties"], ["totalDocuments", "Total Documents"], ["pendingDocuments", "Pending Documents"], ["verifiedDocuments", "Verified Documents"], ["rejectedDocuments", "Rejected Documents"]];
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);

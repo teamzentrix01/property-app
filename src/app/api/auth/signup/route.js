@@ -4,9 +4,6 @@ import { prisma } from "@/lib/prisma";
 
 import {
   hashPassword,
-  signToken,
-  AUTH_COOKIE,
-  AUTH_COOKIE_OPTIONS,
 } from "@/lib/auth";
 
 import {
@@ -343,38 +340,22 @@ export async function POST(req) {
     }
 
     /* =======================================================
-       AUTH TOKEN
-    ======================================================= */
-
-    const token =
-      signToken({
-        id: user.id,
-        sessionVersion:
-          user.sessionVersion,
-      });
-
-    /* =======================================================
        RESPONSE
     ======================================================= */
 
     const res =
       NextResponse.json({
-        id: user.id,
-        name: user.name,
-        role: user.role,
+        ok: true,
+        message: "Account created successfully.",
         documentsUploadPending: documentUploadPending,
-      });
-
-    res.cookies.set(
-      AUTH_COOKIE,
-      token,
-      AUTH_COOKIE_OPTIONS
-    );
+      }, { status: 201 });
 
     /* =======================================================
        WELCOME EMAIL
     ======================================================= */
 
+    // notifyEmail catches delivery errors itself. It is intentionally not part
+    // of the successful registration response path.
     notifyEmail({
       to: user.email,
 
@@ -396,14 +377,7 @@ export async function POST(req) {
             req.url
           ).origin}/dashboard`,
       },
-    }).catch(
-      (error) => {
-        console.error(
-          "Welcome email failed:",
-          error
-        );
-      }
-    );
+    });
 
     /* =======================================================
        SUCCESS

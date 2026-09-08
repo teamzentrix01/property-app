@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function PropertyActions({ listing, compact = false }) {
@@ -14,11 +14,18 @@ export default function PropertyActions({ listing, compact = false }) {
     .replace(/\D/g, "")
     .slice(-10);
   const whatsapp = `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
+  useEffect(() => {
+    fetch("/api/saved", { credentials: "include", cache: "no-store" })
+      .then((response) => response.ok ? response.json() : { ids: [] })
+      .then((data) => setSaved((data.ids || []).includes(listing.id)))
+      .catch(() => setSaved(false));
+  }, [listing.id]);
   async function save() {
     const res = await fetch(
       `/api/saved${saved ? `?listingId=${listing.id}` : ""}`,
       {
         method: saved ? "DELETE" : "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         ...(saved ? {} : { body: JSON.stringify({ listingId: listing.id }) }),
       },

@@ -376,7 +376,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative w-full overflow-visible bg-slate-950">
+    <section className="site-hero relative w-full overflow-visible bg-slate-950">
 
       {/* =====================================================
           BACKGROUND

@@ -1,13 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #16302b;
-  --ink-soft: #64736d;
-  --paper: #f5f0e6;
-  --paper-dim: #e9e1d2;
-  --moss: #2f7a59;
-  --moss-deep: #1c5740;
-  --gold: #c99328;
+  --color-primary-dark: #064e3b;
+  --color-primary: #047857;
+  --color-primary-medium: #059669;
+  --color-accent: #10b981;
+  --color-green-light: #d1fae5;
+  --color-green-soft: #ecfdf5;
+  --color-background: #f8faf9;
+  --color-surface: #ffffff;
+  --color-text: #102a24;
+  --color-text-muted: #64746e;
+  --color-border: #ddeae4;
+  --ink: var(--color-text);
+  --ink-soft: var(--color-text-muted);
+  --paper: var(--color-background);
+  --paper-dim: var(--color-green-soft);
+  --moss: var(--color-primary);
+  --moss-deep: var(--color-primary-dark);
+  --gold: var(--color-accent);
+
+  /* Existing amber utilities now inherit the brand family. This keeps legacy
+     pages visually coherent while components continue to use Tailwind tokens. */
+  --color-amber-50: #ecfdf5;
+  --color-amber-100: #d1fae5;
+  --color-amber-200: #a7f3d0;
+  --color-amber-600: #059669;
+  --color-amber-700: #047857;
+  --color-amber-800: #065f46;
+  --color-amber-900: #064e3b;
+  --color-amber-950: #022c22;
 }
 
 @theme inline {
@@ -30,11 +52,13 @@ html, body {
 }
 
 body { min-width: 320px; }
+main { isolation: isolate; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button, select { cursor: pointer; }
+a, button, input, select, textarea { transition: border-color .2s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease; }
 img { color: transparent; }
 input, select, textarea { outline-color: var(--moss); }
-input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(47, 122, 89, .13); }
+input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(5, 150, 105, .12); }
 
 ::selection {
   background: var(--gold);
@@ -43,6 +67,29 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(47, 122, 
 
 .font-display { font-family: var(--font-display); }
 .font-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+
+/* A small compatibility layer for legacy gold literals used by editorial
+   homepage modules. It deliberately leaves red/amber status states semantic. */
+[class*="bg-[#b58a3a]"], [class*="bg-[#c88915]"], [class*="bg-[#e5a92f]"], [class*="bg-[#f0c451]"] { background-color: #047857 !important; }
+[class*="text-[#b58a3a]"], [class*="text-[#c88915]"], [class*="text-[#d3aa5d]"], [class*="text-[#d99a1f]"], [class*="text-[#b77d0e]"], [class*="text-[#a8730e]"] { color: #059669 !important; }
+[class*="border-[#b58a3a]"], [class*="border-[#d3aa5d]"], [class*="border-[#e5a92f]"] { border-color: #6ee7b7 !important; }
+[class*="from-[#c88915]"] { --tw-gradient-from: #064e3b var(--tw-gradient-from-position) !important; }
+[class*="via-[#e5a92f]"] { --tw-gradient-via: #047857 var(--tw-gradient-via-position) !important; }
+[class*="to-[#f0c451]"], [class*="to-[#e5a92f]"] { --tw-gradient-to: #10b981 var(--tw-gradient-to-position) !important; }
+
+.site-hero { background: linear-gradient(135deg, #022c22 0%, #064e3b 48%, #047857 100%) !important; }
+.site-footer { background: #022c22 !important; }
+.site-footer [class*="bg-[#1c1c1c]"], .site-footer [class*="bg-[#0d0d0d]"] { background-color: #064e3b !important; }
+.site-footer [class*="text-white/"] { color: #fff !important; }
+.site-footer [class*="[#b58a3a]"] { color: #6ee7b7; }
+.site-footer [class*="bg-[#b58a3a]"] { background-color: #047857 !important; color: #fff; }
+
+.auth-shell { position: relative; overflow: hidden; background: #f0fdf4 !important; }
+.auth-shell::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 43%; background: linear-gradient(145deg, #022c22, #047857); }
+.auth-shell::after { content: "Find a place that feels like home."; position: absolute; left: max(2rem, calc((100% - 72rem) / 2)); top: 50%; width: min(28rem, 35%); transform: translateY(-50%); color: white; font-family: var(--font-display); font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 600; line-height: 1.05; z-index: 1; }
+.auth-panel { position: relative; z-index: 2; border: 1px solid var(--color-border) !important; border-radius: 1.25rem !important; box-shadow: 0 20px 55px rgba(6, 78, 59, .12) !important; }
+@media (min-width: 768px) { .auth-panel { margin-left: 38%; } }
+@media (max-width: 767px) { .auth-shell::before, .auth-shell::after { display: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }

@@ -117,6 +117,9 @@ model User {
   panRejectedAt DateTime?
   voterIdRejectedAt DateTime?
   sessionVersion Int       @default(0)
+  // This version is intentionally separate from the customer session. It lets
+  // an admin session be revoked without affecting normal user login.
+  adminSessionVersion Int @default(0)
   role          Role      @default(BUYER)
   verified      Boolean   @default(false)
   emailVerifiedAt DateTime?
@@ -126,6 +129,13 @@ model User {
   // Public broker profile fields
   brokerBio     String?
   brokerAgency  String?
+  // Personal search preferences are optional and belong only to this user.
+  preferredCity String?
+  preferredLocation String?
+  preferredPropertyType String?
+  budgetRange String?
+  preferredBhk String?
+  searchPurpose Purpose?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

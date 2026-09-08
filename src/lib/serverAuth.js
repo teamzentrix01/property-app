@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { AUTH_COOKIE, verifyToken } from "@/lib/auth";
+import { ADMIN_AUTH_COOKIE, AUTH_COOKIE, verifyAdminToken, verifyToken } from "@/lib/auth";
 
 export async function currentUser() {
   const token = (await cookies()).get(AUTH_COOKIE)?.value;
@@ -22,7 +22,19 @@ export async function requireUser(roles = []) {
 }
 
 export async function requireAdmin() {
-  return requireUser(["AREA_ADMIN", "SUPER_ADMIN"]);
+  const user = await currentAdmin();
+  if (!user) return { user: null, status: 401, error: "Admin authentication required" };
+  return { user, status: null, error: null };
+}
+
+export async function currentAdmin() {
+  const token = (await cookies()).get(ADMIN_AUTH_COOKIE)?.value;
+  const payload = token && verifyAdminToken(token);
+  if (!payload?.id || !["AREA_ADMIN", "SUPER_ADMIN"].includes(payload.role)) return null;
+
+  const user = await prisma.user.findUnique({ where: { id: payload.id } });
+  if (!user || !["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role) || user.adminSessionVersion !== payload.adminSessionVersion) return null;
+  return user;
 }
 
 export function isScopedAreaAdmin(user) {

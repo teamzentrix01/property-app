@@ -47,7 +47,15 @@ export async function POST(req) {
     response.cookies.set(AUTH_COOKIE, token, AUTH_COOKIE_OPTIONS);
     return response;
   } catch (error) {
-    console.error("LOGIN API ERROR", { message: error instanceof Error ? error.message : "Unknown error" });
-    return NextResponse.json({ error: "Login service is temporarily unavailable. Please try again." }, { status: 500 });
+    // Keep the client response safe, but preserve enough detail to diagnose
+    // database, Prisma, bcrypt, or JWT configuration failures in development.
+    const message = error instanceof Error ? error.message : "Unknown error";
+    const code = typeof error === "object" && error ? error.code : undefined;
+    console.error("LOGIN API ERROR", { code, message, stack: process.env.NODE_ENV === "development" && error instanceof Error ? error.stack : undefined });
+    const unavailable = code === "P1001" || code === "P1002" || code === "P1008" || /JWT_SECRET must be set|database|connect/i.test(message);
+    return NextResponse.json(
+      { error: unavailable ? "Login service is temporarily unavailable. Please try again." : "Unable to complete login. Please try again." },
+      { status: unavailable ? 503 : 500 },
+    );
   }
 }

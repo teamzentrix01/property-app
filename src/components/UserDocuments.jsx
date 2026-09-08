@@ -16,7 +16,7 @@ export default function UserDocuments() {
 
   async function load() {
     try {
-      const response = await fetch("/api/documents", { cache: "no-store" });
+      const response = await fetch("/api/documents", { credentials: "include", cache: "no-store" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Unable to load your documents.");
       setDocuments(data.documents || []);
@@ -59,7 +59,7 @@ export default function UserDocuments() {
       const body = new FormData();
       body.set("file", selectedFile);
       body.set("documentType", documentType);
-      const response = await fetch("/api/documents/upload", { method: "POST", body });
+      const response = await fetch("/api/documents/upload", { method: "POST", credentials: "include", body });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Document upload failed. Please try again.");
       setSuccess(data.message || "Document uploaded successfully");

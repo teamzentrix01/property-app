@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/serverAuth";
+import { requireAdmin } from "@/lib/serverAuth";
 import { ROLES, text } from "@/lib/validation";
 
 const safeUser = { id: true, name: true, email: true, phone: true, role: true, adminArea: true, verified: true, createdAt: true };
 
 export async function GET() {
-  const auth = await requireUser(["SUPER_ADMIN"]);
+  const auth = await requireAdmin();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const users = await prisma.user.findMany({ select: safeUser, orderBy: { createdAt: "desc" }, take: 200 });
   return NextResponse.json({ users });
 }
 
 export async function PATCH(req) {
-  const auth = await requireUser(["SUPER_ADMIN"]);
+  const auth = await requireAdmin();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
+  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
   const body = await req.json().catch(() => null);
   if (!body?.userId || typeof body.userId !== "string") return NextResponse.json({ error: "userId is required" }, { status: 400 });
   const target = await prisma.user.findUnique({ where: { id: body.userId } });

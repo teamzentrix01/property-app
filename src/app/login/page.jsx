@@ -92,6 +92,7 @@ function LoginForm() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         cache: "no-store",
         body: JSON.stringify({
           emailOrPhone: form.email.trim() || form.mobile.trim(),
@@ -108,12 +109,14 @@ function LoginForm() {
         return;
       }
 
+      window.dispatchEvent(new Event("bhoomi-auth-changed"));
       const next = searchParams.get("next") || searchParams.get("redirect");
       router.replace(next?.startsWith("/") ? next : "/dashboard");
       router.refresh();
     } catch (error) {
+      console.error("Login request failed", error);
       setErrors({
-        form: "Something went wrong. Please try again.",
+        form: "Login service is temporarily unavailable. Please try again.",
       });
     } finally {
       submitting.current = false;
@@ -122,10 +125,10 @@ function LoginForm() {
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center px-6 py-16 bg-gray-50">
+    <main className="auth-shell flex-1 flex items-center justify-center px-6 py-16 bg-gray-50">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm bg-white text-gray-900 rounded-2xl p-8 shadow-lg"
+        className="auth-panel w-full max-w-sm bg-white text-gray-900 rounded-2xl p-8 shadow-lg"
       >
         <h1 className="font-display text-2xl mb-6 font-semibold">
           Log in

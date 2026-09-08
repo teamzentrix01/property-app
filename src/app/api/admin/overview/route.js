@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/serverAuth";
+import { requireAdmin } from "@/lib/serverAuth";
 
 export async function GET(req) {
-  const auth = await requireUser(["SUPER_ADMIN"]);
+  const auth = await requireAdmin();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
   const sp = new URL(req.url).searchParams;
   const page = Math.max(1, Number(sp.get("page")) || 1);
   const take = 50;

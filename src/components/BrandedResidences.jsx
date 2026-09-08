@@ -13,6 +13,7 @@ import {
   Car,
 } from "lucide-react";
 import { formatPrice } from "@/lib/formatters";
+import SaveListingButton from "@/components/SaveListingButton";
 
 const residences = [
   {
@@ -67,15 +68,6 @@ const residences = [
 
 export default function BrandedResidences({ listings = [] }) {
   const residences = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: listing.area, city: listing.city, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, image: listing.photos?.[0]?.url || "/file.svg", brand: listing.propertyType, tag: "Branded Residence" }));
-  const [liked, setLiked] = useState([]);
-
-  const toggleLike = (id) => {
-    setLiked((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
-    );
-  };
 
   return (
     <section className="w-full bg-[#f7f6f3] py-16 sm:py-20 lg:py-24">
@@ -157,19 +149,7 @@ export default function BrandedResidences({ listings = [] }) {
                 </div>
 
                 {/* Wishlist */}
-                <button
-                  onClick={() => toggleLike(residence.id)}
-                  className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-110"
-                  aria-label="Add to wishlist"
-                >
-                  <Heart
-                    className={`h-4 w-4 ${
-                      liked.includes(residence.id)
-                        ? "fill-red-500 text-red-500"
-                        : "text-gray-600"
-                    }`}
-                  />
-                </button>
+                <SaveListingButton listingId={residence.id} className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-110" />
 
                 {/* Price */}
                 <div className="absolute bottom-4 left-4">

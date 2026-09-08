@@ -68,7 +68,7 @@ export default function Navbar() {
   useEffect(() => {
     let active = true;
 
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { user: null }))
       .then((d) => {
         if (active) setUser(d.user);
@@ -85,8 +85,10 @@ export default function Navbar() {
   async function logout() {
     await fetch("/api/auth/logout", {
       method: "POST",
+      credentials: "include",
     });
 
+    window.dispatchEvent(new Event("bhoomi-auth-changed"));
     setUser(null);
     router.push("/");
     router.refresh();
@@ -184,11 +186,11 @@ export default function Navbar() {
               {user ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href="/profile"
                     className="flex items-center gap-1.5 rounded-lg bg-amber-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-amber-800"
                   >
                     <User size={14} />
-                    Dashboard
+                    Profile
                   </Link>
                 </>
               ) : user === null ? (
@@ -205,11 +207,11 @@ export default function Navbar() {
               {user && (
                 <Link
                   href="/post-property"
-                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:from-red-600 hover:to-red-700"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-emerald-700 to-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-emerald-900/15 transition hover:from-emerald-800 hover:to-emerald-700"
                 >
                   <Plus size={14} />
                   Post Property
-                  <span className="ml-1 rounded bg-red-700 px-1.5 py-0.5 text-[8px]">
+                  <span className="ml-1 rounded bg-emerald-900 px-1.5 py-0.5 text-[8px]">
                     FREE
                   </span>
                 </Link>
@@ -248,7 +250,7 @@ export default function Navbar() {
           {/* =================================================
               SEARCH BAR
           ================================================== */}
-          <div className="hidden border-t border-amber-200 py-4 lg:block">
+          <div className="hidden border-t border-emerald-100 bg-emerald-50/70 py-4 lg:block">
 
             <form
               key={`desktop-search-${searchParams.toString()}`}
@@ -256,9 +258,9 @@ export default function Navbar() {
               className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]"
             >
               {/* Location */}
-              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 transition focus-within:border-red-500">
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
                 <MapPin
-                  className="shrink-0 text-red-600"
+                  className="shrink-0 text-emerald-700"
                   size={18}
                 />
 
@@ -272,8 +274,8 @@ export default function Navbar() {
               </div>
 
               {/* Property Type */}
-              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 transition focus-within:border-red-500">
-                <span className="shrink-0 text-sm font-bold text-red-600">
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+                  <span className="shrink-0 text-sm font-bold text-emerald-700">
                   🏢
                 </span>
 
@@ -294,8 +296,8 @@ export default function Navbar() {
               </div>
 
               {/* Budget */}
-              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 transition focus-within:border-red-500">
-                <span className="shrink-0 text-sm font-bold text-red-600">
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
+                  <span className="shrink-0 text-sm font-bold text-emerald-700">
                   ₹
                 </span>
 
@@ -319,7 +321,7 @@ export default function Navbar() {
               {/* Search Button */}
               <button
                 type="submit"
-                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-6 py-2 text-xs font-semibold text-white transition hover:from-red-600 hover:to-red-700"
+                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-800 to-emerald-600 px-6 py-2 text-xs font-semibold text-white shadow-sm shadow-emerald-950/15 transition hover:from-emerald-900 hover:to-emerald-700"
               >
                 <Search size={16} />
                 Search
@@ -342,7 +344,7 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2">
                   <MapPin
-                    className="shrink-0 text-red-600"
+                    className="shrink-0 text-emerald-700"
                     size={18}
                   />
 
@@ -371,7 +373,7 @@ export default function Navbar() {
 
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-800 to-emerald-600 px-4 py-2 text-xs font-semibold text-white"
                 >
                   <Search size={16} />
                   Search
@@ -438,12 +440,12 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <Link
-                      href="/dashboard"
+                      href="/profile"
                       className="flex items-center gap-2 rounded-lg bg-amber-900 px-4 py-2 text-xs font-semibold text-white"
                       onClick={() => setMobileMenu(false)}
                     >
                       <User size={14} />
-                      Dashboard
+                      Profile
                     </Link>
                   </>
                 ) : (
@@ -460,7 +462,7 @@ export default function Navbar() {
                 {user && (
                   <Link
                     href="/post-property"
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-xs font-semibold text-white"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-800 to-emerald-600 px-4 py-2 text-xs font-semibold text-white"
                     onClick={() => setMobileMenu(false)}
                   >
                     <Plus size={14} />

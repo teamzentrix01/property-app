@@ -14,6 +14,7 @@ import {
   Maximize,
 } from "lucide-react";
 import { formatPrice } from "@/lib/formatters";
+import SaveListingButton from "@/components/SaveListingButton";
 
 const properties = [
   {
@@ -116,15 +117,6 @@ export default function RecommendedProperties({ listings = [], error = false }) 
     rera: Boolean(listing.reraNumber),
   }));
   const [activeCard, setActiveCard] = useState(0);
-  const [liked, setLiked] = useState([]);
-
-  const toggleLike = (id) => {
-    setLiked((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
-    );
-  };
 
   const nextSlide = () => {
     if (!properties.length) return;
@@ -240,19 +232,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
                 )}
 
                 {/* Wishlist */}
-                <button
-                  onClick={() => toggleLike(property.id)}
-                  className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md transition hover:scale-110"
-                  aria-label="Add to wishlist"
-                >
-                  <Heart
-                    className={`h-4 w-4 ${
-                      liked.includes(property.id)
-                        ? "fill-red-500 text-red-500"
-                        : "text-gray-600"
-                    }`}
-                  />
-                </button>
+                <SaveListingButton listingId={property.id} className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md transition hover:scale-110" />
 
                 {/* Starting Price */}
                 <div className="absolute bottom-4 left-4">

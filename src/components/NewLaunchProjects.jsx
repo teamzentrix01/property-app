@@ -10,6 +10,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import { formatPrice } from "@/lib/formatters";
+import SaveListingButton from "@/components/SaveListingButton";
 
 const projects = [
   {
@@ -56,15 +57,6 @@ const projects = [
 
 export default function NewLaunchProjects({ listings = [] }) {
   const projects = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: `${listing.area}, ${listing.city}`, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, image: listing.photos?.[0]?.url || "/file.svg", tag: "New Launch" }));
-  const [liked, setLiked] = useState([]);
-
-  const toggleLike = (id) => {
-    setLiked((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
-    );
-  };
 
   return (
     <section className="w-full bg-[#f8f8f8] py-16 sm:py-20 lg:py-24">
@@ -141,18 +133,7 @@ export default function NewLaunchProjects({ listings = [] }) {
                 </div>
 
                 {/* Wishlist */}
-                <button
-                  onClick={() => toggleLike(project.id)}
-                  className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-110"
-                >
-                  <Heart
-                    className={`h-4 w-4 ${
-                      liked.includes(project.id)
-                        ? "fill-red-500 text-red-500"
-                        : "text-gray-600"
-                    }`}
-                  />
-                </button>
+                <SaveListingButton listingId={project.id} className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-110" />
 
                 {/* Price */}
                 <div className="absolute bottom-4 left-4">

@@ -59,7 +59,7 @@ export default function Footer() {
   const [user, setUser] = useState(undefined);
   useEffect(() => { fetch("/api/auth/me").then((response) => response.ok ? response.json() : { user: null }).then((data) => setUser(data.user)).catch(() => setUser(null)); }, []);
   return (
-    <footer className="w-full bg-[#111111] text-white">
+    <footer className="site-footer w-full bg-[#111111] text-white">
 
       {/* =====================================================
           TOP CTA

@@ -7,6 +7,7 @@ import AdminOverview from "@/components/AdminOverview";
 import { CONTENT_CATEGORIES } from "@/lib/contentCategories";
 import StatusBadge, { statusLabel } from "@/components/StatusBadge";
 import UserDocuments from "@/components/UserDocuments";
+import UserProfileDashboard from "@/components/UserProfileDashboard";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -30,6 +31,10 @@ export default function Dashboard() {
       .then((r) => r.json())
       .then((d) => setUser(d.user));
   }, []);
+
+  useEffect(() => {
+    if (user === null) router.replace("/login?next=/dashboard");
+  }, [router, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -219,6 +224,8 @@ export default function Dashboard() {
       </main>
     );
   }
+
+  if (!["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role)) return <UserProfileDashboard />;
 
   return (
     <main className={`flex-1 mx-auto px-4 sm:px-6 py-12 w-full ${user.role === "SUPER_ADMIN" ? "max-w-7xl" : "max-w-4xl"}`}>

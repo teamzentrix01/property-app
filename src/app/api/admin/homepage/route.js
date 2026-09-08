@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/serverAuth";
+import { requireAdmin } from "@/lib/serverAuth";
 
 function normalizeSection(section) {
   return {
@@ -16,10 +16,11 @@ function normalizeSection(section) {
 }
 
 export async function GET() {
-  const auth = await requireUser(["SUPER_ADMIN"]);
+  const auth = await requireAdmin();
   if (!auth.user) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
+  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
 
   const [sections, listings] = await Promise.all([
     prisma.homepageSection.findMany({
@@ -60,10 +61,11 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  const auth = await requireUser(["SUPER_ADMIN"]);
+  const auth = await requireAdmin();
   if (!auth.user) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
+  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
 
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") {
@@ -125,10 +127,11 @@ export async function POST(req) {
 }
 
 export async function DELETE(req) {
-  const auth = await requireUser(["SUPER_ADMIN"]);
+  const auth = await requireAdmin();
   if (!auth.user) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
+  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
 
   const body = await req.json().catch(() => null);
   const sectionId = body?.sectionId ? String(body.sectionId).trim() : "";
