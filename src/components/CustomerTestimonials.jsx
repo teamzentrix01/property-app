@@ -130,7 +130,7 @@ export default function CustomerTestimonials() {
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
-                  className="h-4 w-4 fill-[#b58a3a] text-[#b58a3a]"
+                  className="h-4 w-4 fill-emerald-600 text-emerald-600"
                 />
               ))}
             </div>
@@ -168,7 +168,7 @@ export default function CustomerTestimonials() {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className="h-4 w-4 fill-[#b58a3a] text-[#b58a3a]"
+                    className="h-4 w-4 fill-emerald-600 text-emerald-600"
                   />
                 ))}
               </div>
