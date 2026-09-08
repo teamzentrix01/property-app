@@ -104,7 +104,7 @@ export default function CustomerTestimonials() {
             <div className="mb-3 flex items-center gap-2">
               <MessageCircle className="h-4 w-4 text-[#b58a3a]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a17a2d]">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
                 What Our Customers Say
               </span>
             </div>
@@ -112,7 +112,7 @@ export default function CustomerTestimonials() {
             {/* Heading */}
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               Customer{" "}
-              <span className="text-[#b2873a]">
+              <span className="text-[Explore Gurugram]">
                 Testimonials
               </span>
             </h2>
@@ -271,7 +271,7 @@ export default function CustomerTestimonials() {
           <div className="relative z-10 flex flex-col gap-6 px-6 py-8 sm:px-9 lg:flex-row lg:items-center lg:justify-between lg:px-12">
 
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d3aa5d]">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                 Your Property Journey
               </p>
 

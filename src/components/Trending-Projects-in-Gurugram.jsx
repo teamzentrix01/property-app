@@ -93,7 +93,7 @@ export default function TrendingProjects({ listings = [] }) {
 
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[40px]">
               Trending Projects in{" "}
-              <span className="text-[#b2873a]">
+              <span className="text-[Explore Gurugram]">
                 Gurugram
               </span>
             </h2>
@@ -108,14 +108,14 @@ export default function TrendingProjects({ listings = [] }) {
           <div className="hidden gap-2 md:flex">
             <button
               onClick={previousProjects}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[Explore Gurugram] hover:bg-[Explore Gurugram] hover:text-white"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
 
             <button
               onClick={nextProjects}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[Explore Gurugram] hover:bg-[Explore Gurugram] hover:text-white"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -144,7 +144,7 @@ export default function TrendingProjects({ listings = [] }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/20" />
 
                 {/* Trending Tag */}
-                <div className="absolute left-4 top-4 rounded-md bg-[#b2873a] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                <div className="absolute left-4 top-4 rounded-md bg-[Explore Gurugram] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white">
                   {project.tag}
                 </div>
 
@@ -172,13 +172,13 @@ export default function TrendingProjects({ listings = [] }) {
               {/* CONTENT */}
               <div className="p-5">
 
-                <h3 className="text-lg font-bold text-[#171717] transition group-hover:text-[#b2873a]">
+                <h3 className="text-lg font-bold text-[#171717] transition group-hover:text-[Explore Gurugram]">
                   {project.name}
                 </h3>
 
                 {/* Location */}
                 <div className="mt-2 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 shrink-0 text-[#b2873a]" />
+                  <MapPin className="h-4 w-4 shrink-0 text-[Explore Gurugram]" />
 
                   <p className="text-xs text-gray-500">
                     {project.location}
@@ -214,7 +214,7 @@ export default function TrendingProjects({ listings = [] }) {
                 </div>
 
                 {/* Button */}
-                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[#b2873a] py-2.5 text-sm font-semibold text-[#a17a2d] transition-all duration-300 hover:bg-[#b2873a] hover:text-white">
+                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[Explore Gurugram] py-2.5 text-sm font-semibold text-[Explore Gurugram] transition-all duration-300 hover:bg-[Explore Gurugram] hover:text-white">
                   View Details
 
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -256,7 +256,7 @@ export default function TrendingProjects({ listings = [] }) {
             </p>
           </div>
 
-          <button className="flex items-center gap-2 rounded-lg bg-[#b2873a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#96702c]">
+          <button className="flex items-center gap-2 rounded-lg bg-[Explore Gurugram] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#96702c]">
             Explore Gurugram
             <ArrowRight className="h-4 w-4" />
           </button>

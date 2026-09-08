@@ -255,7 +255,7 @@ export default function Navbar() {
             <form
               key={`desktop-search-${searchParams.toString()}`}
               onSubmit={submitListingSearch}
-              className="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]"
+              className="site-search grid gap-2 rounded-xl bg-emerald-800 p-2 shadow-sm shadow-emerald-950/15 md:grid-cols-[1fr_1fr_1fr_auto]"
             >
               {/* Location */}
               <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
@@ -340,7 +340,7 @@ export default function Navbar() {
             <div className="space-y-3 px-4 py-4">
 
               {/* Mobile Search */}
-              <form key={`mobile-search-${searchParams.toString()}`} onSubmit={submitListingSearch} className="space-y-2">
+              <form key={`mobile-search-${searchParams.toString()}`} onSubmit={submitListingSearch} className="site-search space-y-2 rounded-xl bg-emerald-800 p-2 shadow-sm shadow-emerald-950/15">
 
                 <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2">
                   <MapPin

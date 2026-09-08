@@ -52,7 +52,7 @@ export default function FestivalOffer() {
               {/* Heading */}
               <h2 className="max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[50px]">
                 Best Festival Offer in{" "}
-                <span className="text-[#d3aa5d]">
+                <span className="text-[Explore Gurugram]">
                   2026
                 </span>
               </h2>
@@ -71,17 +71,17 @@ export default function FestivalOffer() {
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
 
                 <div className="flex items-center gap-2 text-sm text-white/85">
-                  <ShieldCheck className="h-4 w-4 text-[#d3aa5d]" />
+                  <ShieldCheck className="h-4 w-4 text-[Explore Gurugram]" />
                   Verified Properties
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-white/85">
-                  <Sparkles className="h-4 w-4 text-[#d3aa5d]" />
+                  <Sparkles className="h-4 w-4 text-[Explore Gurugram]" />
                   Exclusive Deals
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-white/85">
-                  <Clock3 className="h-4 w-4 text-[#d3aa5d]" />
+                  <Clock3 className="h-4 w-4 text-[Explore Gurugram]" />
                   Limited Period
                 </div>
 
@@ -120,7 +120,7 @@ export default function FestivalOffer() {
                   Special Offers
                 </span>
 
-                <span className="font-bold text-[#d3aa5d]">
+                <span className="font-bold text-[Explore Gurugram]">
                   Exclusive
                 </span>
               </div>
@@ -158,7 +158,7 @@ export default function FestivalOffer() {
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
 
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f5efe4]">
-              <Sparkles className="h-5 w-5 text-[#b2873a]" />
+              <Sparkles className="h-5 w-5 text-[Explore Gurugram]" />
             </div>
 
             <div>
@@ -176,7 +176,7 @@ export default function FestivalOffer() {
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
 
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f5efe4]">
-              <Clock3 className="h-5 w-5 text-[#b2873a]" />
+              <Clock3 className="h-5 w-5 text-[Explore Gurugram]" />
             </div>
 
             <div>
@@ -194,7 +194,7 @@ export default function FestivalOffer() {
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
 
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f5efe4]">
-              <ShieldCheck className="h-5 w-5 text-[#b2873a]" />
+              <ShieldCheck className="h-5 w-5 text-[Explore Gurugram]" />
             </div>
 
             <div>

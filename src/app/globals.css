@@ -49,10 +49,14 @@ html, body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body { min-width: 320px; }
 main { isolation: isolate; }
+img, video, canvas, svg { max-width: 100%; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button, select { cursor: pointer; }
 a, button, input, select, textarea { transition: border-color .2s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease; }
@@ -71,8 +75,8 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(5, 150, 1
 /* A small compatibility layer for legacy gold literals used by editorial
    homepage modules. It deliberately leaves red/amber status states semantic. */
 [class*="bg-[#b58a3a]"], [class*="bg-[#c88915]"], [class*="bg-[#e5a92f]"], [class*="bg-[#f0c451]"] { background-color: #047857 !important; }
-[class*="text-[#b58a3a]"], [class*="text-[#c88915]"], [class*="text-[#d3aa5d]"], [class*="text-[#d99a1f]"], [class*="text-[#b77d0e]"], [class*="text-[#a8730e]"] { color: #059669 !important; }
-[class*="border-[#b58a3a]"], [class*="border-[#d3aa5d]"], [class*="border-[#e5a92f]"] { border-color: #6ee7b7 !important; }
+[class*="text-[#b58a3a]"], [class*="text-[#c88915]"], [class*="text-[Explore Gurugram]"], [class*="text-[#d99a1f]"], [class*="text-[#b77d0e]"], [class*="text-[#a8730e]"] { color: #059669 !important; }
+[class*="border-[#b58a3a]"], [class*="border-[Explore Gurugram]"], [class*="border-[#e5a92f]"] { border-color: #6ee7b7 !important; }
 [class*="from-[#c88915]"] { --tw-gradient-from: #064e3b var(--tw-gradient-from-position) !important; }
 [class*="via-[#e5a92f]"] { --tw-gradient-via: #047857 var(--tw-gradient-via-position) !important; }
 [class*="to-[#f0c451]"], [class*="to-[#e5a92f]"] { --tw-gradient-to: #10b981 var(--tw-gradient-to-position) !important; }
@@ -81,7 +85,28 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(5, 150, 1
 .site-footer { background: #022c22 !important; }
 .site-footer [class*="bg-[#1c1c1c]"], .site-footer [class*="bg-[#0d0d0d]"] { background-color: #064e3b !important; }
 .site-footer [class*="text-white/"] { color: #fff !important; }
-.site-footer [class*="[#b58a3a]"] { color: #6ee7b7; }
+.site-footer :is(a, p, span, h1, h2, h3, h4, svg) { color: #fff !important; }
+.site-footer a { border-radius: .5rem; transition: background-color .2s ease, color .2s ease; }
+.site-footer a:hover { background-color: #047857 !important; color: #fff !important; }
+
+/* Green surfaces always carry white, high-contrast content. This also covers
+   badges and legacy components that predate the shared design tokens. */
+:is([class*="bg-green-6"], [class*="bg-green-7"], [class*="bg-green-8"], [class*="bg-green-9"], [class*="bg-emerald-6"], [class*="bg-emerald-7"], [class*="bg-emerald-8"], [class*="bg-emerald-9"], [class*="bg-moss"], [class*="bg-[#047857]"], [class*="bg-[#064e3b]"]) { color: #fff !important; }
+:is([class*="bg-green-6"], [class*="bg-green-7"], [class*="bg-green-8"], [class*="bg-green-9"], [class*="bg-emerald-6"], [class*="bg-emerald-7"], [class*="bg-emerald-8"], [class*="bg-emerald-9"], [class*="bg-moss"], [class*="bg-[#047857]"], [class*="bg-[#064e3b]"]) :is(span, p, svg, h1, h2, h3, h4) { color: inherit !important; }
+
+/* Consistent interaction feedback across navigation, cards, controls and CTA
+   elements. Native error/destructive controls remain semantically red until
+   hovered, then use the requested brand interaction treatment. */
+:where(header, main, aside) :is(a, button, summary, [role="button"]):not(:disabled):hover { background-color: #047857 !important; border-color: #047857 !important; color: #fff !important; }
+:where(header, main, aside) :is(a, button, summary, [role="button"]):not(:disabled):hover :is(svg, span, p) { color: #fff !important; }
+
+/* The property search is a single emerald surface, with controls designed for
+   white-on-green readability rather than a mix of unrelated control colors. */
+.site-search > div { background: transparent !important; border-color: rgba(255,255,255,.34) !important; }
+.site-search :is(input, select, svg, span) { color: #fff !important; }
+.site-search input::placeholder { color: rgba(255,255,255,.78) !important; }
+.site-search select option { background: #fff; color: var(--color-text); }
+.site-footer [class*="[#b58a3a]"] { color: #fff !important; }
 .site-footer [class*="bg-[#b58a3a]"] { background-color: #047857 !important; color: #fff; }
 
 .auth-shell { position: relative; overflow: hidden; background: #f0fdf4 !important; }

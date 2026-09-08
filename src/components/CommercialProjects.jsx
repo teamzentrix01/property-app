@@ -79,7 +79,7 @@ export default function CommercialProjects({ listings = [] }) {
             <div className="mb-3 flex items-center gap-2">
               <Building2 className="h-4 w-4 text-[#b58a3a]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a17a2d]">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
                 Commercial Collection
               </span>
             </div>
@@ -87,7 +87,7 @@ export default function CommercialProjects({ listings = [] }) {
             {/* Heading */}
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               Commercial Projects in{" "}
-              <span className="text-[#b2873a]">
+              <span className="text-[Explore Gurugram]">
                 Delhi NCR
               </span>
             </h2>
@@ -100,7 +100,7 @@ export default function CommercialProjects({ listings = [] }) {
           </div>
 
           {/* View All */}
-          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[#b2873a]">
+          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
             View All Projects
 
             <ArrowRight
@@ -161,18 +161,18 @@ export default function CommercialProjects({ listings = [] }) {
               <div className="p-5">
 
                 {/* Developer */}
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#b2873a]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                   {project.developer}
                 </p>
 
                 {/* Name */}
-                <h3 className="mt-1 line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[#b2873a]">
+                <h3 className="mt-1 line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[Explore Gurugram]">
                   {project.name}
                 </h3>
 
                 {/* Location */}
                 <div className="mt-2 flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#b2873a]" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[Explore Gurugram]" />
 
                   <p className="line-clamp-2 text-xs leading-5 text-gray-500">
                     {project.location}, {project.city}
@@ -206,7 +206,7 @@ export default function CommercialProjects({ listings = [] }) {
                 </div>
 
                 {/* Button */}
-                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[#b2873a] py-2.5 text-sm font-semibold text-[#a17a2d] transition-all duration-300 hover:bg-[#b2873a] hover:text-white">
+                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[Explore Gurugram] py-2.5 text-sm font-semibold text-[Explore Gurugram] transition-all duration-300 hover:bg-[Explore Gurugram] hover:text-white">
                   View Details
 
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -228,9 +228,9 @@ export default function CommercialProjects({ listings = [] }) {
 
             <div>
               <div className="flex items-center gap-2">
-                <BriefcaseBusiness className="h-4 w-4 text-[#d3aa5d]" />
+                <BriefcaseBusiness className="h-4 w-4 text-[Explore Gurugram]" />
 
-                <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#d3aa5d]">
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                   Commercial Investment
                 </span>
               </div>

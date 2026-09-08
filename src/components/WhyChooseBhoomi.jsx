@@ -65,7 +65,7 @@ export default function WhyChoose100Acress() {
           <div className="mb-4 flex items-center justify-center gap-2">
             <Sparkles className="h-4 w-4 text-[#b58a3a]" />
 
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a17a2d]">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
               Your Trusted Property Partner
             </span>
           </div>
@@ -73,7 +73,7 @@ export default function WhyChoose100Acress() {
           {/* Heading */}
           <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
             Why Choose{" "}
-            <span className="text-[#b2873a]">
+            <span className="text-[Explore Gurugram]">
               Bhoomi.com
             </span>
           </h2>
@@ -101,10 +101,10 @@ export default function WhyChoose100Acress() {
 
                 {/* Icon */}
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#b58a3a]/15">
-                  <ShieldCheck className="h-8 w-8 text-[#d3aa5d]" />
+                  <ShieldCheck className="h-8 w-8 text-[Explore Gurugram]" />
                 </div>
 
-                <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-[#d3aa5d]">
+                <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
                   Property Search Made Easy
                 </p>
 
@@ -123,7 +123,7 @@ export default function WhyChoose100Acress() {
               <div className="mt-10 grid grid-cols-2 gap-3">
 
                 <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-2xl font-bold text-[#d3aa5d]">
+                  <p className="text-2xl font-bold text-[Explore Gurugram]">
                     10K+
                   </p>
 
@@ -133,7 +133,7 @@ export default function WhyChoose100Acress() {
                 </div>
 
                 <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-2xl font-bold text-[#d3aa5d]">
+                  <p className="text-2xl font-bold text-[Explore Gurugram]">
                     500+
                   </p>
 
@@ -160,11 +160,11 @@ export default function WhyChoose100Acress() {
 
                   {/* Icon */}
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#f7f1e6] transition-all duration-300 group-hover:bg-[#b58a3a]">
-                    <Icon className="h-5 w-5 text-[#b2873a] transition-colors group-hover:text-white" />
+                    <Icon className="h-5 w-5 text-[Explore Gurugram] transition-colors group-hover:text-white" />
                   </div>
 
                   {/* Title */}
-                  <h3 className="mt-5 text-lg font-bold text-[#171717] transition-colors group-hover:text-[#a17a2d]">
+                  <h3 className="mt-5 text-lg font-bold text-[#171717] transition-colors group-hover:text-[Explore Gurugram]">
                     {item.title}
                   </h3>
 

@@ -100,7 +100,7 @@ export default function BHKLifestyle() {
           <div className="mb-4 flex items-center justify-center gap-2">
             <Sparkles className="h-4 w-4 text-[#b58a3a]" />
 
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a17a2d]">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
               Find Your Perfect Home
             </span>
           </div>
@@ -108,7 +108,7 @@ export default function BHKLifestyle() {
           {/* Heading */}
           <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
             Which BHK suits your{" "}
-            <span className="text-[#b2873a]">
+            <span className="text-[Explore Gurugram]">
               lifestyle best?
             </span>
           </h2>
@@ -129,7 +129,7 @@ export default function BHKLifestyle() {
               className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-300 sm:px-7 ${
                 activeBhk === bhk.id
                   ? "border-[#b58a3a] bg-[#b58a3a] text-white shadow-md"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-[#b58a3a] hover:text-[#a17a2d]"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-[#b58a3a] hover:text-[Explore Gurugram]"
               }`}
             >
               {bhk.id}
@@ -156,7 +156,7 @@ export default function BHKLifestyle() {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/10" />
 
               {/* Decorative */}
-              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-[#d3aa5d]/25" />
+              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-[Explore Gurugram]/25" />
 
               <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-10">
 
@@ -172,13 +172,13 @@ export default function BHKLifestyle() {
                   {selected.title}
                 </h3>
 
-                <p className="mt-2 text-sm font-medium text-[#d3aa5d]">
+                <p className="mt-2 text-sm font-medium text-[Explore Gurugram]">
                   {selected.subtitle}
                 </p>
 
                 {/* Size */}
                 <div className="mt-6 flex items-center gap-2 text-sm text-white/70">
-                  <Home className="h-4 w-4 text-[#d3aa5d]" />
+                  <Home className="h-4 w-4 text-[Explore Gurugram]" />
                   Typical Size:{" "}
                   <span className="font-semibold text-white">
                     {selected.size}
@@ -194,7 +194,7 @@ export default function BHKLifestyle() {
               <div className="flex items-center gap-3">
 
                 <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#f5efe4]">
-                  <Users className="h-5 w-5 text-[#b2873a]" />
+                  <Users className="h-5 w-5 text-[Explore Gurugram]" />
                 </div>
 
                 <div>
@@ -248,7 +248,7 @@ export default function BHKLifestyle() {
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
 
-                <button className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-[#b58a3a] hover:text-[#a17a2d]">
+                <button className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-[#b58a3a] hover:text-[Explore Gurugram]">
                   View All
 
                   <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -268,7 +268,7 @@ export default function BHKLifestyle() {
             Not sure which BHK is right for you?
           </p>
 
-          <button className="text-sm font-bold text-[#a17a2d] underline underline-offset-4 hover:text-[#8c6824]">
+          <button className="text-sm font-bold text-[Explore Gurugram] underline underline-offset-4 hover:text-[#8c6824]">
             Get personalised recommendations
           </button>
 

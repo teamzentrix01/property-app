@@ -81,7 +81,7 @@ export default function PopularBuilders() {
             <div className="mb-3 flex items-center gap-2">
               <Building2 className="h-4 w-4 text-[#b58a3a]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a17a2d]">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
                 Trusted Developers
               </span>
             </div>
@@ -89,7 +89,7 @@ export default function PopularBuilders() {
             {/* Heading */}
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               Popular{" "}
-              <span className="text-[#b2873a]">
+              <span className="text-[Explore Gurugram]">
                 Builders
               </span>
             </h2>
@@ -101,7 +101,7 @@ export default function PopularBuilders() {
           </div>
 
           {/* View All */}
-          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[#b2873a]">
+          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
             View All Builders
 
             <ArrowRight
@@ -129,7 +129,7 @@ export default function PopularBuilders() {
 
                 <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-[#e7dcc7] bg-[#faf7f0]">
 
-                  <span className="text-sm font-black tracking-tight text-[#a17a2d]">
+                  <span className="text-sm font-black tracking-tight text-[Explore Gurugram]">
                     {builder.initial}
                   </span>
 
@@ -142,7 +142,7 @@ export default function PopularBuilders() {
               </div>
 
               {/* Builder Name */}
-              <h3 className="mt-5 text-base font-bold text-[#171717] transition group-hover:text-[#a17a2d] sm:text-lg">
+              <h3 className="mt-5 text-base font-bold text-[#171717] transition group-hover:text-[Explore Gurugram] sm:text-lg">
                 {builder.name}
               </h3>
 
@@ -150,7 +150,7 @@ export default function PopularBuilders() {
               <div className="mt-2 flex items-center gap-1.5">
                 <Star className="h-3.5 w-3.5 fill-[#b58a3a] text-[#b58a3a]" />
 
-                <span className="text-xs font-semibold text-[#a17a2d]">
+                <span className="text-xs font-semibold text-[Explore Gurugram]">
                   {builder.projects}
                 </span>
               </div>
@@ -186,11 +186,11 @@ export default function PopularBuilders() {
             <div className="flex items-start gap-4">
 
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#b58a3a]/15">
-                <ShieldCheck className="h-6 w-6 text-[#d3aa5d]" />
+                <ShieldCheck className="h-6 w-6 text-[Explore Gurugram]" />
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d3aa5d]">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                   Trusted Developers
                 </p>
 

@@ -146,7 +146,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
             <div className="mb-3 flex items-center gap-2">
               <span className="h-[2px] w-8 bg-[#d9a441]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#a17a2d]">
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                 100acress Exclusive
               </span>
             </div>
@@ -154,7 +154,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
             {/* Heading */}
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               bhoomi{" "}
-              <span className="text-[#b2873a]">
+              <span className="text-[Explore Gurugram]">
                 Recommended
               </span>
             </h2>
@@ -167,7 +167,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
           </div>
 
           {/* View All */}
-          <Link href="/listings" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[#b2873a]">
+          <Link href="/listings" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
             View All Properties
 
             <ArrowRight
@@ -182,7 +182,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
         <div className="mb-5 hidden items-center justify-end gap-2 md:flex">
           <button
             onClick={previousSlide}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[Explore Gurugram] hover:bg-[Explore Gurugram] hover:text-white"
             aria-label="Previous"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -190,7 +190,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
 
           <button
             onClick={nextSlide}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[Explore Gurugram] hover:bg-[Explore Gurugram] hover:text-white"
             aria-label="Next"
           >
             <ChevronRight className="h-5 w-5" />
@@ -252,13 +252,13 @@ export default function RecommendedProperties({ listings = [], error = false }) 
               <div className="p-5">
 
                 {/* Property Name */}
-                <h3 className="line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[#b2873a]">
+                <h3 className="line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[Explore Gurugram]">
                   {property.name}
                 </h3>
 
                 {/* Location */}
                 <div className="mt-2 flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#b2873a]" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[Explore Gurugram]" />
 
                   <p className="line-clamp-2 text-xs leading-5 text-gray-500">
                     {property.location}, {property.city}
@@ -316,7 +316,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
                 </div>
 
                 {/* Bottom Action */}
-                <Link href={`/listings/${property.id}`} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[#b2873a] py-2.5 text-sm font-semibold text-[#9b752f] transition-all duration-300 hover:bg-[#b2873a] hover:text-white">
+                <Link href={`/listings/${property.id}`} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[Explore Gurugram] py-2.5 text-sm font-semibold text-[Explore Gurugram] transition-all duration-300 hover:bg-[Explore Gurugram] hover:text-white">
                   View Property
 
                   <ArrowRight className="h-4 w-4" />

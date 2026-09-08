@@ -78,9 +78,9 @@ export default function Footer() {
 
               <div>
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-[#d3aa5d]" />
+                  <ShieldCheck className="h-4 w-4 text-[Explore Gurugram]" />
 
-                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#d3aa5d]">
+                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                     Looking for your dream property?
                   </span>
                 </div>
@@ -108,7 +108,7 @@ export default function Footer() {
 
                 <a
                   href="tel:+918500900100"
-                  className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-[#b58a3a] hover:text-[#d3aa5d]"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-[#b58a3a] hover:text-[Explore Gurugram]"
                 >
                   <Phone className="h-4 w-4" />
                   Call Now
@@ -143,7 +143,7 @@ export default function Footer() {
 
               <div>
                 <span className="block text-xl font-black tracking-tight text-white">
-                  100<span className="text-[#d3aa5d]">acress</span>
+                  100<span className="text-[Explore Gurugram]">acress</span>
                 </span>
 
                 <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/40">
@@ -163,7 +163,7 @@ export default function Footer() {
 
               <a
                 href="tel:+918500900100"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[#d3aa5d]"
+                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[Explore Gurugram]"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
                   <Phone className="h-4 w-4 text-[#b58a3a]" />
@@ -174,7 +174,7 @@ export default function Footer() {
 
               <a
                 href="mailto:support@100acress.com"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[#d3aa5d]"
+                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[Explore Gurugram]"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
                   <Mail className="h-4 w-4 text-[#b58a3a]" />
@@ -212,7 +212,7 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[#d3aa5d]"
+                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[Explore Gurugram]"
                 >
                   <ChevronRight className="h-3.5 w-3.5 text-[#b58a3a] transition-transform group-hover:translate-x-1" />
 
@@ -237,7 +237,7 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[#d3aa5d]"
+                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[Explore Gurugram]"
                 >
                   <ChevronRight className="h-3.5 w-3.5 text-[#b58a3a] transition-transform group-hover:translate-x-1" />
 
@@ -262,7 +262,7 @@ export default function Footer() {
                 <Link
                   key={location.name}
                   href={location.href}
-                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[#d3aa5d]"
+                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[Explore Gurugram]"
                 >
                   <MapPin className="h-3.5 w-3.5 text-[#b58a3a]" />
 
@@ -367,7 +367,7 @@ export default function Footer() {
               <Link
                 key={item}
                 href="/properties"
-                className="text-xs text-white/35 transition hover:text-[#d3aa5d]"
+                className="text-xs text-white/35 transition hover:text-[Explore Gurugram]"
               >
                 {item}
               </Link>
@@ -396,7 +396,7 @@ export default function Footer() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-xs text-white/35 transition hover:text-[#d3aa5d]"
+                className="text-xs text-white/35 transition hover:text-[Explore Gurugram]"
               >
                 {link.name}
               </Link>

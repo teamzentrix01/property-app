@@ -82,14 +82,14 @@ export default function BrandedResidences({ listings = [] }) {
             <div className="mb-3 flex items-center gap-2">
               <Crown className="h-4 w-4 text-[#b58a3a]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a17a2d]">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
                 100acress Private Collection
               </span>
             </div>
 
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               Branded Residences in{" "}
-              <span className="text-[#b2873a]">
+              <span className="text-[Explore Gurugram]">
                 Gurugram
               </span>
             </h2>
@@ -101,7 +101,7 @@ export default function BrandedResidences({ listings = [] }) {
           </div>
 
           {/* View All */}
-          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[#b2873a]">
+          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
             View All Projects
 
             <ArrowRight
@@ -167,18 +167,18 @@ export default function BrandedResidences({ listings = [] }) {
               <div className="p-5">
 
                 {/* Brand */}
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#b2873a]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
                   {residence.brand}
                 </p>
 
                 {/* Name */}
-                <h3 className="mt-1 text-lg font-bold text-[#171717] transition group-hover:text-[#b2873a]">
+                <h3 className="mt-1 text-lg font-bold text-[#171717] transition group-hover:text-[Explore Gurugram]">
                   {residence.name}
                 </h3>
 
                 {/* Location */}
                 <div className="mt-2 flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#b2873a]" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[Explore Gurugram]" />
 
                   <p className="line-clamp-2 text-xs leading-5 text-gray-500">
                     {residence.location}, {residence.city}
@@ -211,7 +211,7 @@ export default function BrandedResidences({ listings = [] }) {
                 </div>
 
                 {/* Button */}
-                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[#b2873a] py-2.5 text-sm font-semibold text-[#a17a2d] transition-all duration-300 hover:bg-[#b2873a] hover:text-white">
+                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[Explore Gurugram] py-2.5 text-sm font-semibold text-[Explore Gurugram] transition-all duration-300 hover:bg-[Explore Gurugram] hover:text-white">
                   View Residence
 
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -241,16 +241,16 @@ export default function BrandedResidences({ listings = [] }) {
             <div className="max-w-3xl">
 
               <div className="flex items-center gap-2">
-                <Crown className="h-5 w-5 text-[#d3aa5d]" />
+                <Crown className="h-5 w-5 text-[Explore Gurugram]" />
 
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#d3aa5d]">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
                   100acress Private Collection
                 </span>
               </div>
 
               <h3 className="mt-4 text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
                 Where Branded Residences Meet
-                <span className="block text-[#d3aa5d]">
+                <span className="block text-[Explore Gurugram]">
                   Architectural Masterpieces
                 </span>
               </h3>
@@ -265,17 +265,17 @@ export default function BrandedResidences({ listings = [] }) {
               <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3">
 
                 <div className="flex items-center gap-2 text-sm text-white/80">
-                  <ConciergeBell className="h-4 w-4 text-[#d3aa5d]" />
+                  <ConciergeBell className="h-4 w-4 text-[Explore Gurugram]" />
                   Concierge Services
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Car className="h-4 w-4 text-[#d3aa5d]" />
+                  <Car className="h-4 w-4 text-[Explore Gurugram]" />
                   Valet Services
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-white/80">
-                  <BadgeCheck className="h-4 w-4 text-[#d3aa5d]" />
+                  <BadgeCheck className="h-4 w-4 text-[Explore Gurugram]" />
                   RERA Verified
                 </div>
 
