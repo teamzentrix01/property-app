@@ -13,8 +13,8 @@ try {
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.upsert({
     where: { email },
-    update: { name: "Bhoomi Super Admin", phone: "+919999999999", passwordHash, role: "SUPER_ADMIN", adminArea: null, sessionVersion: { increment: 1 }, adminSessionVersion: { increment: 1 } },
-    create: { name: "Bhoomi Super Admin", email, phone: "+919999999999", passwordHash, role: "SUPER_ADMIN" },
+    update: { name: "Bhoomi Super Admin", phone: "+9999999999", passwordHash, role: "SUPER_ADMIN", adminArea: null, sessionVersion: { increment: 1 }, adminSessionVersion: { increment: 1 } },
+    create: { name: "Bhoomi Super Admin", email, phone: "+9999999999", passwordHash, role: "SUPER_ADMIN" },
     select: { email: true, role: true },
   });
   console.log(`Created ${user.role}: ${user.email}`);

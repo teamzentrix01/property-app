@@ -1,9 +1,10 @@
-
 "use client";
 
 import { Suspense, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import BhoomiMark from "@/components/BhoomiMark";
 
 function LoginForm() {
   const router = useRouter();
@@ -125,184 +126,224 @@ function LoginForm() {
   }
 
   return (
-    <main className="auth-shell flex-1 flex items-center justify-center px-6 py-16 bg-gray-50">
-      <form
-        onSubmit={onSubmit}
-        className="auth-panel w-full max-w-sm bg-white text-gray-900 rounded-2xl p-8 shadow-lg"
-      >
-        <h1 className="font-display text-2xl mb-6 font-semibold">
-          Log in
-        </h1>
+    <main className="login-page-shell">
+      {/* ── LEFT: Property hero visual (hidden on mobile) ── */}
+      <div className="login-hero-panel" aria-hidden="true">
+        <img
+          src="/login-hero.jpg"
+          alt=""
+          className="login-hero-img"
+          draggable={false}
+        />
+        <div className="login-hero-overlay" />
 
-        {/* General Error */}
-        {errors.form && (
-          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
-            <p className="text-red-700 text-sm">
-              {errors.form}
+        <div className="login-hero-content">
+          <BhoomiMark light />
+          <h2 className="login-hero-heading font-display">
+            Find Your Perfect Property
+          </h2>
+          <p className="login-hero-sub">
+            Discover homes, apartments, plots, and investment opportunities in
+            the locations that matter to you.
+          </p>
+          <div className="login-hero-stats">
+            <div className="login-hero-stat">
+              <span className="login-hero-stat-num">5,000+</span>
+              <span className="login-hero-stat-label">Properties</span>
+            </div>
+            <div className="login-hero-stat-divider" />
+            <div className="login-hero-stat">
+              <span className="login-hero-stat-num">200+</span>
+              <span className="login-hero-stat-label">Cities</span>
+            </div>
+            <div className="login-hero-stat-divider" />
+            <div className="login-hero-stat">
+              <span className="login-hero-stat-num">10k+</span>
+              <span className="login-hero-stat-label">Happy Clients</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── RIGHT: Login card ── */}
+      <div className="login-form-panel">
+        <div className="login-card">
+          {/* Brand mark (mobile only) */}
+          <div className="login-card-brand md:hidden">
+            <BhoomiMark />
+          </div>
+
+          <div className="login-card-header">
+            <h1 className="login-card-title font-display">Welcome Back</h1>
+            <p className="login-card-subtitle">
+              Login to continue exploring properties.
             </p>
           </div>
-        )}
 
-        {/* Name */}
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">
-            Name
-          </label>
-
-          <input
-            type="text"
-            name="name"
-            maxLength={80}
-            pattern="[A-Za-z ]+"
-            title="Use letters and spaces only"
-            placeholder="Enter your name"
-            value={form.name}
-            onChange={handleChange}
-            className={`w-full rounded-lg px-3 py-2 border outline-none transition ${
-              errors.name
-                ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                : "border-gray-300 focus:border-green-600"
-            }`}
-          />
-
-          {errors.name && (
-            <p className="text-red-600 text-xs mt-1">
-              ⚠ {errors.name}
-            </p>
+          {/* ── Form-level error alert ── */}
+          {errors.form && (
+            <div className="login-error-banner" role="alert">
+              <AlertCircle className="login-error-icon" />
+              <p className="login-error-text">
+                {errors.form}
+              </p>
+            </div>
           )}
-        </div>
 
-        {/* Email */}
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">
-            Email
-          </label>
+          <form onSubmit={onSubmit} className="login-form" noValidate>
+            {/* Email / Phone */}
+            <div className="login-field-group">
+              <label htmlFor="login-email" className="login-label">
+                Email Address
+              </label>
+              <div className="login-input-wrap">
+                <Mail className="login-input-icon" aria-hidden="true" />
+                <input
+                  id="login-email"
+                  type="email"
+                  name="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "login-email-err" : undefined}
+                  className={`login-input ${errors.email ? "login-input--error" : ""}`}
+                />
+              </div>
+              {errors.email && (
+                <p id="login-email-err" className="login-field-error" role="alert">
+                  <AlertCircle size={14} /> {errors.email}
+                </p>
+              )}
+            </div>
 
-          <input
-            type="email"
-            name="email"
-            inputMode="email"
-            placeholder="Enter your email"
-            value={form.email}
-            onChange={handleChange}
-            className={`w-full rounded-lg px-3 py-2 border outline-none transition ${
-              errors.email
-                ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                : "border-gray-300 focus:border-green-600"
-            }`}
-          />
+            {/* Mobile */}
+            <div className="login-field-group">
+              <label htmlFor="login-mobile" className="login-label">
+                Or Mobile Number
+              </label>
+              <div className="login-input-wrap">
+                <span className="login-input-icon login-input-icon--text" aria-hidden="true">+91</span>
+                <input
+                  id="login-mobile"
+                  type="tel"
+                  name="mobile"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  maxLength={10}
+                  pattern="[6-9][0-9]{9}"
+                  placeholder="10-digit mobile number"
+                  value={form.mobile}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    if (value.length <= 10) {
+                      setForm((prev) => ({
+                        ...prev,
+                        mobile: value,
+                      }));
+                      if (errors.mobile) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          mobile: "",
+                        }));
+                      }
+                    }
+                  }}
+                  aria-invalid={!!errors.mobile}
+                  aria-describedby={errors.mobile ? "login-mobile-err" : undefined}
+                  className={`login-input ${errors.mobile ? "login-input--error" : ""}`}
+                />
+              </div>
+              {errors.mobile && (
+                <p id="login-mobile-err" className="login-field-error" role="alert">
+                  <AlertCircle size={14} /> {errors.mobile}
+                </p>
+              )}
+            </div>
 
-          {errors.email && (
-            <p className="text-red-600 text-xs mt-1">
-              ⚠ {errors.email}
-            </p>
-          )}
-        </div>
+            {/* Password */}
+            <div className="login-field-group">
+              <label htmlFor="login-password" className="login-label">
+                Password
+              </label>
+              <div className="login-input-wrap">
+                <Lock className="login-input-icon" aria-hidden="true" />
+                <input
+                  id="login-password"
+                  required
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChange={handleChange}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "login-pass-err" : undefined}
+                  className={`login-input login-input--password ${errors.password ? "login-input--error" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="login-eye-btn"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={0}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p id="login-pass-err" className="login-field-error" role="alert">
+                  <AlertCircle size={14} /> {errors.password}
+                </p>
+              )}
+            </div>
 
-        {/* Mobile */}
-        <div className="mb-4">
-          <label className="mb-1 block text-sm font-medium">
-            Mobile Number
-          </label>
+            {/* Remember / Forgot */}
+            <div className="login-meta-row">
+              <label className="login-remember">
+                <input type="checkbox" className="login-checkbox" />
+                <span>Remember me</span>
+              </label>
+              <Link href="#" className="login-forgot">
+                Forgot Password?
+              </Link>
+            </div>
 
-          <input
-            type="tel"
-            name="mobile"
-            inputMode="numeric"
-            maxLength={10}
-            pattern="[6-9][0-9]{9}"
-            placeholder="Enter 10-digit mobile number"
-            value={form.mobile}
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "");
-
-              if (value.length <= 10) {
-                setForm((prev) => ({
-                  ...prev,
-                  mobile: value,
-                }));
-
-                if (errors.mobile) {
-                  setErrors((prev) => ({
-                    ...prev,
-                    mobile: "",
-                  }));
-                }
-              }
-            }}
-            className={`w-full rounded-lg px-3 py-2 border outline-none transition ${
-              errors.mobile
-                ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                : "border-gray-300 focus:border-green-600"
-            }`}
-          />
-
-          {errors.mobile && (
-            <p className="text-red-600 text-xs mt-1">
-              ⚠ {errors.mobile}
-            </p>
-          )}
-        </div>
-
-        {/* Password */}
-        <div className="mb-5">
-          <label className="mb-1 block text-sm font-medium">
-            Password
-          </label>
-
-          <div className="relative">
-            <input
-              required
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              value={form.password}
-              onChange={handleChange}
-              className={`w-full rounded-lg border px-3 py-2 pr-14 outline-none transition ${
-                errors.password
-                  ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                  : "border-gray-300 focus:border-green-600"
-              }`}
-            />
-
+            {/* Submit */}
             <button
-              type="button"
-              onClick={() =>
-                setShowPassword((value) => !value)
-              }
-              className="absolute inset-y-0 right-3 text-xs font-medium text-green-700"
+              type="submit"
+              disabled={loading}
+              className="login-submit-btn"
             >
-              {showPassword ? "Hide" : "Show"}
+              {loading ? (
+                <>
+                  <Loader2 className="login-spinner" />
+                  Logging in…
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
+          </form>
+
+          {/* Divider */}
+          <div className="login-divider">
+            <span className="login-divider-line" />
+            <span className="login-divider-text">OR</span>
+            <span className="login-divider-line" />
           </div>
 
-          {errors.password && (
-            <p className="text-red-600 text-xs mt-1">
-              ⚠ {errors.password}
-            </p>
-          )}
+          {/* Register CTA */}
+          <p className="login-register-cta">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="login-register-link">
+              Register
+            </Link>
+          </p>
         </div>
-
-        {/* Login Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-gray-900 text-white rounded-full py-3 font-medium hover:bg-green-800 transition disabled:opacity-50"
-        >
-          {loading ? "Logging in..." : "Log in"}
-        </button>
-
-        {/* Signup */}
-        <p className="text-sm text-gray-600 mt-4">
-          New here?{" "}
-          <Link
-            href="/signup"
-            className="text-green-700 font-medium hover:underline"
-          >
-            Create an account
-          </Link>
-        </p>
-      </form>
+      </div>
     </main>
   );
 }
@@ -310,4 +351,3 @@ function LoginForm() {
 export default function LoginPage() {
   return <Suspense fallback={<main className="flex-1" />}><LoginForm /></Suspense>;
 }
-

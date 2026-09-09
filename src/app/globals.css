@@ -109,13 +109,957 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(5, 150, 1
 .site-footer [class*="[#b58a3a]"] { color: #fff !important; }
 .site-footer [class*="bg-[#b58a3a]"] { background-color: #047857 !important; color: #fff; }
 
-.auth-shell { position: relative; overflow: hidden; background: #f0fdf4 !important; }
-.auth-shell::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 43%; background: linear-gradient(145deg, #022c22, #047857); }
-.auth-shell::after { content: "Find a place that feels like home."; position: absolute; left: max(2rem, calc((100% - 72rem) / 2)); top: 50%; width: min(28rem, 35%); transform: translateY(-50%); color: white; font-family: var(--font-display); font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 600; line-height: 1.05; z-index: 1; }
-.auth-panel { position: relative; z-index: 2; border: 1px solid var(--color-border) !important; border-radius: 1.25rem !important; box-shadow: 0 20px 55px rgba(6, 78, 59, .12) !important; }
-@media (min-width: 768px) { .auth-panel { margin-left: 38%; } }
-@media (max-width: 767px) { .auth-shell::before, .auth-shell::after { display: none; } }
+/* ───────────────────────────────────────────────────────────────────
+   LOGIN PAGE — Premium Two-Column Layout
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Shell */
+.login-page-shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  background: #f8faf9;
+}
+
+/* ── LEFT: Hero Panel ── */
+.login-hero-panel {
+  position: relative;
+  display: none;
+  width: 50%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.login-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.login-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    175deg,
+    rgba(2, 44, 34, 0.82) 0%,
+    rgba(4, 120, 87, 0.70) 50%,
+    rgba(6, 78, 59, 0.85) 100%
+  );
+}
+.login-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 3.5rem;
+  color: #fff;
+  animation: loginHeroFadeIn 0.9s ease-out both;
+}
+.login-hero-heading {
+  margin-top: 2rem;
+  font-size: clamp(2rem, 3.2vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.login-hero-sub {
+  margin-top: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 28rem;
+}
+.login-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+.login-hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.login-hero-stat-num {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.login-hero-stat-label {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.login-hero-stat-divider {
+  width: 1px;
+  height: 2.2rem;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes loginHeroFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RIGHT: Form Panel ── */
+.login-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ── Login Card ── */
+.login-card {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border: 1px solid #e8eeeb;
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem;
+  box-shadow:
+    0 1px 3px rgba(6, 78, 59, 0.04),
+    0 8px 32px rgba(6, 78, 59, 0.07);
+  animation: loginCardSlideIn 0.6s ease-out both;
+}
+@keyframes loginCardSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-card-brand {
+  margin-bottom: 1.5rem;
+}
+
+.login-card-header {
+  margin-bottom: 1.75rem;
+}
+.login-card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.login-card-subtitle {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Error banner ── */
+.login-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  padding: 0.85rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.75rem;
+  animation: loginShake 0.4s ease;
+}
+.login-error-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #dc2626;
+  margin-top: 1px;
+}
+.login-error-text {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #b91c1c;
+}
+@keyframes loginShake {
+  0%, 100% { transform: translateX(0); }
+  15%      { transform: translateX(-4px); }
+  30%      { transform: translateX(4px); }
+  45%      { transform: translateX(-3px); }
+  60%      { transform: translateX(2px); }
+}
+
+/* ── Form ── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Field ── */
+.login-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.login-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.login-input-icon {
+  position: absolute;
+  left: 0.9rem;
+  width: 18px;
+  height: 18px;
+  color: #94a3a8;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+.login-input-icon--text {
+  width: auto;
+  height: auto;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3a8;
+  line-height: 1;
+}
+.login-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 1rem 0 2.75rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: #f8faf9;
+  border: 1.5px solid #ddeae4;
+  border-radius: 0.85rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+.login-input::placeholder {
+  color: #a3b4ae;
+  font-weight: 400;
+}
+.login-input:hover {
+  border-color: #b0cfc1;
+  background: #fff;
+}
+.login-input:focus {
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3.5px rgba(4, 120, 87, 0.10);
+}
+.login-input:focus ~ .login-input-icon,
+.login-input:focus ~ .login-eye-btn {
+  color: var(--color-primary);
+}
+/* Re-target the preceding icon via the wrapper */
+.login-input-wrap:focus-within .login-input-icon {
+  color: var(--color-primary);
+}
+.login-input--error {
+  border-color: #f87171 !important;
+  background: #fff !important;
+}
+.login-input--error:focus {
+  box-shadow: 0 0 0 3.5px rgba(248, 113, 113, 0.12) !important;
+}
+.login-input--password {
+  padding-right: 3rem;
+}
+
+/* Eye toggle */
+.login-eye-btn {
+  position: absolute;
+  right: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 0.5rem;
+  color: #94a3a8;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+  background: transparent !important;
+  border: none !important;
+}
+.login-eye-btn:hover {
+  color: var(--color-primary) !important;
+  background: rgba(4, 120, 87, 0.08) !important;
+}
+.login-eye-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.login-eye-btn svg {
+  color: inherit !important;
+}
+
+/* Field error */
+.login-field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #dc2626;
+  margin-top: 0.1rem;
+  animation: loginFieldErrIn 0.25s ease-out;
+}
+@keyframes loginFieldErrIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Remember / Forgot row ── */
+.login-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -0.15rem;
+}
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.login-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.login-forgot {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary) !important;
+  text-decoration: none;
+  transition: color 0.2s;
+  background: transparent !important;
+}
+.login-forgot:hover {
+  color: var(--color-primary-dark) !important;
+  text-decoration: underline;
+  background: transparent !important;
+}
+
+/* ── Submit ── */
+.login-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 52px;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff !important;
+  background: linear-gradient(135deg, #047857, #059669) !important;
+  border: none !important;
+  border-radius: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(4, 120, 87, 0.22);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+.login-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(4, 120, 87, 0.32) !important;
+  background: linear-gradient(135deg, #065f46, #047857) !important;
+}
+.login-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.login-submit-btn:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+}
+.login-submit-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* Spinner */
+.login-spinner {
+  width: 20px;
+  height: 20px;
+  animation: loginSpin 0.75s linear infinite;
+}
+@keyframes loginSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Divider ── */
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1.25rem;
+}
+.login-divider-line {
+  flex: 1;
+  height: 1px;
+  background: #ddeae4;
+}
+.login-divider-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #a3b4ae;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Register CTA ── */
+.login-register-cta {
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--color-text-muted);
+}
+.login-register-link {
+  font-weight: 700;
+  color: var(--color-primary) !important;
+  text-decoration: none;
+  transition: color 0.2s;
+  background: transparent !important;
+}
+.login-register-link:hover {
+  color: var(--color-primary-dark) !important;
+  text-decoration: underline;
+  background: transparent !important;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   SIGNUP PAGE — Extends the shared auth classes above
+   ─────────────────────────────────────────────────────────────────── */
+
+/* The signup form can be taller than viewport, so the right panel
+   should align to top and scroll naturally instead of centering. */
+.signup-form-panel {
+  align-items: flex-start;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+.signup-card {
+  max-width: 500px;
+}
+
+/* ── Hero benefits ── */
+.signup-hero-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+.signup-hero-benefit {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+.signup-hero-benefit-icon {
+  flex-shrink: 0;
+  color: #6ee7b7;
+}
+
+/* ── Stepper ── */
+.signup-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.75rem;
+}
+.signup-step {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+.signup-step-num {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #e8eeeb;
+  color: #94a3a8;
+  transition: background 0.3s, color 0.3s;
+}
+.signup-step--active .signup-step-num {
+  background: var(--color-primary);
+  color: #fff;
+}
+.signup-step-num--done {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+}
+.signup-step-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3a8;
+  transition: color 0.3s;
+}
+.signup-step--active .signup-step-label {
+  color: var(--color-text);
+}
+.signup-step-connector {
+  flex: 1;
+  height: 2px;
+  margin: 0 0.75rem;
+  background: #e8eeeb;
+  border-radius: 1px;
+  overflow: hidden;
+}
+.signup-step-connector-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+.signup-step-connector-fill--active {
+  width: 100%;
+}
+
+/* ── Step content animation ── */
+.signup-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: signupStepIn 0.35s ease-out both;
+}
+@keyframes signupStepIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Success banner ── */
+.signup-success-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  padding: 0.85rem 1rem;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 0.75rem;
+}
+.signup-success-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: #059669;
+  margin-top: 1px;
+}
+.signup-success-text {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #065f46;
+}
+
+/* ── Password strength ── */
+.signup-password-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+}
+.signup-pw-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.signup-pw-strength-track {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+  max-width: 120px;
+}
+.signup-pw-strength-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+.signup-pw-strength-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.signup-pw-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.signup-pw-rules li {
+  font-size: 0.78rem;
+  color: #94a3a8;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.2s;
+}
+.signup-pw-rules li::before {
+  content: "○";
+  font-size: 0.6rem;
+  color: inherit;
+}
+.signup-pw-rule--pass {
+  color: #059669 !important;
+}
+.signup-pw-rule--pass::before {
+  content: "✓" !important;
+  font-size: 0.7rem !important;
+}
+
+/* ── Role selector cards ── */
+.signup-role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.signup-role-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  border: 1.5px solid #ddeae4;
+  border-radius: 0.85rem;
+  background: #f8faf9 !important;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.signup-role-card:hover {
+  border-color: #b0cfc1 !important;
+  background: #fff !important;
+}
+.signup-role-card--active {
+  border-color: var(--color-primary) !important;
+  background: #ecfdf5 !important;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.08);
+}
+.signup-role-card--active:hover {
+  background: #ecfdf5 !important;
+}
+.signup-role-card-icon {
+  color: #94a3a8;
+  transition: color 0.2s;
+}
+.signup-role-card--active .signup-role-card-icon {
+  color: var(--color-primary) !important;
+}
+.signup-role-card-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.signup-role-card-check {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  animation: signupCheckPop 0.25s ease-out;
+}
+@keyframes signupCheckPop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+.signup-role-card svg {
+  color: inherit !important;
+}
+
+/* ── Document upload ── */
+.signup-documents-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #f8faf9;
+  border: 1px solid #e8eeeb;
+  border-radius: 0.85rem;
+}
+.signup-documents-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.signup-documents-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.signup-documents-desc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.signup-documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.signup-doc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.signup-doc-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.signup-doc-required {
+  color: #dc2626;
+}
+
+/* Drop zone */
+.signup-doc-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1.5px dashed #c8dbd3;
+  border-radius: 0.75rem;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.signup-doc-dropzone:hover {
+  border-color: var(--color-primary) !important;
+  background: #ecfdf5 !important;
+}
+.signup-doc-dropzone--error {
+  border-color: #f87171 !important;
+}
+.signup-doc-dropzone-icon {
+  color: #94a3a8;
+}
+.signup-doc-dropzone:hover .signup-doc-dropzone-icon {
+  color: var(--color-primary) !important;
+}
+.signup-doc-dropzone-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.signup-doc-dropzone-hint {
+  font-size: 0.72rem;
+  color: #94a3a8;
+}
+
+/* Uploaded file */
+.signup-doc-uploaded {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 0.75rem;
+}
+.signup-doc-uploaded-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.signup-doc-uploaded-icon {
+  flex-shrink: 0;
+  color: #059669;
+}
+.signup-doc-uploaded-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #065f46;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.signup-doc-uploaded-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.signup-doc-action-link {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-primary) !important;
+  text-decoration: underline;
+  background: transparent !important;
+}
+.signup-doc-action-link:hover {
+  color: var(--color-primary-dark) !important;
+  background: transparent !important;
+}
+.signup-doc-action-remove {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none !important;
+  background: rgba(220, 38, 38, 0.08) !important;
+  color: #dc2626 !important;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.signup-doc-action-remove:hover {
+  background: rgba(220, 38, 38, 0.16) !important;
+  color: #dc2626 !important;
+}
+.signup-doc-action-remove svg {
+  color: inherit !important;
+}
+
+/* ── Action buttons row ── */
+.signup-actions-row {
+  display: flex;
+  gap: 0.75rem;
+}
+.signup-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 35%;
+  height: 52px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-primary) !important;
+  background: #fff !important;
+  border: 1.5px solid #ddeae4 !important;
+  border-radius: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.signup-back-btn:hover {
+  border-color: var(--color-primary) !important;
+  background: #ecfdf5 !important;
+  color: var(--color-primary) !important;
+}
+.signup-back-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.signup-back-btn svg {
+  color: inherit !important;
+}
+.signup-submit-btn {
+  flex: 1;
+}
+
+/* Screen reader utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   RESPONSIVE — Auth (Login + Signup)
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Tablet & up: show hero */
+@media (min-width: 1024px) {
+  .login-hero-panel {
+    display: block;
+  }
+  .login-card {
+    padding: 2.75rem 2.5rem;
+  }
+  .signup-form-panel {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1280px) {
+  .login-hero-content {
+    padding: 4rem;
+  }
+  .login-card {
+    max-width: 480px;
+    padding: 3rem 2.75rem;
+  }
+  .signup-card {
+    max-width: 520px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .login-form-panel {
+    padding: 1.5rem 1rem;
+  }
+  .login-card {
+    padding: 2rem 1.5rem;
+    border-radius: 1rem;
+  }
+  .login-card-title {
+    font-size: 1.5rem;
+  }
+  .signup-role-grid {
+    grid-template-columns: 1fr;
+  }
+  .signup-actions-row {
+    flex-direction: column;
+  }
+  .signup-back-btn {
+    width: 100%;
+  }
+  .signup-form-panel {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+

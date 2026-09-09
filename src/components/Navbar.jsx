@@ -219,12 +219,12 @@ export default function Navbar() {
 
               {/* CONTACT NUMBER */}
               <a
-                href="tel:+916397036898"
+                href="9999999999"
                 className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-amber-900 transition hover:text-red-600"
                 aria-label="Call Bhoomi Real Estate"
               >
                 <Phone size={16} />
-                <span>+91 63970 36898</span>
+                <span>+91 9999999999</span>
               </a>
 
               {user && (
@@ -275,7 +275,7 @@ export default function Navbar() {
 
               {/* Property Type */}
               <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
-                  <span className="shrink-0 text-sm font-bold text-emerald-700">
+                <span className="shrink-0 text-sm font-bold text-emerald-700">
                   🏢
                 </span>
 
@@ -297,7 +297,7 @@ export default function Navbar() {
 
               {/* Budget */}
               <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-100">
-                  <span className="shrink-0 text-sm font-bold text-emerald-700">
+                <span className="shrink-0 text-sm font-bold text-emerald-700">
                   ₹
                 </span>
 
@@ -471,7 +471,7 @@ export default function Navbar() {
                 )}
 
                 <a
-                  href="tel:+916397036898"
+                  href="9999999999"
                   className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
                 >
                   <Phone size={17} className="text-red-600" />
@@ -504,11 +504,10 @@ export default function Navbar() {
         {/* Home */}
         <Link
           href="/"
-          className={`flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] ${
-            pathname === "/"
-              ? "font-bold text-red-600"
-              : "text-amber-900"
-          }`}
+          className={`flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] ${pathname === "/"
+            ? "font-bold text-red-600"
+            : "text-amber-900"
+            }`}
         >
           <svg
             viewBox="0 0 24 24"
