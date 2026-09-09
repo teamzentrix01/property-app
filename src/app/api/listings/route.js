@@ -19,6 +19,15 @@ export async function GET(req) {
   const { where: filters, error } = listingFilters(searchParams);
   if (error) return NextResponse.json({ error }, { status: 400 });
   Object.assign(where, filters);
+  if (searchParams.get("cityMatch") === "exact" && searchParams.get("city")?.trim()) {
+    // Resolve legacy whitespace/case variants before applying the result limit.
+    const city = searchParams.get("city").trim().toLowerCase();
+    const matches = await prisma.$queryRaw`
+      SELECT DISTINCT "city" FROM "Listing"
+      WHERE lower(regexp_replace("city", '^[[:space:]]+|[[:space:]]+$', '', 'g')) = ${city}
+    `;
+    where.city = { in: matches.map((match) => match.city) };
+  }
   if (categorySlug) {
     const category = categoryFromSlug(categorySlug);
     if (!category) return NextResponse.json({ error: "Invalid category" }, { status: 400 });

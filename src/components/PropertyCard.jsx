@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { MapPin, ArrowRight, BadgeCheck } from "lucide-react";
+import SaveListingButton from "@/components/SaveListingButton";
 import PropertyActions from "@/components/PropertyActions";
 import { formatPrice } from "@/lib/formatters";
 const TYPES = {
@@ -12,7 +14,8 @@ const TYPES = {
   OFFICE: "Office Space",
   PG: "PG / Co-living",
 };
-export default function PropertyCard({ listing }) {
+export default function PropertyCard({ listing, variant }) {
+  if (variant === "trending") return <TrendingCard listing={listing} />;
   const photo = listing.photos?.[0]?.url;
   const facts =
     listing.propertyType === "PLOT"
@@ -108,5 +111,120 @@ export default function PropertyCard({ listing }) {
         </div>
       </div>
     </article>
+  );
+}
+
+function TrendingCard({ listing }) {
+  const project = {
+    id: listing.id,
+    name: listing.title,
+    location: [listing.area, listing.city].filter(Boolean).join(", "),
+    price: formatPrice(listing.price, listing.purpose),
+    type: listing.propertyType || "Residential",
+    area: listing.sizeValue
+      ? `${listing.sizeValue} ${listing.sizeUnit || "sq ft"}`
+      : "Area on request",
+    image:
+      listing.photos?.[0]?.url,
+    tag: "Trending",
+  };
+
+  return (
+              <div
+                className="group overflow-hidden rounded-xl border border-gray-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.12)]"
+              >
+                {/* IMAGE */}
+                <div className="relative h-[235px] overflow-hidden">
+                  {project.image ? <img
+                    src={project.image}
+                    alt={project.name}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  /> : <div className="grid h-full place-items-center bg-paper-dim text-xs text-ink-soft">Photo coming soon</div>}
+
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/20" />
+
+                  {/* Trending Tag */}
+                  <div className="absolute left-4 top-4 rounded-md bg-[#b2873a] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                    {project.tag}
+                  </div>
+
+                  {/* RERA */}
+                  {listing.reraNumber?.trim() && <div className="absolute right-4 top-4 flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-1.5 text-[10px] font-bold text-green-700 shadow-sm">
+                    <BadgeCheck className="h-3.5 w-3.5" />
+                    RERA
+                  </div>}
+
+                  {/* Heart */}
+                  <SaveListingButton
+                    listingId={project.id}
+                    className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md transition hover:scale-110"
+                  />
+
+                  {/* Price */}
+                  <div className="absolute bottom-4 left-4">
+                    <p className="text-[10px] uppercase tracking-wide text-white/70">
+                      Starting From
+                    </p>
+
+                    <p className="text-xl font-bold text-white">
+                      {project.price}
+                    </p>
+                  </div>
+                </div>
+
+                {/* CONTENT */}
+                <div className="p-5">
+                  <Link href={`/listings/${project.id}`}>
+                    <h3 className="line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[#b2873a]">
+                      {project.name}
+                    </h3>
+                  </Link>
+
+                  {/* Location */}
+                  <div className="mt-2 flex items-center gap-2">
+                    <MapPin className="h-4 w-4 shrink-0 text-[#b2873a]" />
+
+                    <p className="line-clamp-1 text-xs text-gray-500">
+                      {project.location}
+                    </p>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="my-4 h-px bg-gray-100" />
+
+                  {/* Details */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-xs text-gray-400">
+                        Property Type
+                      </span>
+
+                      <span className="text-xs font-semibold text-gray-700">
+                        {project.type}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-xs text-gray-400">
+                        Area
+                      </span>
+
+                      <span className="text-xs font-semibold text-gray-700">
+                        {project.area}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Button */}
+                  <Link
+                    href={`/listings/${project.id}`}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[#b2873a] py-2.5 text-sm font-semibold text-[#b2873a] transition-all duration-300 hover:bg-[#b2873a] hover:text-white"
+                  >
+                    View Details
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </div>
   );
 }

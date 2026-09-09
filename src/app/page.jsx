@@ -41,7 +41,7 @@ export default async function Page() {
     <main className="w-full max-w-full overflow-x-hidden">
       <Herosection />
       <RecommendedProperties listings={listings} error={listingsError} />
-      <TrendingProjects listings={listings} />
+      <TrendingProjects />
       <NewLaunchProjects listings={listings} />
       <FestivalOffer />
       <BrandedResidences listings={brandedListings}/>
