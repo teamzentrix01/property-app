@@ -15,6 +15,20 @@ export async function getApprovedListings(where = {}) {
   return { listings: serializeForClient(listings), demo: false };
 }
 
+export async function getAllApprovedListings(where = {}) {
+  if (!process.env.DATABASE_URL) {
+    return { listings: [], demo: true };
+  }
+
+  const listings = await prisma.listing.findMany({
+    // The common properties page is intentionally limited to approved listings.
+    where: { ...where, status: "APPROVED" },
+    include: { photos: true, owner: { select: { verified: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+  return { listings: serializeForClient(listings), demo: false };
+}
+
 export async function getHomepageSections() {
   if (!process.env.DATABASE_URL) {
     return { sections: [], fallbackListings: [] };

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   MapPin,
   Heart,
@@ -107,13 +108,13 @@ export default function TopLuxuryProjects({ listings = [] }) {
           </div>
 
           {/* View All */}
-          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
+          <Link href="/properties" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
             View All Projects
 
             <ArrowRight
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
             />
-          </button>
+          </Link>
         </div>
 
         {/* ==================================================
@@ -231,11 +232,11 @@ export default function TopLuxuryProjects({ listings = [] }) {
                 </div>
 
                 {/* View Details */}
-                <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[Explore Gurugram] py-2.5 text-sm font-semibold text-[Explore Gurugram] transition-all duration-300 hover:bg-[Explore Gurugram] hover:text-white">
+                <Link href={`/listings/${project.id}`} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[Explore Gurugram] py-2.5 text-sm font-semibold text-[Explore Gurugram] transition-all duration-300 hover:bg-[Explore Gurugram] hover:text-white">
                   View Details
 
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
+                </Link>
               </div>
             </article>
           ))}

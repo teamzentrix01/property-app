@@ -4,8 +4,11 @@ import { currentUser, isScopedAreaAdmin } from "@/lib/serverAuth";
 import { formatPrice } from "@/lib/formatters";
 import PropertyActions from "@/components/PropertyActions";
 import PropertyGallery from "@/components/PropertyGallery";
+import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
-import StatusBadge, { statusLabel } from "@/components/StatusBadge";
+import { BadgeCheck } from "lucide-react";
+import StatusBadge from "@/components/StatusBadge";
+import { serializeForClient } from "@/lib/formatters";
 const LABELS = {
   sizeValue: "Area",
   sizeUnit: "Area unit",
@@ -67,6 +70,47 @@ export default async function ListingDetail({ params }) {
   const phone = listing.owner?.phone || listing.contactNumber;
   const isOwner = viewer?.id === listing.ownerId;
   const unitPrice = listing.sizeValue ? Number(listing.price) / listing.sizeValue : null;
+  const recommendationBaseWhere = { status: "APPROVED", id: { not: listing.id } };
+  let recommendedListings = [];
+  try {
+    const includeRecommendationData = {
+      photos: true,
+      owner: { select: { verified: true } },
+    };
+    const [closestMatches, cityMatches, typeAndPurposeMatches, otherMatches] = await Promise.all([
+      prisma.listing.findMany({
+        where: { ...recommendationBaseWhere, city: listing.city, propertyType: listing.propertyType, purpose: listing.purpose },
+        include: includeRecommendationData,
+        orderBy: { createdAt: "desc" },
+        take: 4,
+      }),
+      prisma.listing.findMany({
+        where: { ...recommendationBaseWhere, city: listing.city },
+        include: includeRecommendationData,
+        orderBy: { createdAt: "desc" },
+        take: 4,
+      }),
+      prisma.listing.findMany({
+        where: { ...recommendationBaseWhere, propertyType: listing.propertyType, purpose: listing.purpose },
+        include: includeRecommendationData,
+        orderBy: { createdAt: "desc" },
+        take: 4,
+      }),
+      prisma.listing.findMany({
+        where: recommendationBaseWhere,
+        include: includeRecommendationData,
+        orderBy: { createdAt: "desc" },
+        take: 4,
+      }),
+    ]);
+    recommendedListings = Array.from(
+      new Map(
+        [...closestMatches, ...cityMatches, ...typeAndPurposeMatches, ...otherMatches].map((item) => [item.id, item]),
+      ).values(),
+    ).slice(0, 4);
+  } catch {
+    recommendedListings = [];
+  }
   return (
     <main className="flex-1 bg-[#f7f7f3] pb-28 md:pb-16">
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
@@ -79,9 +123,15 @@ export default async function ListingDetail({ params }) {
         <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_360px]">
           <section>
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-moss/10 px-3 py-1 text-xs font-bold text-moss-deep">
+              {listing.status === "APPROVED" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+                  <BadgeCheck className="h-4 w-4 text-green-600" />
+                  Approved by Admin
+                </span>
+              )}
+              {false && <span className="rounded-full bg-moss/10 px-3 py-1 text-xs font-bold text-moss-deep">
                 {listing.owner?.verified ? "✓ Owner verified" : "✓ Listing reviewed"}
-              </span>
+              </span>}
               {listing.reraNumber && (
                 <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-bold text-gold">
                   RERA
@@ -112,7 +162,6 @@ export default async function ListingDetail({ params }) {
                 {unitPrice && <p className="mt-1 text-right text-xs font-semibold text-moss-deep">₹{Math.round(unitPrice).toLocaleString("en-IN")} / {listing.sizeUnit || "sq ft"}</p>}
               </div>
             </div>
-            <StatusTimeline status={listing.status} rejectionReason={listing.rejectionReason} />
             <div className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-ink/8 bg-ink/8 sm:grid-cols-4">
               {[
                 ["Property type", listing.propertyType.replaceAll("_", " ")],
@@ -212,6 +261,26 @@ export default async function ListingDetail({ params }) {
             </>}
           </aside>
         </div>
+        {recommendedListings.length > 0 && (
+          <section className="mt-12 border-t border-ink/10 pt-10">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="font-display text-3xl">Recommended Properties</h2>
+                <p className="mt-1 text-sm text-ink-soft">
+                  Explore more verified properties you may be interested in.
+                </p>
+              </div>
+              <Link href="/properties" className="text-sm font-semibold text-moss-deep transition hover:text-moss">
+                View All Properties →
+              </Link>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {serializeForClient(recommendedListings).map((recommendedListing) => (
+                <PropertyCard key={recommendedListing.id} listing={recommendedListing} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
       {isOwner ? <div className="fixed inset-x-0 bottom-[65px] z-40 border-t border-ink/10 bg-white p-3 md:hidden"><Link href={`/listings/${listing.id}/edit`} className="block rounded-xl bg-moss py-3 text-center text-sm font-bold text-white">Edit property</Link></div> : <div className="fixed inset-x-0 bottom-[65px] z-40 grid grid-cols-2 gap-2 border-t border-ink/10 bg-white p-3 md:hidden">
         <a

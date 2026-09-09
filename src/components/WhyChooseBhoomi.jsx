@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   ShieldCheck,
   Search,
@@ -214,11 +215,11 @@ export default function WhyChoose100Acress() {
 
             </div>
 
-            <button className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-7 py-3 text-sm font-bold text-white transition hover:bg-[#c69d50]">
+            <Link href="/properties" className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-7 py-3 text-sm font-bold text-white transition hover:bg-[#c69d50]">
               Explore Properties
 
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
+            </Link>
 
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Home,
   Users,
@@ -242,17 +243,17 @@ export default function BHKLifestyle() {
               {/* CTA */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
 
-                <button className="group flex items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#c69d50]">
+                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#c69d50]">
                   Explore {selected.id} Properties
 
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </button>
+                </Link>
 
-                <button className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-[#b58a3a] hover:text-[Explore Gurugram]">
+                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-[#b58a3a] hover:text-[Explore Gurugram]">
                   View All
 
                   <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </button>
+                </Link>
 
               </div>
             </div>

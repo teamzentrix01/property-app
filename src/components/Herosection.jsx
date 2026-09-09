@@ -1753,13 +1753,13 @@ export default function HeroSection() {
             type="button"
             onClick={handleSearch}
             disabled={!location || !propertyType}
-            className={`group mt-5 flex min-h-[62px] w-full items-center justify-center gap-3 rounded-2xl text-sm font-extrabold transition-all duration-300 ${
+            className={`group mt-5 flex min-h-[62px] w-full items-center justify-center gap-3 rounded-2xl bg-emerald-50 text-sm font-semibold text-emerald-700 transition-colors duration-200 ${
               location && propertyType
-                ? "bg-gradient-to-r from-[#c88915] via-[#e5a92f] to-[#f0c451] text-white shadow-lg shadow-[#d99a1f]/25 hover:-translate-y-0.5 hover:shadow-xl"
-                : "cursor-not-allowed bg-slate-100 text-slate-400"
+                ? "shadow-lg shadow-emerald-700/10 hover:-translate-y-0.5 hover:bg-emerald-100 hover:text-emerald-800 hover:shadow-xl"
+                : "cursor-not-allowed"
             }`}
           >
-            <Search className="h-5 w-5 transition-transform group-hover:scale-110" />
+            <Search className="h-5 w-5 text-emerald-700 transition-transform duration-200 group-hover:scale-110 group-hover:text-emerald-800" />
 
             Search Properties
 

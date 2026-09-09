@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   MapPin,
   ArrowRight,
   Heart,
-  ChevronLeft,
-  ChevronRight,
   BadgeCheck,
   Building2,
   CalendarDays,
@@ -116,22 +114,6 @@ export default function RecommendedProperties({ listings = [], error = false }) 
     tag: listing.purpose === "RENT" ? "For Rent" : "For Sale",
     rera: Boolean(listing.reraNumber),
   }));
-  const [activeCard, setActiveCard] = useState(0);
-
-  const nextSlide = () => {
-    if (!properties.length) return;
-    setActiveCard((prev) =>
-      prev >= properties.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  const previousSlide = () => {
-    if (!properties.length) return;
-    setActiveCard((prev) =>
-      prev <= 0 ? properties.length - 1 : prev - 1
-    );
-  };
-
   return (
     <section className="w-full bg-[#f7f7f7] py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
@@ -167,34 +149,13 @@ export default function RecommendedProperties({ listings = [], error = false }) 
           </div>
 
           {/* View All */}
-          <Link href="/listings" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
+          <Link href="/properties" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
             View All Properties
 
             <ArrowRight
               className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
             />
           </Link>
-        </div>
-
-        {/* =========================================
-            DESKTOP CONTROLS
-        ========================================== */}
-        <div className="mb-5 hidden items-center justify-end gap-2 md:flex">
-          <button
-            onClick={previousSlide}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[Explore Gurugram] hover:bg-[Explore Gurugram] hover:text-white"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[Explore Gurugram] hover:bg-[Explore Gurugram] hover:text-white"
-            aria-label="Next"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
         </div>
 
         {/* =========================================
@@ -333,27 +294,6 @@ export default function RecommendedProperties({ listings = [], error = false }) 
         )}
 
         {/* =========================================
-            MOBILE SLIDER BUTTONS
-        ========================================== */}
-        <div className="mt-6 flex justify-center gap-2 md:hidden">
-
-          <button
-            onClick={previousSlide}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-
-        </div>
-
-        {/* =========================================
             BOTTOM CTA
         ========================================== */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-xl bg-[#181818] px-6 py-6 sm:flex-row sm:px-8">
@@ -368,10 +308,10 @@ export default function RecommendedProperties({ listings = [], error = false }) 
             </p>
           </div>
 
-          <button className="flex shrink-0 items-center gap-2 rounded-lg bg-[#b58a3a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#c59b4d]">
+          <Link href="/properties" className="flex shrink-0 items-center gap-2 rounded-lg bg-[#b58a3a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#c59b4d]">
             Explore Properties
             <ArrowRight className="h-4 w-4" />
-          </button>
+          </Link>
 
         </div>
       </div>
