@@ -169,7 +169,7 @@ function LoginForm() {
       <div className="login-form-panel">
         <div className="login-card">
           {/* Brand mark (mobile only) */}
-          <div className="login-card-brand md:hidden">
+          <div className="login-card-brand">
             <BhoomiMark />
           </div>
 

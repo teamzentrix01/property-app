@@ -29,7 +29,7 @@ export default async function CatalogPage({ params }) {
           <PropertyCard key={listing.id} listing={serializeForClient(listing)} />
         ))}
       </div>
-      <a href={`tel:${link.broker.phone}`} className="inline-block mt-10 bg-gold text-ink px-6 py-3 rounded-full font-medium">
+      <a href={`tel:${link.broker.phone}`} className="inline-block mt-10 bg-green-700 text-white px-6 py-3 rounded-full font-medium">
         Call {link.broker.name} — {link.broker.phone}
       </a>
     </main>

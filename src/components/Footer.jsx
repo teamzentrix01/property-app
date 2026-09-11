@@ -57,9 +57,19 @@ const socialLinks = [
 
 export default function Footer() {
   const [user, setUser] = useState(undefined);
-  useEffect(() => { fetch("/api/auth/me").then((response) => response.ok ? response.json() : { user: null }).then((data) => setUser(data.user)).catch(() => setUser(null)); }, []);
+  useEffect(() => {
+    const loadUser = () => {
+      fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : { user: null }))
+        .then((data) => setUser(data.user))
+        .catch(() => setUser(null));
+    };
+    loadUser();
+    window.addEventListener("bhoomi-auth-changed", loadUser);
+    return () => window.removeEventListener("bhoomi-auth-changed", loadUser);
+  }, []);
   return (
-    <footer className="site-footer w-full bg-[#111111] text-white">
+    <footer className="site-footer w-full bg-[#052E16] text-white border-t-2 border-red-600">
 
       {/* =====================================================
           TOP CTA
@@ -67,20 +77,20 @@ export default function Footer() {
       <div className="border-b border-white/10">
         <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 lg:px-10">
 
-          <div className="relative overflow-hidden rounded-2xl bg-[#1c1c1c]">
+          <div className="relative overflow-hidden rounded-2xl bg-[#14532D]">
 
             {/* Decorative circles */}
-            <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full border border-[#b58a3a]/20" />
+            <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full border border-green-700/20" />
 
-            <div className="absolute -right-5 -top-10 h-48 w-48 rounded-full border border-[#b58a3a]/15" />
+            <div className="absolute -right-5 -top-10 h-48 w-48 rounded-full border border-green-700/15" />
 
             <div className="relative z-10 flex flex-col gap-7 px-6 py-8 sm:px-9 lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:py-10">
 
               <div>
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-[Explore Gurugram]" />
+                  <ShieldCheck className="h-4 w-4 text-green-100" />
 
-                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
+                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-green-100">
                     Looking for your dream property?
                   </span>
                 </div>
@@ -89,7 +99,7 @@ export default function Footer() {
                   Let our property experts help you.
                 </h2>
 
-                <p className="mt-2 max-w-xl text-sm leading-6 text-white/50">
+                <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
                   Get personalised property recommendations based on your
                   location, budget and lifestyle.
                 </p>
@@ -99,7 +109,7 @@ export default function Footer() {
 
                 <Link
                   href="/properties"
-                  className="group flex items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#c69d50]"
+                  className="group flex items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-green-700"
                 >
                   Explore Properties
 
@@ -108,7 +118,7 @@ export default function Footer() {
 
                 <a
                   href="tel:+918500900100"
-                  className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-[#b58a3a] hover:text-[Explore Gurugram]"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-green-700 hover:text-green-100"
                 >
                   <Phone className="h-4 w-4" />
                   Call Now
@@ -137,22 +147,22 @@ export default function Footer() {
               href="/"
               className="inline-flex items-center gap-3"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#b58a3a]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-700">
                 <Building2 className="h-6 w-6 text-white" />
               </div>
 
               <div>
                 <span className="block text-xl font-black tracking-tight text-white">
-                  100<span className="text-[Explore Gurugram]">acress</span>
+                  Bhoomi
                 </span>
 
-                <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/70">
                   Real Estate
                 </span>
               </div>
             </Link>
 
-            <p className="mt-6 max-w-sm text-sm leading-7 text-white/50">
+            <p className="mt-6 max-w-sm text-sm leading-7 text-white/70">
               Your trusted destination for premium residential and
               commercial properties, new launches, luxury projects
               and real estate investments.
@@ -163,29 +173,29 @@ export default function Footer() {
 
               <a
                 href="tel:+918500900100"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[Explore Gurugram]"
+                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-green-100"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
-                  <Phone className="h-4 w-4 text-[#b58a3a]" />
+                  <Phone className="h-4 w-4 text-green-100" />
                 </span>
 
                 <span>+91 8500 900 100</span>
               </a>
 
               <a
-                href="mailto:support@100acress.com"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[Explore Gurugram]"
+                href="mailto:support@Bhoomi"
+                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-green-100"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
-                  <Mail className="h-4 w-4 text-[#b58a3a]" />
+                  <Mail className="h-4 w-4 text-green-100" />
                 </span>
 
-                <span>support@100acress.com</span>
+                <span>support@Bhoomi</span>
               </a>
 
               <div className="flex items-start gap-3 text-sm text-white/60">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5">
-                  <MapPin className="h-4 w-4 text-[#b58a3a]" />
+                  <MapPin className="h-4 w-4 text-green-100" />
                 </span>
 
                 <span className="leading-6">
@@ -212,9 +222,9 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[Explore Gurugram]"
+                  className="group flex items-center gap-2 text-sm text-white/70 transition hover:text-green-100"
                 >
-                  <ChevronRight className="h-3.5 w-3.5 text-[#b58a3a] transition-transform group-hover:translate-x-1" />
+                  <ChevronRight className="h-3.5 w-3.5 text-green-100 transition-transform group-hover:translate-x-1" />
 
                   {link.name}
                 </Link>
@@ -237,9 +247,9 @@ export default function Footer() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[Explore Gurugram]"
+                  className="group flex items-center gap-2 text-sm text-white/70 transition hover:text-green-100"
                 >
-                  <ChevronRight className="h-3.5 w-3.5 text-[#b58a3a] transition-transform group-hover:translate-x-1" />
+                  <ChevronRight className="h-3.5 w-3.5 text-green-100 transition-transform group-hover:translate-x-1" />
 
                   {link.name}
                 </Link>
@@ -262,9 +272,9 @@ export default function Footer() {
                 <Link
                   key={location.name}
                   href={location.href}
-                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[Explore Gurugram]"
+                  className="group flex items-center gap-2 text-sm text-white/70 transition hover:text-green-100"
                 >
-                  <MapPin className="h-3.5 w-3.5 text-[#b58a3a]" />
+                  <MapPin className="h-3.5 w-3.5 text-green-100" />
 
                   {location.name}
                 </Link>
@@ -282,7 +292,7 @@ export default function Footer() {
               Get Property Updates
             </h3>
 
-            <p className="mt-6 text-sm leading-6 text-white/50">
+            <p className="mt-6 text-sm leading-6 text-white/70">
               Stay updated with new launches, premium projects and
               exclusive property opportunities.
             </p>
@@ -301,7 +311,7 @@ export default function Footer() {
                 type="button"
                 suppressHydrationWarning
                 aria-label="Subscribe"
-                className="flex w-12 shrink-0 items-center justify-center bg-[#b58a3a] transition hover:bg-[#c69d50]"
+                className="flex w-12 shrink-0 items-center justify-center bg-green-700 transition hover:bg-green-700"
               >
                 <ArrowRight className="h-4 w-4 text-white" />
               </button>
@@ -310,7 +320,7 @@ export default function Footer() {
 
             {/* Assistance */}
             <div className="mt-4 flex items-center gap-2 text-xs text-white/35">
-              <Clock3 className="h-3.5 w-3.5 text-[#b58a3a]" />
+              <Clock3 className="h-3.5 w-3.5 text-green-100" />
 
               Expert assistance available
             </div>
@@ -318,7 +328,7 @@ export default function Footer() {
             {/* Social */}
             <div className="mt-7">
 
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/40">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
                 Follow Us
               </p>
 
@@ -329,7 +339,7 @@ export default function Footer() {
                     key={social.name}
                     href={social.href}
                     aria-label={social.name}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-white/50 transition hover:border-[#b58a3a] hover:bg-[#b58a3a] hover:text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-extrabold text-[#14532D] shadow-sm transition-all duration-200 hover:scale-110 hover:bg-[#15803D] hover:text-white"
                   >
                     {social.short}
                   </a>
@@ -344,7 +354,7 @@ export default function Footer() {
       {/* =====================================================
           POPULAR SEARCHES
       ===================================================== */}
-      <div className="border-y border-white/10 bg-[#0d0d0d]">
+      <div className="border-y border-white/10 bg-[#042411]">
 
         <div className="mx-auto max-w-[1400px] px-5 py-8 sm:px-8 lg:px-10">
 
@@ -367,7 +377,7 @@ export default function Footer() {
               <Link
                 key={item}
                 href="/properties"
-                className="text-xs text-white/35 transition hover:text-[Explore Gurugram]"
+                className="text-xs text-white/40 transition hover:text-green-300"
               >
                 {item}
               </Link>
@@ -384,8 +394,8 @@ export default function Footer() {
 
         <div className="flex flex-col gap-5 py-6 md:flex-row md:items-center md:justify-between">
 
-          <p className="text-xs leading-5 text-white/35">
-            © 2019–{new Date().getFullYear()} 100acress.com. All Rights Reserved.
+          <p className="text-xs leading-5 text-white/40">
+            © 2019–{new Date().getFullYear()} Bhoomi. All Rights Reserved.
             <span className="hidden sm:inline"> · </span>
             A Venture of Kaushraj Global LLP
           </p>
@@ -396,7 +406,7 @@ export default function Footer() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-xs text-white/35 transition hover:text-[Explore Gurugram]"
+                className="text-xs text-white/40 transition hover:text-green-300"
               >
                 {link.name}
               </Link>
@@ -408,9 +418,9 @@ export default function Footer() {
         {/* Made in India */}
         <div className="border-t border-white/10 py-5 text-center">
 
-          <p className="text-xs text-white/30">
+          <p className="text-xs text-white/40">
             Made with{" "}
-            <span className="text-[#b58a3a]">♥</span>{" "}
+            <span className="text-red-500">♥</span>{" "}
             in India
           </p>
 

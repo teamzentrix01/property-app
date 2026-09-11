@@ -6,7 +6,7 @@ import PropertyActions from "@/components/PropertyActions";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, MapPin } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import { serializeForClient } from "@/lib/formatters";
 const LABELS = {
@@ -112,7 +112,7 @@ export default async function ListingDetail({ params }) {
     recommendedListings = [];
   }
   return (
-    <main className="flex-1 bg-[#f7f7f3] pb-28 md:pb-16">
+    <main className="flex-1 bg-slate-50 pb-28 md:pb-16">
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
         <p className="text-xs text-ink-soft">
           Home / {listing.city} / {listing.area}
@@ -120,46 +120,43 @@ export default async function ListingDetail({ params }) {
         <div className="mt-5">
           <PropertyGallery photos={listing.photos.map((photo) => ({ id: photo.id, url: photo.url }))} title={listing.title} />
         </div>
-        <div className="mt-7 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           <section>
             <div className="flex flex-wrap gap-2">
               {listing.status === "APPROVED" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-                  <BadgeCheck className="h-4 w-4 text-green-600" />
-                  Approved by Admin
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-[#DCFCE7] px-3.5 py-1 text-xs font-bold text-[#15803D]">
+                  <BadgeCheck className="h-4 w-4 text-[#15803D]" />
+                  ✓ Approved by Admin
                 </span>
               )}
-              {false && <span className="rounded-full bg-moss/10 px-3 py-1 text-xs font-bold text-moss-deep">
-                {listing.owner?.verified ? "✓ Owner verified" : "✓ Listing reviewed"}
-              </span>}
               {listing.reraNumber && (
-                <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-bold text-gold">
-                  RERA
+                <span className="rounded-full border border-green-200 bg-white px-3 py-1 text-xs font-bold text-green-700 shadow-sm">
+                  RERA Registered
                 </span>
               )}
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold">
+              <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700">
                 {listing.postedBy === "BROKER"
-                  ? "Listed by agent"
-                  : "Listed by owner"}
+                  ? "Listed by Verified Agent"
+                  : "Listed by Owner"}
               </span>
             </div>
             <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h1 className="font-display text-3xl leading-tight sm:text-4xl">
+                <h1 className="font-display text-3xl font-extrabold text-gray-950 sm:text-4xl">
                   {listing.title}
                 </h1>
-                <p className="mt-2 text-ink-soft">
-                  ⌖ {listing.area}, {listing.city}
+                <p className="mt-2 flex items-center gap-2 text-sm font-medium text-gray-500">
+                  <MapPin size={17} className="shrink-0 text-red-600"/> {listing.area}, {listing.city}
                 </p>
               </div>
-              <div>
-                <p className="font-display text-3xl font-semibold">
+              <div className="text-right">
+                <p className="font-display text-3xl font-extrabold text-gray-950 sm:text-4xl">
                   {formatPrice(listing.price, listing.purpose)}
                 </p>
-                <p className="text-right text-xs text-ink-soft">
-                  {listing.negotiable ? "Negotiable" : "Quoted price"}
+                <p className="text-right text-xs font-medium text-gray-500">
+                  {listing.negotiable ? "Price Negotiable" : "Fixed Quoted Price"}
                 </p>
-                {unitPrice && <p className="mt-1 text-right text-xs font-semibold text-moss-deep">₹{Math.round(unitPrice).toLocaleString("en-IN")} / {listing.sizeUnit || "sq ft"}</p>}
+                {unitPrice && <p className="mt-1 text-right text-xs font-bold text-green-700">₹{Math.round(unitPrice).toLocaleString("en-IN")} / {listing.sizeUnit || "sq ft"}</p>}
               </div>
             </div>
             <div className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-ink/8 bg-ink/8 sm:grid-cols-4">
@@ -194,10 +191,10 @@ export default async function ListingDetail({ params }) {
                 {details.map(([k, label]) => (
                   <div
                     key={k}
-                    className="flex justify-between bg-white p-4 text-sm"
+                    className="flex justify-between gap-4 bg-white p-4 text-sm"
                   >
                     <dt className="text-ink-soft">{label}</dt>
-                    <dd className="font-semibold capitalize">
+                    <dd className="min-w-0 break-words text-right font-semibold capitalize">
                       {typeof listing[k] === "boolean"
                         ? listing[k]
                           ? "Yes"
@@ -217,7 +214,7 @@ export default async function ListingDetail({ params }) {
               </Block>
             )}
             <Block title="Location & neighbourhood">
-              <div className="rounded-2xl bg-gradient-to-br from-moss/15 to-paper-dim p-6">
+              <div className="rounded-xl border border-green-100 bg-green-50 p-5">
                 <p className="font-semibold">
                   {listing.area}, {listing.city}
                 </p>
@@ -228,7 +225,7 @@ export default async function ListingDetail({ params }) {
               </div>
             </Block>
           </section>
-          <aside className="h-fit rounded-3xl border border-ink/10 bg-white p-6 shadow-xl shadow-ink/8 lg:sticky lg:top-24">
+          <aside className="h-fit rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:sticky lg:top-40">
             {isOwner ? <>
               <p className="text-xs font-bold uppercase tracking-widest text-moss">Your property</p>
               <h2 className="mt-2 font-display text-2xl">Manage this listing</h2>

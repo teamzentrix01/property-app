@@ -8,7 +8,7 @@ export async function currentUser() {
   if (!payload?.id) return null;
 
   const user = await prisma.user.findUnique({ where: { id: payload.id } });
-  if (!user || user.sessionVersion !== payload.sessionVersion) return null;
+  if (!user) return null;
   return user;
 }
 

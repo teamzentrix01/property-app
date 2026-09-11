@@ -91,7 +91,7 @@ export default function BHKLifestyle() {
     bhkOptions.find((item) => item.id === activeBhk) || bhkOptions[2];
 
   return (
-    <section className="w-full bg-[#f7f6f3] py-16 sm:py-20 lg:py-24">
+    <section className="w-full bg-slate-50 py-12 sm:py-16">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -99,17 +99,17 @@ export default function BHKLifestyle() {
 
           {/* Label */}
           <div className="mb-4 flex items-center justify-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#b58a3a]" />
+            <Sparkles className="h-4 w-4 text-green-700" />
 
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-green-700">
               Find Your Perfect Home
             </span>
           </div>
 
           {/* Heading */}
-          <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
+          <h2 className="section-title text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
             Which BHK suits your{" "}
-            <span className="text-[Explore Gurugram]">
+            <span className="text-green-700">
               lifestyle best?
             </span>
           </h2>
@@ -129,8 +129,8 @@ export default function BHKLifestyle() {
               onClick={() => setActiveBhk(bhk.id)}
               className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-300 sm:px-7 ${
                 activeBhk === bhk.id
-                  ? "border-[#b58a3a] bg-[#b58a3a] text-white shadow-md"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-[#b58a3a] hover:text-[Explore Gurugram]"
+                  ? "border-green-700 bg-green-700 text-white shadow-md"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-green-700 hover:text-green-700"
               }`}
             >
               {bhk.id}
@@ -139,7 +139,7 @@ export default function BHKLifestyle() {
         </div>
 
         {/* ================= MAIN CONTENT ================= */}
-        <div className="mt-10 overflow-hidden rounded-2xl border border-[#e7e2d8] bg-white shadow-[0_8px_35px_rgba(0,0,0,0.06)]">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_8px_35px_rgba(0,0,0,0.06)]">
 
           <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
 
@@ -157,13 +157,13 @@ export default function BHKLifestyle() {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/10" />
 
               {/* Decorative */}
-              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-[Explore Gurugram]/25" />
+              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-green-700/25" />
 
               <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-10">
 
                 {/* BHK */}
                 <div className="flex h-20 w-20 items-center justify-center rounded-xl border border-white/20 bg-black/35 backdrop-blur-md">
-                  <span className="text-2xl font-black text-[#e0bc72]">
+                  <span className="text-2xl font-black text-green-100">
                     {selected.id.replace(" BHK", "")}
                     <span className="text-sm"> BHK</span>
                   </span>
@@ -173,13 +173,13 @@ export default function BHKLifestyle() {
                   {selected.title}
                 </h3>
 
-                <p className="mt-2 text-sm font-medium text-[Explore Gurugram]">
+                <p className="mt-2 text-sm font-medium text-green-700">
                   {selected.subtitle}
                 </p>
 
                 {/* Size */}
                 <div className="mt-6 flex items-center gap-2 text-sm text-white/70">
-                  <Home className="h-4 w-4 text-[Explore Gurugram]" />
+                  <Home className="h-4 w-4 text-green-700" />
                   Typical Size:{" "}
                   <span className="font-semibold text-white">
                     {selected.size}
@@ -194,8 +194,8 @@ export default function BHKLifestyle() {
               {/* Ideal For */}
               <div className="flex items-center gap-3">
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#f5efe4]">
-                  <Users className="h-5 w-5 text-[Explore Gurugram]" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-slate-50">
+                  <Users className="h-5 w-5 text-green-700" />
                 </div>
 
                 <div>
@@ -229,7 +229,7 @@ export default function BHKLifestyle() {
                       key={index}
                       className="flex items-center gap-3"
                     >
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-[#b58a3a]" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-green-700" />
 
                       <span className="text-sm text-gray-600">
                         {feature}
@@ -243,13 +243,13 @@ export default function BHKLifestyle() {
               {/* CTA */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
 
-                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#c69d50]">
+                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700">
                   Explore {selected.id} Properties
 
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
 
-                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-[#b58a3a] hover:text-[Explore Gurugram]">
+                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-green-700 hover:text-green-700">
                   View All
 
                   <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -263,13 +263,13 @@ export default function BHKLifestyle() {
         {/* ================= BOTTOM MESSAGE ================= */}
         <div className="mt-7 flex flex-col items-center justify-center gap-2 text-center sm:flex-row">
 
-          <Home className="h-4 w-4 text-[#b58a3a]" />
+          <Home className="h-4 w-4 text-green-700" />
 
           <p className="text-sm text-gray-500">
             Not sure which BHK is right for you?
           </p>
 
-          <button className="text-sm font-bold text-[Explore Gurugram] underline underline-offset-4 hover:text-[#8c6824]">
+          <button className="text-sm font-bold text-green-700 underline underline-offset-4 hover:text-green-900">
             Get personalised recommendations
           </button>
 

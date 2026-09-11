@@ -87,6 +87,6 @@ export default function SaveListingButton({ listingId, className = "", iconClass
   }
 
   return <button type="button" onClick={toggle} disabled={saving} aria-label={saved ? "Remove saved property" : ariaLabel} aria-pressed={saved} className={className}>
-    <Heart className={`${iconClassName} ${saved ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+    <Heart className={`${iconClassName} ${saved ? "fill-red-600 text-red-600" : "text-red-600"}`} />
   </button>;
 }

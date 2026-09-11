@@ -45,7 +45,7 @@ export default function NewListingPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
       .then((response) => (response.ok ? response.json() : { user: null }))
       .then(({ user }) => {
         if (!active) return;
@@ -92,7 +92,7 @@ export default function NewListingPage() {
     setLoading(true);
     const body = new FormData();
     files.forEach((f) => body.append("files", f));
-    const res = await fetch("/api/upload", { method: "POST", body });
+    const res = await fetch("/api/upload", { method: "POST", credentials: "include", body });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) return setError(data.error || "Upload failed");
@@ -144,6 +144,7 @@ export default function NewListingPage() {
     try {
       const res = await fetch("/api/listings", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -157,15 +158,15 @@ export default function NewListingPage() {
     }
   }
   return (
-    <main className="flex-1 bg-[#f7f7f3] pb-28 md:pb-16">
+    <main className="flex-1 bg-[#F8FAFC] pb-28 md:pb-16">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
           <aside>
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-moss">
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#15803D]">
               List on Bhoomi
             </p>
-            <h1 className="mt-2 font-display text-3xl">Post your property</h1>
-            <p className="mt-2 text-sm leading-6 text-ink-soft">
+            <h1 className="mt-2 font-display text-3xl text-gray-900">Post your property</h1>
+            <p className="mt-2 text-sm leading-6 text-gray-600">
               Reach genuine local buyers. Your listing will be reviewed before
               it goes live.
             </p>
@@ -180,10 +181,10 @@ export default function NewListingPage() {
                   type="button"
                   onClick={() => n < step && setStep(n)}
                   key={n}
-                  className={`flex w-full items-center gap-3 rounded-xl p-3 text-left text-sm ${step === n ? "bg-ink font-semibold text-white" : n < step ? "bg-moss/10 text-moss-deep" : "text-ink-soft"}`}
+                  className={`flex w-full items-center gap-3 rounded-xl p-3 text-left text-sm transition ${step === n ? "bg-[#15803D] font-semibold text-white shadow-sm" : n < step ? "bg-[#DCFCE7] text-[#15803D] font-medium hover:bg-green-100" : "text-gray-500 hover:bg-gray-100"}`}
                 >
                   <span
-                    className={`grid h-7 w-7 place-items-center rounded-full text-xs ${step === n ? "bg-gold text-ink" : "bg-white"}`}
+                    className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${step === n ? "bg-white text-[#15803D]" : n < step ? "bg-[#15803D] text-white" : "bg-gray-200 text-gray-600"}`}
                   >
                     {n < step ? "✓" : n}
                   </span>
@@ -191,25 +192,25 @@ export default function NewListingPage() {
                 </button>
               ))}
             </div>
-            <div className="mt-7 hidden rounded-2xl bg-moss/10 p-4 text-xs leading-5 text-moss-deep lg:block">
-              <strong>Private & secure</strong>
+            <div className="mt-7 hidden rounded-2xl border border-green-200 bg-[#DCFCE7]/70 p-4 text-xs leading-5 text-[#14532D] lg:block">
+              <strong className="font-bold text-[#14532D]">Private & secure</strong>
               <br />
               Verification documents are never displayed publicly.
             </div>
           </aside>
           <form onSubmit={submit} className="min-w-0">
-            <div className="mb-4 flex h-2 overflow-hidden rounded-full bg-ink/8">
+            <div className="mb-4 flex h-2.5 overflow-hidden rounded-full bg-gray-200">
               <span
-                className="bg-moss transition-all"
+                className="bg-[#15803D] transition-all duration-300"
                 style={{ width: `${step * 25}%` }}
               />
             </div>
             {error && (
-              <p className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <p className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">
                 {error}
               </p>
             )}
-            <div className="rounded-3xl border border-ink/8 bg-white p-5 shadow-xl shadow-ink/5 sm:p-8">
+            <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
               {step === 1 && (
                 <>
                   <Heading
@@ -299,11 +300,11 @@ export default function NewListingPage() {
                         placeholder="Metro, school, highway or market"
                       />
                     </Field>
-                    <div className="sm:col-span-2 rounded-2xl border border-ink/10 bg-paper-dim p-4">
-                      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">Property location pin <span className="font-normal text-ink-soft">(optional)</span></p><p className="mt-1 text-xs text-ink-soft">Detect your device location or paste coordinates from Google Maps.</p></div><button type="button" onClick={detectLocation} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-moss-deep">{location ? "Location pinned ✓" : "Detect location"}</button></div>
-                      <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={mapInput} onChange={(e) => setMapInput(e.target.value)} placeholder="Paste Maps link or 28.6139, 77.2090" className="min-w-0 flex-1 rounded-xl border border-ink/10 bg-white px-3 py-2.5 text-sm"/><button type="button" onClick={applyMapInput} className="rounded-xl border border-moss/20 bg-white px-4 py-2.5 text-sm font-semibold text-moss-deep">Pin manually</button></div>
-                      {locationMessage && <p className={`mt-3 text-xs ${location ? "text-moss-deep" : "text-ink-soft"}`}>{locationMessage}</p>}
-                      {location && <a href={`https://www.google.com/maps?q=${location.mapLat},${location.mapLng}`} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-moss-deep underline">Preview pinned location ↗</a>}
+                    <div className="sm:col-span-2 rounded-2xl border border-gray-200 bg-slate-50 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold text-gray-900">Property location pin <span className="font-normal text-gray-500">(optional)</span></p><p className="mt-1 text-xs text-gray-500">Detect your device location or paste coordinates from Google Maps.</p></div><button type="button" onClick={detectLocation} className="rounded-xl bg-white border border-gray-200 px-4 py-2 text-sm font-semibold text-[#15803D] hover:bg-green-50 shadow-xs">{location ? "Location pinned ✓" : "Detect location"}</button></div>
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={mapInput} onChange={(e) => setMapInput(e.target.value)} placeholder="Paste Maps link or 28.6139, 77.2090" className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:border-[#15803D] focus:outline-none focus:ring-2 focus:ring-[#DCFCE7]"/><button type="button" onClick={applyMapInput} className="rounded-xl bg-[#15803D] hover:bg-[#14532D] text-white px-4 py-2.5 text-sm font-semibold shadow-xs">Pin manually</button></div>
+                      {locationMessage && <p className={`mt-3 text-xs ${location ? "text-[#15803D] font-medium" : "text-gray-500"}`}>{locationMessage}</p>}
+                      {location && <a href={`https://www.google.com/maps?q=${location.mapLat},${location.mapLng}`} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs font-semibold text-[#15803D] hover:underline">Preview pinned location ↗</a>}
                     </div>
                     <Field label="Area">
                       <input
@@ -540,15 +541,15 @@ export default function NewListingPage() {
                     title="Add clear property photos"
                     copy="Listings with 5+ genuine photos receive more enquiries."
                   />
-                  <label className="mt-7 grid min-h-48 cursor-pointer place-items-center rounded-2xl border-2 border-dashed border-moss/25 bg-moss/5 p-6 text-center">
+                  <label className="mt-7 grid min-h-48 cursor-pointer place-items-center rounded-2xl border-2 border-dashed border-green-300 bg-green-50/50 p-6 text-center hover:bg-green-50 transition">
                     <div>
-                      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white text-2xl text-moss shadow-sm">
+                      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white text-2xl text-[#15803D] shadow-xs border border-green-200">
                         ＋
                       </span>
-                      <p className="mt-3 font-semibold">
+                      <p className="mt-3 font-semibold text-gray-900">
                         Upload property photos
                       </p>
-                      <p className="mt-1 text-xs text-ink-soft">
+                      <p className="mt-1 text-xs text-gray-500">
                         JPEG, PNG, WebP or AVIF · max 8 MB each
                       </p>
                     </div>
@@ -565,7 +566,7 @@ export default function NewListingPage() {
                       {photos.map((url, i) => (
                         <div
                           key={url}
-                          className="relative aspect-square overflow-hidden rounded-xl"
+                          className="relative aspect-square overflow-hidden rounded-xl border border-gray-200 shadow-xs"
                         >
                           <img
                             src={url}
@@ -577,12 +578,12 @@ export default function NewListingPage() {
                             onClick={() =>
                               setPhotos((p) => p.filter((x) => x !== url))
                             }
-                            className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-black/65 text-white"
+                            className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-red-600 text-white shadow hover:bg-red-700"
                           >
                             ×
                           </button>
                           {i === 0 && (
-                            <span className="absolute bottom-1 left-1 rounded bg-white px-2 py-1 text-[9px] font-bold">
+                            <span className="absolute bottom-1 left-1 rounded bg-[#15803D] text-white px-2 py-0.5 text-[9px] font-bold">
                               COVER
                             </span>
                           )}
@@ -590,9 +591,9 @@ export default function NewListingPage() {
                       ))}
                     </div>
                   )}
-                  <div className="mt-6 rounded-2xl bg-paper-dim p-4">
-                    <label className="flex items-start gap-3 text-sm">
-                      <input required type="checkbox" className="mt-1" />
+                  <div className="mt-6 rounded-2xl border border-gray-200 bg-slate-50 p-4">
+                    <label className="flex items-start gap-3 text-sm text-gray-700">
+                      <input required type="checkbox" className="mt-1 accent-[#15803D]" />
                       <span>
                         I confirm the information is accurate and I am
                         authorised to list this property. I understand Bhoomi
@@ -609,7 +610,7 @@ export default function NewListingPage() {
                 <button
                   type="button"
                   onClick={() => setStep((s) => s - 1)}
-                  className="rounded-xl border border-ink/15 px-6 py-3 text-sm font-semibold"
+                  className="rounded-xl border border-gray-300 bg-white hover:bg-gray-50 px-6 py-3 text-sm font-semibold text-gray-700 transition"
                 >
                   Back
                 </button>
@@ -620,14 +621,14 @@ export default function NewListingPage() {
                 <button
                   type="button"
                   onClick={next}
-                  className="rounded-xl bg-ink px-7 py-3 text-sm font-bold text-white"
+                  className="rounded-xl bg-[#15803D] hover:bg-[#14532D] px-7 py-3 text-sm font-bold text-white shadow-xs transition"
                 >
                   Continue →
                 </button>
               ) : (
                 <button
                   disabled={loading}
-                  className="rounded-xl bg-moss px-7 py-3 text-sm font-bold text-white disabled:opacity-50"
+                  className="rounded-xl bg-[#15803D] hover:bg-[#14532D] px-7 py-3 text-sm font-bold text-white shadow-xs transition disabled:opacity-50"
                 >
                   {loading ? "Submitting…" : "Submit for verification"}
                 </button>
@@ -642,11 +643,11 @@ export default function NewListingPage() {
 function Heading({ eyebrow, title, copy }) {
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-widest text-gold">
+      <p className="text-xs font-bold uppercase tracking-widest text-[#15803D]">
         {eyebrow}
       </p>
-      <h2 className="mt-2 font-display text-3xl">{title}</h2>
-      <p className="mt-2 text-sm text-ink-soft">{copy}</p>
+      <h2 className="mt-2 font-display text-3xl text-gray-900">{title}</h2>
+      <p className="mt-2 text-sm text-gray-600">{copy}</p>
     </div>
   );
 }
@@ -655,7 +656,7 @@ function Choice({ active, onClick, children }) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border p-4 text-left text-sm font-semibold transition ${active ? "border-moss bg-moss/8 text-moss-deep ring-2 ring-moss/10" : "border-ink/10 hover:border-moss/30"}`}
+      className={`rounded-xl border p-4 text-left text-sm font-semibold transition ${active ? "border-[#15803D] bg-[#DCFCE7]/60 text-[#14532D] ring-2 ring-[#15803D]/20 shadow-xs" : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"}`}
     >
       {children}
     </button>
@@ -664,9 +665,9 @@ function Choice({ active, onClick, children }) {
 function Field({ label, hint, wide, children }) {
   return (
     <label className={wide ? "sm:col-span-2" : ""}>
-      <span className="text-sm font-semibold">{label}</span>
-      {hint && <span className="ml-2 text-xs text-ink-soft">{hint}</span>}
-      <div className="mt-2 [&_input]:w-full [&_input]:rounded-xl [&_input]:border [&_input]:border-ink/10 [&_input]:px-4 [&_input]:py-3 [&_select]:w-full [&_select]:rounded-xl [&_select]:border [&_select]:border-ink/10 [&_select]:bg-white [&_select]:px-4 [&_select]:py-3 [&_textarea]:w-full [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-ink/10 [&_textarea]:px-4 [&_textarea]:py-3">
+      <span className="text-sm font-semibold text-gray-900">{label}</span>
+      {hint && <span className="ml-2 text-xs text-gray-500">{hint}</span>}
+      <div className="mt-2 [&_input]:w-full [&_input]:rounded-xl [&_input]:border [&_input]:border-gray-200 [&_input]:px-4 [&_input]:py-3 [&_input]:text-sm [&_input]:text-gray-900 focus-within:[&_input]:border-[#15803D] focus-within:[&_input]:outline-none focus-within:[&_input]:ring-2 focus-within:[&_input]:ring-[#DCFCE7] [&_select]:w-full [&_select]:rounded-xl [&_select]:border [&_select]:border-gray-200 [&_select]:bg-white [&_select]:px-4 [&_select]:py-3 [&_select]:text-sm [&_select]:text-gray-900 focus-within:[&_select]:border-[#15803D] focus-within:[&_select]:outline-none focus-within:[&_select]:ring-2 focus-within:[&_select]:ring-[#DCFCE7] [&_textarea]:w-full [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-gray-200 [&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:text-sm [&_textarea]:text-gray-900 focus-within:[&_textarea]:border-[#15803D] focus-within:[&_textarea]:outline-none focus-within:[&_textarea]:ring-2 focus-within:[&_textarea]:ring-[#DCFCE7]">
         {children}
       </div>
     </label>
@@ -674,11 +675,12 @@ function Field({ label, hint, wide, children }) {
 }
 function Check({ label, checked, onChange }) {
   return (
-    <label className="flex items-center gap-3 rounded-xl border border-ink/10 p-4 text-sm font-medium">
+    <label className="flex items-center gap-3 rounded-xl border border-gray-200 p-4 text-sm font-medium text-gray-800 hover:bg-gray-50 cursor-pointer">
       <input
         type="checkbox"
         checked={!!checked}
         onChange={(e) => onChange(e.target.checked)}
+        className="accent-[#15803D] h-4 w-4 rounded"
       />
       {label}
     </label>

@@ -66,7 +66,7 @@ export async function PATCH(req, { params }) {
       categories: { deleteMany: {}, create: categories.map((category) => ({ category })) },
     };
     if (Array.isArray(body.photos)) {
-      const photos = [...new Set(body.photos)].filter((url) => typeof url === "string" && url.startsWith("https://res.cloudinary.com/dwvfedqrb/image/upload/"));
+      const photos = [...new Set(body.photos)].filter((url) => typeof url === "string" && /^https:\/\/res\.cloudinary\.com\/[a-zA-Z0-9_-]+\/image\/upload\/.+/.test(url));
       if (!photos.length || photos.length > 12 || photos.length !== body.photos.length) return NextResponse.json({ error: "Keep between 1 and 12 valid property photos" }, { status: 400 });
       data.photos = { deleteMany: {}, create: photos.map((url) => ({ url })) };
     }

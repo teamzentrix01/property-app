@@ -63,7 +63,7 @@ export default function PropertyActions({ listing, compact = false }) {
         type="button"
         onClick={save}
         aria-label="Save property"
-        className={`grid h-9 w-9 place-items-center rounded-full bg-white/95 shadow-sm ${saved ? "text-red-500" : "text-ink-soft"}`}
+        className={`grid h-9 w-9 place-items-center rounded-full bg-white/95 shadow-sm ${saved ? "text-red-600" : "text-red-600"}`}
       >
         <svg
           viewBox="0 0 24 24"
@@ -78,66 +78,73 @@ export default function PropertyActions({ listing, compact = false }) {
     );
   return (
     <>
-      <div className="grid gap-2">
+      <div className="grid gap-2.5">
         <a
           href={whatsapp}
           target="_blank"
           rel="noreferrer"
-          className="block rounded-xl bg-moss py-3 text-center text-sm font-bold text-white"
+          className="flex items-center justify-center gap-2 rounded-xl bg-green-700 py-3 text-center text-sm font-bold text-white shadow-sm transition duration-200 hover:bg-green-800"
         >
-          Get best quote on WhatsApp
+          Get Best Quote on WhatsApp
         </a>
         <div className="grid grid-cols-2 gap-2">
           <a
             href={`tel:${phone}`}
-            className="rounded-xl bg-ink py-3 text-center text-sm font-bold text-white"
+            className="btn btn-primary"
           >
-            Call now
+            Call Now
           </a>
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="rounded-xl border border-ink/15 py-3 text-sm font-semibold"
+            className="btn btn-tertiary"
           >
-            Schedule visit
+            Schedule Visit
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-2"><button type="button" onClick={save} className="rounded-xl border border-moss/20 py-3 text-sm font-semibold text-moss-deep">{saved ? "Saved ✓" : "Save property"}</button><button type="button" onClick={share} className="rounded-xl border border-ink/15 py-3 text-sm font-semibold">Share</button></div>
-        {status && !open && <p className="text-center text-xs text-moss-deep">{status}</p>}
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={save} className="btn btn-secondary">
+            {saved ? "Saved ✓" : "Save Property"}
+          </button>
+          <button type="button" onClick={share} className="rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-gray-50">
+            Share
+          </button>
+        </div>
+        {status && !open && <p className="text-center text-xs font-semibold text-green-800">{status}</p>}
       </div>
       {open && (
         <div
-          className="fixed inset-0 z-[70] grid place-items-end bg-black/45 p-0 sm:place-items-center sm:p-5"
+          className="fixed inset-0 z-[70] grid place-items-end bg-black/50 p-0 backdrop-blur-sm sm:place-items-center sm:p-5"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-t-3xl bg-white p-6 sm:rounded-3xl"
+            className="w-full max-w-md rounded-t-3xl border border-gray-200 bg-white p-6 shadow-2xl sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-2xl">Request a visit</h3>
-            <p className="mt-2 text-sm text-ink-soft">
-              The owner or agent will receive this request.
+            <h3 className="font-display text-2xl font-bold text-gray-950">Request a Visit</h3>
+            <p className="mt-1.5 text-sm text-gray-500">
+              The owner or expert will receive your visit inquiry.
             </p>
             <textarea
-              rows="5"
+              rows="4"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="mt-5 w-full rounded-xl border border-ink/10 p-3 text-sm"
+              className="mt-4 w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-800 outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
             />
             <button
               type="button"
               onClick={enquire}
-              className="mt-3 w-full rounded-xl bg-moss py-3 text-sm font-bold text-white"
+              className="mt-3.5 w-full rounded-xl bg-green-700 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-green-800"
             >
-              Send request
+              Send Request
             </button>
             {status && (
-              <p className="mt-3 text-center text-xs text-ink-soft">{status}</p>
+              <p className="mt-2.5 text-center text-xs font-semibold text-green-800">{status}</p>
             )}
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="mt-2 w-full py-2 text-sm text-ink-soft"
+              className="mt-2 w-full py-2 text-xs font-semibold text-gray-500 hover:text-gray-800"
             >
               Cancel
             </button>

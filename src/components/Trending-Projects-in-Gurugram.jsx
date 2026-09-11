@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import SectionHeading from "@/components/SectionHeading";
 import PropertyCard from "@/components/PropertyCard";
 
 const cities = ["Moradabad", "Meerut", "Rampur"];
@@ -48,55 +49,51 @@ export default function TrendingProjects() {
   }, [selectedCity, retry]);
 
   return (
-    <section className="w-full bg-white py-16 sm:py-20">
+    <section className="w-full bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
-        {/* ================= HEADER ================= */}
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <span className="h-[2px] w-8 bg-moss" />
-
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-moss">
-                EXPLORE {selectedCity.toUpperCase()}
-              </span>
+        <SectionHeading
+          eyebrow="Explore your city"
+          title={`Trending Projects in ${selectedCity}`}
+          description={`Discover homes, plots and commercial spaces in ${selectedCity}.`}
+          action={
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={leftArrow}
+                aria-label="Previous city"
+                className="grid h-10 w-10 place-items-center rounded-full border border-green-700 bg-white text-green-700 shadow-sm transition duration-200 hover:bg-green-700 hover:text-white"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={rightArrow}
+                aria-label="Next city"
+                className="grid h-10 w-10 place-items-center rounded-full border border-green-700 bg-white text-green-700 shadow-sm transition duration-200 hover:bg-green-700 hover:text-white"
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
-
-            <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[40px]">
-              Trending Projects in{" "}
-              <span className="text-moss">
-                {selectedCity}
-              </span>
-            </h2>
-
-            <p className="mt-3 max-w-2xl text-sm text-gray-500 sm:text-base">
-              Discover the most sought-after residential projects
-              and premium properties in {selectedCity}.
-            </p>
-          </div>
-
-          {/* Desktop arrows */}
-          <div className="hidden gap-2 md:flex">
+          }
+        />
+        <div className="mb-6 flex gap-2 border-b border-gray-200" role="group" aria-label="Trending project city">
+          {cities.map((city, index) => (
             <button
+              key={city}
               type="button"
-              onClick={leftArrow}
-              aria-label="Previous city"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
+              aria-pressed={city === selectedCity}
+              onClick={() => setCurrentCityIndex(index)}
+              className={`rounded-t-xl border-b-2 px-5 py-3 text-sm font-bold transition duration-200 ${
+                city === selectedCity
+                  ? "border-green-700 bg-[#DCFCE7] text-[#15803D]"
+                  : "border-transparent text-gray-600 hover:text-green-700 hover:bg-green-50/50"
+              }`}
             >
-              <ChevronLeft className="h-5 w-5" />
+              {city}
             </button>
-
-            <button
-              type="button"
-              onClick={rightArrow}
-              aria-label="Next city"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+          ))}
         </div>
-
         {/* ================= PROJECT CARDS ================= */}
         <div key={selectedCity} className={projects.length ? "grid grid-flow-col auto-cols-[100%] gap-5 overflow-x-auto pb-2 sm:auto-cols-[calc((100%_-_20px)/2)] lg:auto-cols-[calc((100%_-_60px)/4)]" : "grid grid-cols-1 gap-5"}>
           {loading ? (
@@ -109,8 +106,8 @@ export default function TrendingProjects() {
               <button type="button" className="ml-2 underline" onClick={() => { setResult(null); setRetry((value) => value + 1); }}>Try again</button>
             </div>
           ) : projects.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-[#fbf9f5] py-16 px-4 text-center">
-              <MapPin className="mb-3 h-10 w-10 text-[#b2873a] opacity-50" />
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-slate-50 py-16 px-4 text-center">
+              <MapPin className="mb-3 h-10 w-10 text-green-700 opacity-50" />
               <p className="text-base font-medium text-gray-700">
                 No properties available in {selectedCity} right now.
               </p>
@@ -125,29 +122,8 @@ export default function TrendingProjects() {
           )}
         </div>
 
-        {/* ================= MOBILE ARROWS ================= */}
-        <div className="mt-6 flex justify-center gap-2 md:hidden">
-          <button
-            type="button"
-            onClick={leftArrow}
-            aria-label="Previous city"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-
-          <button
-            type="button"
-            onClick={rightArrow}
-            aria-label="Next city"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:border-[#b2873a] hover:bg-[#b2873a] hover:text-white"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-
         {/* ================= BOTTOM CTA ================= */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-xl bg-[#f8f6f1] px-6 py-6 sm:flex-row sm:px-8">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-xl bg-slate-50 px-6 py-6 sm:flex-row sm:px-8">
           <div>
             <h3 className="text-lg font-bold text-[#1c1c1c]">
               Looking for a property in {selectedCity}?
@@ -160,7 +136,7 @@ export default function TrendingProjects() {
 
           <Link
             href={`/listings?city=${encodeURIComponent(selectedCity)}`}
-            className="flex items-center gap-2 rounded-lg bg-[#b2873a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#96702c]"
+            className="flex items-center gap-2 rounded-lg bg-green-700 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-900"
           >
             Explore {selectedCity}
             <ArrowRight className="h-4 w-4" />

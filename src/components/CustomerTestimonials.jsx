@@ -94,7 +94,7 @@ export default function CustomerTestimonials() {
   };
 
   return (
-    <section className="w-full bg-[#f7f6f3] py-16 sm:py-20 lg:py-24">
+    <section className="w-full bg-slate-50 py-12 sm:py-16">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -103,17 +103,17 @@ export default function CustomerTestimonials() {
           <div>
             {/* Label */}
             <div className="mb-3 flex items-center gap-2">
-              <MessageCircle className="h-4 w-4 text-[#b58a3a]" />
+              <MessageCircle className="h-4 w-4 text-green-700" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-green-700">
                 What Our Customers Say
               </span>
             </div>
 
             {/* Heading */}
-            <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
+            <h2 className="section-title text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               Customer{" "}
-              <span className="text-[Explore Gurugram]">
+              <span className="text-green-700">
                 Testimonials
               </span>
             </h2>
@@ -125,13 +125,13 @@ export default function CustomerTestimonials() {
           </div>
 
           {/* Rating */}
-          <div className="flex w-fit items-center gap-3 rounded-xl border border-[#e5dccb] bg-white px-5 py-3 shadow-sm">
+          <div className="flex w-fit items-center gap-3 rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm">
 
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
-                  className="h-4 w-4 fill-emerald-600 text-emerald-600"
+                  className="h-4 w-4 fill-green-600 text-green-600"
                 />
               ))}
             </div>
@@ -156,12 +156,12 @@ export default function CustomerTestimonials() {
           {visibleTestimonials.map((testimonial) => (
             <article
               key={testimonial.id}
-              className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_5px_22px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-[#dccba8] hover:shadow-[0_18px_40px_rgba(0,0,0,0.09)]"
+              className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_5px_22px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_18px_40px_rgba(0,0,0,0.09)]"
             >
 
               {/* Quote Icon */}
-              <div className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#f8f2e7]">
-                <Quote className="h-5 w-5 text-[#b58a3a]" />
+              <div className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-slate-50">
+                <Quote className="h-5 w-5 text-green-700" />
               </div>
 
               {/* Stars */}
@@ -169,14 +169,14 @@ export default function CustomerTestimonials() {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className="h-4 w-4 fill-emerald-600 text-emerald-600"
+                    className="h-4 w-4 fill-green-600 text-green-600"
                   />
                 ))}
               </div>
 
               {/* Review */}
               <p className="mt-6 min-h-[120px] text-sm leading-7 text-gray-600">
-                "{testimonial.text}"
+                &ldquo;{testimonial.text}&rdquo;
               </p>
 
               {/* Divider */}
@@ -186,7 +186,7 @@ export default function CustomerTestimonials() {
               <div className="flex items-center gap-3">
 
                 {/* Avatar */}
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#b58a3a] text-sm font-bold text-white shadow-sm">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-700 text-sm font-bold text-white shadow-sm">
                   {testimonial.initials}
                 </div>
 
@@ -205,7 +205,7 @@ export default function CustomerTestimonials() {
                   </p>
 
                   <div className="mt-1 flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-[#b58a3a]" />
+                    <MapPin className="h-3 w-3 text-green-700" />
 
                     <span className="text-[10px] text-gray-400">
                       {testimonial.location}
@@ -215,7 +215,7 @@ export default function CustomerTestimonials() {
               </div>
 
               {/* Gold hover line */}
-              <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#b58a3a] transition-all duration-500 group-hover:w-full" />
+              <div className="absolute bottom-0 left-0 h-1 w-0 bg-green-700 transition-all duration-500 group-hover:w-full" />
             </article>
           ))}
         </div>
@@ -232,7 +232,7 @@ export default function CustomerTestimonials() {
                 aria-label={`Go to testimonial ${index + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   active === index
-                    ? "w-8 bg-[#b58a3a]"
+                    ? "w-8 bg-green-700"
                     : "w-2 bg-gray-300"
                 }`}
               />
@@ -245,7 +245,7 @@ export default function CustomerTestimonials() {
             <button
               onClick={prevSlide}
               aria-label="Previous testimonials"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition hover:border-[#b58a3a] hover:bg-[#b58a3a] hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition hover:border-green-700 hover:bg-green-700 hover:text-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -253,7 +253,7 @@ export default function CustomerTestimonials() {
             <button
               onClick={nextSlide}
               aria-label="Next testimonials"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition hover:border-[#b58a3a] hover:bg-[#b58a3a] hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition hover:border-green-700 hover:bg-green-700 hover:text-white"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -262,17 +262,17 @@ export default function CustomerTestimonials() {
         </div>
 
         {/* ================= CTA ================= */}
-        <div className="relative mt-10 overflow-hidden rounded-2xl bg-[#181818]">
+        <div className="relative mt-10 overflow-hidden rounded-2xl bg-green-900">
 
           {/* Decorative circles */}
-          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full border border-[#b58a3a]/20" />
+          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full border border-green-700/20" />
 
-          <div className="absolute -right-5 -top-10 h-44 w-44 rounded-full border border-[#b58a3a]/15" />
+          <div className="absolute -right-5 -top-10 h-44 w-44 rounded-full border border-green-700/15" />
 
           <div className="relative z-10 flex flex-col gap-6 px-6 py-8 sm:px-9 lg:flex-row lg:items-center lg:justify-between lg:px-12">
 
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-green-700">
                 Your Property Journey
               </p>
 
@@ -285,7 +285,7 @@ export default function CustomerTestimonials() {
               </p>
             </div>
 
-            <Link href="/properties" className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-7 py-3.5 text-sm font-bold text-white transition hover:bg-[#c69d50]">
+            <Link href="/properties" className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-green-700 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-green-700">
               Explore Properties
 
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

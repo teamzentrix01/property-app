@@ -217,7 +217,7 @@ export default function Dashboard() {
         <p className="mb-4">You need to log in to see your dashboard.</p>
         <Link
           href="/login"
-          className="bg-gold text-ink px-6 py-3 rounded-full font-medium"
+          className="bg-green-700 text-white px-6 py-3 rounded-full font-medium"
         >
           Log in
         </Link>
@@ -251,7 +251,7 @@ export default function Dashboard() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/listings"
-                className="rounded-full bg-gold px-5 py-3 font-medium text-ink"
+                className="rounded-full bg-green-700 px-5 py-3 font-medium text-white"
               >
                 Browse properties
               </Link>
@@ -567,8 +567,8 @@ export default function Dashboard() {
 
 function StatusSelect({ listing, saving, onChange }) {
   const colors = {
-    PENDING: "border-yellow-200 bg-yellow-100 text-yellow-800",
-    UNDER_REVIEW: "border-blue-200 bg-blue-100 text-blue-800",
+    PENDING: "border-gray-200 bg-gray-100 text-gray-800",
+    UNDER_REVIEW: "border-green-200 bg-green-100 text-green-800",
     APPROVED: "border-green-200 bg-green-100 text-green-800",
     REJECTED: "border-red-200 bg-red-100 text-red-700",
     ACTIVE: "border-green-300 bg-green-200 text-green-900",

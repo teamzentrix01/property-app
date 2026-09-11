@@ -49,7 +49,7 @@ export default function ManageUsers() {
           <tbody>
             {users.map((u) => (
               <tr key={u.id} className="border-t border-ink/10">
-                <td className="p-3"><Link href={`/admin/users/${u.id}`} className="font-semibold text-amber-800 hover:underline">{u.name}</Link><p className="mt-1 text-[10px] text-slate-400">{u.id}</p></td>
+                <td className="p-3"><Link href={`/admin/users/${u.id}`} className="font-semibold text-gray-800 hover:underline">{u.name}</Link><p className="mt-1 text-[10px] text-slate-400">{u.id}</p></td>
                 <td className="p-3 font-data text-xs">{u.email}<br />{u.phone}</td>
                 <td className="p-3">
                   <select value={u.role} onChange={(e) => {

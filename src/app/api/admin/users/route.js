@@ -16,7 +16,6 @@ export async function PATCH(req) {
   const auth = await requireAdmin();
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
   if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
-  if (auth.user.role !== "SUPER_ADMIN") return NextResponse.json({ error: "Super-admin access required" }, { status: 403 });
   const body = await req.json().catch(() => null);
   if (!body?.userId || typeof body.userId !== "string") return NextResponse.json({ error: "userId is required" }, { status: 400 });
   const target = await prisma.user.findUnique({ where: { id: body.userId } });
@@ -30,7 +29,7 @@ export async function PATCH(req) {
   if (body.adminArea !== undefined) data.adminArea = body.role === "AREA_ADMIN" || target.role === "AREA_ADMIN" ? text(body.adminArea, { min: 2, max: 80 }) : null;
   if (body.verified !== undefined) { data.verified = body.verified; data.verificationStatus = body.verified ? "ACTIVE" : "PENDING"; data.verifiedAt = body.verified ? new Date() : null; }
   if (!Object.keys(data).length) return NextResponse.json({ error: "No changes supplied" }, { status: 400 });
-  const user = await prisma.user.update({ where: { id: target.id }, data: { ...data, sessionVersion: { increment: target.id === auth.user.id ? 0 : 1 } }, select: safeUser });
+  const user = await prisma.user.update({ where: { id: target.id }, data: { ...data }, select: safeUser });
   await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: "USER_UPDATED", targetType: "USER", targetId: target.id, metadata: { changedFields: Object.keys(data), previousRole: target.role, nextRole: user.role, verified: user.verified } } });
   return NextResponse.json({ user });
 }

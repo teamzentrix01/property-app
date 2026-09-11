@@ -2,7 +2,7 @@ import React from "react";
 
 export default function PropertiesLoading() {
   return (
-    <main className="min-h-screen flex-1 bg-[#f7f7f3] pb-24 md:pb-16">
+    <main className="min-h-screen flex-1 bg-slate-50 pb-24 md:pb-16">
       <section className="border-b border-ink/8 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <div className="h-4 w-24 animate-pulse rounded bg-gray-200" />

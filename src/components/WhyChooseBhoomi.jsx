@@ -56,7 +56,7 @@ const benefits = [
 
 export default function WhyChoose100Acress() {
   return (
-    <section className="w-full bg-white py-16 sm:py-20 lg:py-24">
+    <section className="w-full bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -64,17 +64,17 @@ export default function WhyChoose100Acress() {
 
           {/* Label */}
           <div className="mb-4 flex items-center justify-center gap-2">
-            <Sparkles className="h-4 w-4 text-[#b58a3a]" />
+            <Sparkles className="h-4 w-4 text-green-700" />
 
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-green-700">
               Your Trusted Property Partner
             </span>
           </div>
 
           {/* Heading */}
-          <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
+          <h2 className="section-title text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
             Why Choose{" "}
-            <span className="text-[Explore Gurugram]">
+            <span className="text-green-700">
               Bhoomi.com
             </span>
           </h2>
@@ -89,23 +89,23 @@ export default function WhyChoose100Acress() {
         <div className="mt-12 grid gap-7 lg:grid-cols-[0.75fr_1.25fr]">
 
           {/* ================= LEFT CARD ================= */}
-          <div className="relative min-h-[470px] overflow-hidden rounded-2xl bg-[#171717] p-7 sm:p-10">
+          <div className="relative min-h-[470px] overflow-hidden rounded-2xl bg-[#052E16] border border-green-900/40 p-7 sm:p-10 shadow-lg">
 
             {/* Decorative circles */}
-            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-[#b58a3a]/20" />
+            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-green-700/20" />
 
-            <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full border border-[#b58a3a]/10" />
+            <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full border border-green-700/10" />
 
             <div className="relative z-10 flex h-full flex-col justify-between">
 
               <div>
 
                 {/* Icon */}
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#b58a3a]/15">
-                  <ShieldCheck className="h-8 w-8 text-[Explore Gurugram]" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-700/15">
+                  <ShieldCheck className="h-8 w-8 text-green-700" />
                 </div>
 
-                <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
+                <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-green-700">
                   Property Search Made Easy
                 </p>
 
@@ -124,7 +124,7 @@ export default function WhyChoose100Acress() {
               <div className="mt-10 grid grid-cols-2 gap-3">
 
                 <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-2xl font-bold text-[Explore Gurugram]">
+                  <p className="text-2xl font-bold text-green-700">
                     10K+
                   </p>
 
@@ -134,7 +134,7 @@ export default function WhyChoose100Acress() {
                 </div>
 
                 <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-2xl font-bold text-[Explore Gurugram]">
+                  <p className="text-2xl font-bold text-green-700">
                     500+
                   </p>
 
@@ -156,16 +156,16 @@ export default function WhyChoose100Acress() {
               return (
                 <div
                   key={index}
-                  className="group rounded-xl border border-gray-100 bg-white p-6 shadow-[0_4px_18px_rgba(0,0,0,0.045)] transition-all duration-300 hover:-translate-y-1 hover:border-[#d9c49c] hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
+                  className="group rounded-xl border border-gray-100 bg-white p-6 shadow-[0_4px_18px_rgba(0,0,0,0.045)] transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
                 >
 
                   {/* Icon */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#f7f1e6] transition-all duration-300 group-hover:bg-[#b58a3a]">
-                    <Icon className="h-5 w-5 text-[Explore Gurugram] transition-colors group-hover:text-white" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 transition-all duration-300 group-hover:bg-green-700">
+                    <Icon className="h-5 w-5 text-green-700 transition-colors group-hover:text-white" />
                   </div>
 
                   {/* Title */}
-                  <h3 className="mt-5 text-lg font-bold text-[#171717] transition-colors group-hover:text-[Explore Gurugram]">
+                  <h3 className="mt-5 text-lg font-bold text-[#171717] transition-colors group-hover:text-green-700">
                     {item.title}
                   </h3>
 
@@ -177,7 +177,7 @@ export default function WhyChoose100Acress() {
                   {/* Bottom */}
                   <div className="mt-5 flex items-center gap-2 border-t border-gray-100 pt-4">
 
-                    <CheckCircle2 className="h-4 w-4 text-[#b58a3a]" />
+                    <CheckCircle2 className="h-4 w-4 text-green-700" />
 
                     <span className="text-[11px] font-semibold text-gray-400">
                       Trusted Experience
@@ -191,15 +191,15 @@ export default function WhyChoose100Acress() {
         </div>
 
         {/* ================= BOTTOM CTA ================= */}
-        <div className="relative mt-8 overflow-hidden rounded-2xl border border-[#eadfc9] bg-[#faf7f0]">
+        <div className="relative mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-slate-50">
 
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-[#b58a3a]/10" />
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-green-700/10" />
 
           <div className="relative z-10 flex flex-col gap-5 px-6 py-7 sm:px-9 lg:flex-row lg:items-center lg:justify-between lg:px-10">
 
             <div className="flex items-start gap-4">
 
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#b58a3a]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-700">
                 <CheckCircle2 className="h-5 w-5 text-white" />
               </div>
 
@@ -215,7 +215,7 @@ export default function WhyChoose100Acress() {
 
             </div>
 
-            <Link href="/properties" className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#b58a3a] px-7 py-3 text-sm font-bold text-white transition hover:bg-[#c69d50]">
+            <Link href="/properties" className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-green-700 px-7 py-3 text-sm font-bold text-white transition hover:bg-green-700">
               Explore Properties
 
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

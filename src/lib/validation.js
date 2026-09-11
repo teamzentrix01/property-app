@@ -63,7 +63,7 @@ export function validateListingRequiredFields(input, { validatePhotoUrls = false
   if (!PROPERTY_TYPES.includes(fields.propertyType)) errors.push("Property type is required");
   if (fields.photos.length < 1) errors.push("Please upload at least 1 property photo");
   else if (fields.photos.length > 12) errors.push("You can upload a maximum of 12 property photos");
-  else if (validatePhotoUrls && fields.photos.some((url) => typeof url !== "string" || !url.startsWith("https://res.cloudinary.com/dwvfedqrb/image/upload/"))) errors.push("One or more property photos are invalid");
+  else if (validatePhotoUrls && fields.photos.some((url) => typeof url !== "string" || !/^https:\/\/res\.cloudinary\.com\/[a-zA-Z0-9_-]+\/image\/upload\/.+/.test(url))) errors.push("One or more property photos are invalid");
   return { fields, errors };
 }
 

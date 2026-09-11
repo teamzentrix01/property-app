@@ -34,8 +34,8 @@ function getPasswordStrength(password) {
   if (/[^A-Za-z0-9]/.test(password)) score++;
 
   if (score <= 1) return { level: 1, label: "Weak", color: "#ef4444" };
-  if (score <= 3) return { level: 2, label: "Medium", color: "#f59e0b" };
-  return { level: 3, label: "Strong", color: "#059669" };
+  if (score <= 3) return { level: 2, label: "Medium", color: "#6b7280" };
+  return { level: 3, label: "Strong", color: "#15803d" };
 }
 
 export default function SignupPage() {
@@ -294,7 +294,7 @@ export default function SignupPage() {
       <div className="login-form-panel signup-form-panel">
         <div className="login-card signup-card">
           {/* Brand (mobile only) */}
-          <div className="login-card-brand md:hidden">
+          <div className="login-card-brand">
             <BhoomiMark />
           </div>
 

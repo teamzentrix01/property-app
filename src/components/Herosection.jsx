@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Search,
   MapPin,
@@ -211,12 +212,18 @@ export default function HeroSection() {
   ========================================================= */
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((response) =>
-        response.ok ? response.json() : { user: null }
-      )
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null));
+    const loadUser = () => {
+      fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
+        .then((response) =>
+          response.ok ? response.json() : { user: null }
+        )
+        .then((data) => setUser(data.user))
+        .catch(() => setUser(null));
+    };
+
+    loadUser();
+    window.addEventListener("bhoomi-auth-changed", loadUser);
+    return () => window.removeEventListener("bhoomi-auth-changed", loadUser);
   }, []);
 
   /* =========================================================
@@ -253,127 +260,21 @@ export default function HeroSection() {
   };
 
   const handleSearch = () => {
-    if (!location || !propertyType) return;
-
-    const searchData = {
-      purpose: activeTab,
-      propertyType,
-      location,
-      requirements,
-    };
-
-    console.log("PROPERTY SEARCH:", searchData);
+    const params = new URLSearchParams();
+    if (activeTab === "Rent") params.set("purpose", "RENT");
+    else if (activeTab === "Buy") params.set("purpose", "SALE");
+    if (location.trim()) params.set("search", location.trim());
+    if (propertyType) {
+      const typeMap = { Plot: "PLOT", House: "HOUSE", Flat: "FLAT", "Builder Floor": "FLAT", "PG / Room": "PG" };
+      params.set("propertyType", typeMap[propertyType] || propertyType);
+    }
+    window.location.assign(`/listings${params.size ? `?${params.toString()}` : ""}`);
   };
 
   /* =========================================================
      INPUT FIELD
   ========================================================= */
 
-  const InputField = ({
-    label,
-    placeholder,
-    value,
-    onChange,
-    type = "text",
-    icon,
-  }) => {
-    return (
-      <div className="group rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-all duration-200 hover:border-[#e5a92f]/60 hover:shadow-md focus-within:border-[#d99a1f] focus-within:ring-4 focus-within:ring-[#e5a92f]/10">
-        <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-            {label}
-          </label>
-
-          {icon && (
-            <span className="text-[#d99a1f] opacity-70">
-              {icon}
-            </span>
-          )}
-        </div>
-
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="mt-2 w-full bg-transparent text-[15px] font-semibold text-slate-800 outline-none placeholder:text-slate-400"
-        />
-      </div>
-    );
-  };
-
-  /* =========================================================
-     SELECT FIELD
-  ========================================================= */
-
-  const SelectField = ({
-    label,
-    value,
-    onChange,
-    options,
-    placeholder,
-    icon,
-  }) => {
-    return (
-      <div className="group rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-all duration-200 hover:border-[#e5a92f]/60 hover:shadow-md focus-within:border-[#d99a1f] focus-within:ring-4 focus-within:ring-[#e5a92f]/10">
-        <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-            {label}
-          </label>
-
-          {icon && (
-            <span className="text-[#d99a1f] opacity-70">
-              {icon}
-            </span>
-          )}
-        </div>
-
-        <div className="relative">
-          <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="mt-2 w-full cursor-pointer appearance-none bg-transparent pr-7 text-[15px] font-semibold text-slate-800 outline-none"
-          >
-            <option value="">{placeholder}</option>
-
-            {options.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-
-          <ChevronDown className="pointer-events-none absolute right-0 bottom-0.5 h-4 w-4 text-slate-400" />
-        </div>
-      </div>
-    );
-  };
-
-  /* =========================================================
-     SECTION TITLE
-  ========================================================= */
-
-  const SectionTitle = ({ icon, title, description }) => {
-    return (
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e5a92f]/10 text-[#d99a1f]">
-          {icon}
-        </div>
-
-        <div>
-          <h4 className="text-sm font-extrabold text-slate-800">
-            {title}
-          </h4>
-
-          {description && (
-            <p className="mt-0.5 text-[11px] text-slate-400">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <section className="site-hero relative w-full max-w-full overflow-hidden bg-slate-950">
@@ -386,40 +287,32 @@ export default function HeroSection() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90')",
+            "url('/login-hero.jpg')",
         }}
       />
 
       {/* DARK OVERLAY */}
 
-      <div className="absolute inset-0 bg-slate-950/55" />
+      <div className="absolute inset-0 bg-black/55" />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/40 to-slate-950/95" />
-
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-slate-950/40" />
-
-      {/* GOLD GLOW */}
-
-      <div className="pointer-events-none absolute -left-40 top-32 h-96 w-96 rounded-full bg-[#e5a92f]/10 blur-3xl" />
-
-      <div className="pointer-events-none absolute -right-40 bottom-20 h-96 w-96 rounded-full bg-[#e5a92f]/10 blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30" />
 
       {/* =====================================================
           MAIN CONTENT
       ====================================================== */}
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-24 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 pt-10 sm:px-6 lg:px-8">
 
         {/* BADGE */}
 
         <div className="flex justify-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-xl">
             <span className="relative flex h-2 w-2">
-              <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative h-2 w-2 rounded-full bg-emerald-400" />
+              <span className="absolute h-full w-full rounded-full bg-green-400 opacity-60" />
+              <span className="relative h-2 w-2 rounded-full bg-green-400" />
             </span>
 
-            <ShieldCheck className="h-4 w-4 text-[#f4c35b]" />
+            <ShieldCheck className="h-4 w-4 text-green-300" />
 
             Verified Properties Across India
           </div>
@@ -427,15 +320,15 @@ export default function HeroSection() {
 
         {/* HEADING */}
 
-        <div className="mx-auto mt-7 max-w-4xl text-center">
-          <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
-            Find Your
-            <span className="block bg-gradient-to-r from-[#f7c95c] via-[#fff1b8] to-[#e5a92f] bg-clip-text text-transparent">
-              Dream Property
+        <div className="mx-auto mt-5 max-w-4xl text-center">
+          <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Find Your{" "}
+            <span className="text-emerald-400">
+              Perfect Property
             </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
             Discover verified homes, apartments, plots and properties
             at the right price and the right location.
           </p>
@@ -445,21 +338,21 @@ export default function HeroSection() {
             SEARCH CARD
         ====================================================== */}
 
-        <div className="mx-auto mt-9 w-full max-w-6xl rounded-[30px] border border-white/70 bg-white p-3 shadow-2xl sm:p-5">
+        <div className="mx-auto mt-6 w-full max-w-5xl rounded-2xl border border-gray-200 bg-white p-4 shadow-xl sm:p-6">
 
           {/* BUY / RENT */}
 
           <div className="flex justify-center sm:justify-start">
-            <div className="inline-flex rounded-xl bg-slate-100 p-1">
+            <div className="inline-flex max-w-full items-center border-b border-gray-200">
               {["Buy", "Rent"].map((tab) => (
                 <button
                   key={tab}
                   type="button"
                   onClick={() => handleTabChange(tab)}
-                  className={`flex min-w-[110px] items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-sm font-bold transition-all ${
+                  className={`flex items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-all ${
                     activeTab === tab
-                      ? "bg-white text-[#c88915] shadow-sm"
-                      : "text-slate-500 hover:text-slate-800"
+                      ? "border-green-700 bg-green-50 text-green-700"
+                      : "border-transparent text-gray-500 hover:text-green-700"
                   }`}
                 >
                   {tab === "Buy" ? (
@@ -471,6 +364,7 @@ export default function HeroSection() {
                   {tab}
                 </button>
               ))}
+              <Link href="/categories/commercial" className="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-gray-500 hover:border-green-700 hover:text-green-700">Commercial</Link>
             </div>
           </div>
 
@@ -482,12 +376,12 @@ export default function HeroSection() {
 
             {/* LOCATION */}
 
-            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition-all hover:border-[#e5a92f]/60 focus-within:border-[#d99a1f] focus-within:ring-4 focus-within:ring-[#e5a92f]/10">
+            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition-all hover:border-green-700/60 focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
 
               <div className="flex items-center gap-3">
 
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e5a92f]/10">
-                  <MapPin className="h-5 w-5 text-[#d99a1f]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-700/10">
+                  <MapPin className="h-5 w-5 text-red-600" />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -513,7 +407,7 @@ export default function HeroSection() {
                 </div>
 
                 {location && (
-                  <span className="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600 sm:block">
+                  <span className="hidden rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-600 sm:block">
                     Selected
                   </span>
                 )}
@@ -539,10 +433,10 @@ export default function HeroSection() {
                       key={`${item.name}-${item.city || ""}-${index}`}
                       type="button"
                       onClick={() => handleLocationSelect(item)}
-                      className="group flex w-full items-center gap-3 border-b border-slate-50 px-4 py-3 text-left last:border-0 hover:bg-[#fffaf0]"
+                      className="group flex w-full items-center gap-3 border-b border-slate-50 px-4 py-3 text-left last:border-0 hover:bg-slate-50"
                     >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 group-hover:bg-[#e5a92f]/10">
-                        <MapPin className="h-4 w-4 text-slate-400 group-hover:text-[#d99a1f]" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 group-hover:bg-green-700/10">
+                        <MapPin className="h-4 w-4 text-slate-400 group-hover:text-green-700" />
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -557,7 +451,7 @@ export default function HeroSection() {
                         </p>
                       </div>
 
-                      <ArrowRight className="h-4 w-4 text-slate-300 group-hover:translate-x-1 group-hover:text-[#d99a1f]" />
+                      <ArrowRight className="h-4 w-4 text-slate-300 group-hover:translate-x-1 group-hover:text-green-700" />
                     </button>
                   ))}
                 </div>
@@ -566,12 +460,12 @@ export default function HeroSection() {
 
             {/* PROPERTY TYPE */}
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition-all hover:border-[#e5a92f]/60 focus-within:border-[#d99a1f] focus-within:ring-4 focus-within:ring-[#e5a92f]/10">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition-all hover:border-green-700/60 focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
 
               <div className="flex items-center gap-3">
 
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e5a92f]/10">
-                  <Home className="h-5 w-5 text-[#d99a1f]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-700/10">
+                  <Home className="h-5 w-5 text-green-700" />
                 </div>
 
                 <div className="relative flex-1">
@@ -608,13 +502,15 @@ export default function HeroSection() {
           ================================================== */}
 
           {propertyType && (
-            <div className="mt-5 rounded-[26px] border border-slate-200 bg-[#fafafa] p-5 sm:p-7">
+            <details className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-green-700">More preferences for {propertyType}</summary>
+              <div className="mt-4">
 
               {/* HEADER */}
 
               <div className="mb-7 flex items-center gap-3 border-b border-slate-200 pb-5">
 
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#e5a92f]/10 text-[#d99a1f]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green-700/10 text-green-700">
                   {propertyType === "Plot" ? (
                     <LandPlot className="h-5 w-5" />
                   ) : (
@@ -1742,7 +1638,8 @@ export default function HeroSection() {
                     </div>
                   </div>
                 )}
-            </div>
+              </div>
+            </details>
           )}
 
           {/* =================================================
@@ -1752,20 +1649,11 @@ export default function HeroSection() {
           <button
             type="button"
             onClick={handleSearch}
-            disabled={!location || !propertyType}
-            className={`group mt-5 flex min-h-[62px] w-full items-center justify-center gap-3 rounded-2xl bg-emerald-50 text-sm font-semibold text-emerald-700 transition-colors duration-200 ${
-              location && propertyType
-                ? "shadow-lg shadow-emerald-700/10 hover:-translate-y-0.5 hover:bg-emerald-100 hover:text-emerald-800 hover:shadow-xl"
-                : "cursor-not-allowed"
-            }`}
+            className="group mt-5 flex min-h-[50px] w-full items-center justify-center gap-3 rounded-xl bg-green-700 text-sm font-bold text-white shadow-md shadow-green-950/20 transition-all duration-200 hover:bg-green-800 active:scale-[0.99]"
           >
-            <Search className="h-5 w-5 text-emerald-700 transition-transform duration-200 group-hover:scale-110 group-hover:text-emerald-800" />
-
-            Search Properties
-
-            {location && propertyType && (
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            )}
+            <Search className="h-5 w-5 text-white" />
+            <span>Search Properties</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </button>
 
           {/* =================================================
@@ -1789,7 +1677,7 @@ export default function HeroSection() {
                       •
                     </span>
 
-                    <span className="rounded-full bg-[#e5a92f]/10 px-3 py-1 font-bold text-[#b77d0e]">
+                    <span className="rounded-full bg-green-700/10 px-3 py-1 font-bold text-green-700">
                       {propertyType}
                     </span>
                   </>
@@ -1801,7 +1689,7 @@ export default function HeroSection() {
                       •
                     </span>
 
-                    <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-bold text-emerald-700">
+                    <span className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 font-bold text-green-700">
                       <MapPin className="h-3 w-3" />
                       {location}
                     </span>
@@ -1843,7 +1731,7 @@ export default function HeroSection() {
                   <div className="mt-3 flex flex-wrap gap-1.5">
 
                     {requirements.plotType && (
-                      <span className="rounded-full bg-[#e5a92f]/10 px-2.5 py-1 font-semibold text-[#a8730e]">
+                      <span className="rounded-full bg-green-700/10 px-2.5 py-1 font-semibold text-green-900">
                         {requirements.plotType}
                       </span>
                     )}
@@ -1874,27 +1762,27 @@ export default function HeroSection() {
 
                     {requirements.cornerPlot ===
                       "Yes - Corner Plot" && (
-                      <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">
+                      <span className="rounded-full bg-green-50 px-2.5 py-1 font-semibold text-green-700">
                         Corner Plot
                       </span>
                     )}
 
                     {requirements.gatedSociety === "Yes" && (
-                      <span className="rounded-full bg-blue-50 px-2.5 py-1 font-semibold text-blue-700">
+                      <span className="rounded-full bg-green-50 px-2.5 py-1 font-semibold text-green-700">
                         Gated Society
                       </span>
                     )}
 
                     {activeTab === "Rent" &&
                       requirements.rent && (
-                        <span className="rounded-full bg-[#e5a92f]/10 px-2.5 py-1 font-semibold text-[#a8730e]">
+                        <span className="rounded-full bg-green-700/10 px-2.5 py-1 font-semibold text-green-900">
                           ₹{requirements.rent}/month
                         </span>
                       )}
 
                     {activeTab === "Buy" &&
                       requirements.maxBudget && (
-                        <span className="rounded-full bg-[#e5a92f]/10 px-2.5 py-1 font-semibold text-[#a8730e]">
+                        <span className="rounded-full bg-green-700/10 px-2.5 py-1 font-semibold text-green-900">
                           Budget ₹{requirements.maxBudget}
                         </span>
                       )}
@@ -1948,7 +1836,7 @@ export default function HeroSection() {
             QUICK ACTIONS
         ====================================================== */}
 
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
 
           <button
             type="button"
@@ -1986,7 +1874,7 @@ export default function HeroSection() {
               onClick={() =>
                 window.location.assign("/listings/new")
               }
-              className="group flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:bg-[#e5a92f] hover:text-white"
+              className="group flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:bg-green-700 hover:text-white"
             >
               Post Property FREE
 
@@ -1995,47 +1883,114 @@ export default function HeroSection() {
           )}
         </div>
 
-        {/* =====================================================
-            STATS
-        ====================================================== */}
 
-        <div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-white/10 bg-black/20 px-5 py-5 backdrop-blur-md">
-
-          <div className="grid grid-cols-3 divide-x divide-white/10">
-
-            <div className="text-center">
-              <p className="text-xl font-black text-white sm:text-2xl">
-                50K+
-              </p>
-
-              <p className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-white/50 sm:text-xs">
-                Properties
-              </p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-xl font-black text-white sm:text-2xl">
-                25K+
-              </p>
-
-              <p className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-white/50 sm:text-xs">
-                Happy Customers
-              </p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-xl font-black text-white sm:text-2xl">
-                100%
-              </p>
-
-              <p className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-white/50 sm:text-xs">
-                Verified
-              </p>
-            </div>
-
-          </div>
-        </div>
       </div>
     </section>
   );
 }
+
+  const InputField = ({
+    label,
+    placeholder,
+    value,
+    onChange,
+    type = "text",
+    icon,
+  }) => {
+    return (
+      <div className="group rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-all duration-200 hover:border-green-700/60 hover:shadow-md focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            {label}
+          </label>
+
+          {icon && (
+            <span className="text-green-700 opacity-70">
+              {icon}
+            </span>
+          )}
+        </div>
+
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="mt-2 w-full bg-transparent text-[15px] font-semibold text-slate-800 outline-none placeholder:text-slate-400"
+        />
+      </div>
+    );
+  };
+
+  /* =========================================================
+     SELECT FIELD
+  ========================================================= */
+
+  const SelectField = ({
+    label,
+    value,
+    onChange,
+    options,
+    placeholder,
+    icon,
+  }) => {
+    return (
+      <div className="group rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-all duration-200 hover:border-green-700/60 hover:shadow-md focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            {label}
+          </label>
+
+          {icon && (
+            <span className="text-green-700 opacity-70">
+              {icon}
+            </span>
+          )}
+        </div>
+
+        <div className="relative">
+          <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="mt-2 w-full cursor-pointer appearance-none bg-transparent pr-7 text-[15px] font-semibold text-slate-800 outline-none"
+          >
+            <option value="">{placeholder}</option>
+
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+
+          <ChevronDown className="pointer-events-none absolute right-0 bottom-0.5 h-4 w-4 text-slate-400" />
+        </div>
+      </div>
+    );
+  };
+
+  /* =========================================================
+     SECTION TITLE
+  ========================================================= */
+
+  const SectionTitle = ({ icon, title, description }) => {
+    return (
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-700/10 text-green-700">
+          {icon}
+        </div>
+
+        <div>
+          <h4 className="text-sm font-extrabold text-slate-800">
+            {title}
+          </h4>
+
+          {description && (
+            <p className="mt-0.5 text-[11px] text-slate-400">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };

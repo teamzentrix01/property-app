@@ -57,7 +57,7 @@ export default function EditListingPage() {
   if (!listing && !error) return <main className="flex-1 px-5 py-16 text-center">Loading property...</main>;
 
   return (
-    <main className="flex-1 bg-[#f7f7f3] pb-24">
+    <main className="flex-1 bg-slate-50 pb-24">
       <form onSubmit={submit} className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <p className="text-xs font-bold uppercase tracking-widest text-moss">Owner listing</p>
         <h1 className="mt-2 font-display text-3xl">Edit property</h1>
