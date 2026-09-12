@@ -53,7 +53,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
         ========================================== */}
         <div className="mb-10 text-center">
           <h2 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-[42px]">
-            <span className="text-[#c41920]">100acress</span>{" "}
+            <span className="text-[#c41920]">Bhoomi</span>{" "}
             <span className="text-[#0f172a]">Recommended</span>
           </h2>
 

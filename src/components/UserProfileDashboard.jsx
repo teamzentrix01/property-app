@@ -4,7 +4,7 @@ import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, FileText, Heart, Home, LogOut, MapPin, Menu, Pencil, UserRound, X } from "lucide-react";
+import { Building2, FileText, Heart, Home, Lock, LogOut, MapPin, Menu, Pencil, UserRound, X } from "lucide-react";
 import { formatPrice } from "@/lib/formatters";
 import UserDocuments from "@/components/UserDocuments";
 
@@ -21,6 +21,7 @@ export default function UserProfileDashboard() {
   const [counts, setCounts] = useState({ saved: 0, posted: 0, documents: 0 });
   const [saved, setSaved] = useState([]); const [docs, setDocs] = useState([]); const [posted, setPosted] = useState([]);
   const [editing, setEditing] = useState(false); const [form, setForm] = useState(blank); const [notice, setNotice] = useState(""); const [error, setError] = useState("");
+  const [lockedNotice, setLockedNotice] = useState(false);
   const load = async () => {
     const options = { credentials: "include", cache: "no-store" };
     const [p, s, d, l] = await Promise.all([fetch("/api/profile", options), fetch("/api/profile/saved-properties", options), fetch("/api/profile/documents", options), fetch("/api/profile/posted-properties", options)]);
@@ -38,6 +39,7 @@ export default function UserProfileDashboard() {
   const logout = async () => { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); router.push("/"); router.refresh(); };
   if (!profile) return <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12"><div className="h-64 animate-pulse rounded-3xl bg-white" /></main>;
   const accountType = roleLabel[profile.role] || profile.role;
+  const isVerified = profile.verificationStatus === "ACTIVE" || ["AREA_ADMIN", "SUPER_ADMIN"].includes(profile.role);
   return (
     <main className="flex-1 bg-slate-50">
       <div className="mx-auto w-full max-w-7xl px-4 py-7 sm:px-6 lg:py-10">
@@ -89,8 +91,14 @@ export default function UserProfileDashboard() {
                     <p><span className="font-medium text-gray-400">Email:</span> {profile.email}</p>
                     <p><span className="font-medium text-gray-400">Mobile:</span> {profile.phone || "Not provided"}</p>
                     <p><span className="font-medium text-gray-400">Member Since:</span> {date(profile.createdAt)}</p>
-                    <p><span className="font-medium text-gray-400">Status:</span> <span className="inline-flex rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-bold text-green-800">{profile.verificationStatus}</span></p>
+                    <p><span className="font-medium text-gray-400">Status:</span> <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${profile.verificationStatus === "ACTIVE" ? "bg-green-50 text-green-800" : profile.verificationStatus === "REJECTED" ? "bg-red-50 text-red-700 border border-red-200" : "bg-amber-50 text-amber-800"}`}>{profile.verificationStatus}</span></p>
                   </div>
+                  {profile.verificationStatus === "REJECTED" && (
+                    <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
+                      <strong className="font-bold">Account Verification Rejected:</strong>{" "}
+                      {profile.rejectionReason || "Your account verification was rejected. Please re-upload clear and valid documents."}
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -146,14 +154,14 @@ export default function UserProfileDashboard() {
               <>
                 <Header title={`Saved Properties (${saved.length})`}/>
                 {saved.length ? (
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="flex flex-wrap gap-5">
                     {saved.map((l) => (
                       <ListingCard key={l.id} listing={l} actions={
                         <>
-                          <Link href={`/listings/${l.id}`} className="rounded-xl bg-green-700 px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-green-800">
+                          <Link href={`/listings/${l.id}`} className="flex-1 text-center rounded-xl bg-green-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-800">
                             View Property
                           </Link>
-                          <button onClick={() => removeSaved(l.id)} className="rounded-xl border border-red-200 px-3.5 py-1.5 text-xs font-bold text-red-600 transition hover:bg-red-50">
+                          <button onClick={() => removeSaved(l.id)} className="flex-1 text-center rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50">
                             Remove
                           </button>
                         </>
@@ -176,36 +184,121 @@ export default function UserProfileDashboard() {
             {section === "posted" && (
               <>
                 <Header title={`My Posted Properties (${posted.length})`} action={
-                  <Link href="/post-property" className="rounded-xl bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-green-800">
-                    Post Property
-                  </Link>
+                  isVerified ? (
+                    <Link href="/post-property" className="rounded-xl bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-green-800">
+                      Post Property
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setLockedNotice(true)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-bold text-amber-900 shadow-sm transition hover:bg-amber-100"
+                      title="Account not verified by admin"
+                    >
+                      <Lock size={15} className="text-amber-700" />
+                      <span>Post Property</span>
+                      <span className="rounded-md bg-amber-200/90 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-900">Locked</span>
+                    </button>
+                  )
                 }/>
                 {posted.length ? (
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="flex flex-wrap gap-5">
                     {posted.map((l) => (
                       <ListingCard key={l.id} listing={l} actions={
                         <>
-                          <Link href={`/listings/${l.id}`} className="rounded-xl bg-green-700 px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-green-800">
+                          <Link href={`/listings/${l.id}`} className="flex-1 text-center rounded-xl bg-green-700 px-2.5 py-2 text-xs font-bold text-white transition hover:bg-green-800">
                             View
                           </Link>
-                          <Link href={`/listings/${l.id}/edit`} className="rounded-xl border border-gray-200 px-3.5 py-1.5 text-xs font-bold text-gray-700 transition hover:bg-gray-50">
+                          <Link href={`/listings/${l.id}/edit`} className="flex-1 text-center rounded-xl border border-gray-200 px-2.5 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50">
                             Edit
                           </Link>
-                          <button onClick={() => deleteListing(l.id)} className="rounded-xl border border-red-200 px-3.5 py-1.5 text-xs font-bold text-red-600 transition hover:bg-red-50">
+                          <button onClick={() => deleteListing(l.id)} className="flex-1 text-center rounded-xl border border-red-200 px-2.5 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50">
                             Delete
                           </button>
                         </>
                       }/>
                     ))}
                   </div>
-                ) : (
+                ) : isVerified ? (
                   <EmptyState href="/post-property" action="Post Property">You haven&apos;t posted any property yet.</EmptyState>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500 shadow-sm">
+                    <p>You haven&apos;t posted any property yet.</p>
+                    <button
+                      type="button"
+                      onClick={() => setLockedNotice(true)}
+                      className="mt-4 inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-5 py-2.5 text-xs font-bold text-amber-900 shadow-sm transition hover:bg-amber-100"
+                    >
+                      <Lock size={14} className="text-amber-700" />
+                      <span>Post Property (Locked)</span>
+                    </button>
+                  </div>
                 )}
               </>
             )}
           </section>
         </div>
       </div>
+
+      {/* Account Verification Required Modal */}
+      {lockedNotice && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLockedNotice(false)}
+        >
+          <div
+            className="relative flex flex-col w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-7 text-center border border-gray-100 animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setLockedNotice(false)}
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/80 mb-4">
+              <Lock size={30} />
+            </div>
+
+            <h3 className="font-display text-xl font-extrabold text-gray-950">
+              Account Not Verified
+            </h3>
+
+            <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3.5 text-xs font-semibold text-amber-900 leading-relaxed">
+              Your account is not verified by the admin so you cannot post any property.
+            </div>
+
+            <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+              Please make sure your verification documents (Aadhaar, PAN, Address Proof) are submitted. Once reviewed and approved by the admin, property posting will be unlocked.
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setLockedNotice(false);
+                  selectSection("documents");
+                }}
+                className="flex-1 rounded-xl bg-green-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-green-800"
+              >
+                Go to My Documents
+              </button>
+              <button
+                type="button"
+                onClick={() => setLockedNotice(false)}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-100 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

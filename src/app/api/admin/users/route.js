@@ -3,7 +3,32 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/serverAuth";
 import { ROLES, text } from "@/lib/validation";
 
-const safeUser = { id: true, name: true, email: true, phone: true, role: true, adminArea: true, verified: true, createdAt: true };
+const safeUser = {
+  id: true,
+  name: true,
+  email: true,
+  phone: true,
+  role: true,
+  adminArea: true,
+  verified: true,
+  verificationStatus: true,
+  rejectionReason: true,
+  rejectedAt: true,
+  createdAt: true,
+  documents: {
+    select: {
+      id: true,
+      documentType: true,
+      originalName: true,
+      cloudinaryUrl: true,
+      fileType: true,
+      verificationStatus: true,
+      rejectionReason: true,
+      uploadedAt: true,
+    },
+    orderBy: { uploadedAt: "desc" },
+  },
+};
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -27,9 +52,60 @@ export async function PATCH(req) {
   const data = {};
   if (body.role) data.role = body.role;
   if (body.adminArea !== undefined) data.adminArea = body.role === "AREA_ADMIN" || target.role === "AREA_ADMIN" ? text(body.adminArea, { min: 2, max: 80 }) : null;
-  if (body.verified !== undefined) { data.verified = body.verified; data.verificationStatus = body.verified ? "ACTIVE" : "PENDING"; data.verifiedAt = body.verified ? new Date() : null; }
+  
+  if (body.action === "REJECT" || body.verificationStatus === "REJECTED") {
+    const reason = typeof body.rejectionReason === "string" && body.rejectionReason.trim()
+      ? body.rejectionReason.trim().slice(0, 500)
+      : "Account rejected by administrator.";
+    data.verificationStatus = "REJECTED";
+    data.verified = false;
+    data.verifiedAt = null;
+    data.rejectedAt = new Date();
+    data.rejectionReason = reason;
+  } else if (body.action === "RESTORE" || body.action === "RESET_PENDING" || (body.verificationStatus === "PENDING" && target.verificationStatus === "REJECTED")) {
+    data.verificationStatus = "PENDING";
+    data.verified = false;
+    data.verifiedAt = null;
+    data.rejectedAt = null;
+    data.rejectionReason = null;
+  }
+
+  if (body.verified !== undefined) {
+    if (body.verified === true) {
+      const userDocs = await prisma.userDocument.findMany({
+        where: { userId: target.id },
+        select: { id: true, documentType: true, verificationStatus: true },
+      });
+      if (!userDocs.length) {
+        return NextResponse.json(
+          { error: "Cannot verify user: No verification documents have been uploaded by this user." },
+          { status: 400 }
+        );
+      }
+      const unverified = userDocs.filter((d) => d.verificationStatus !== "VERIFIED");
+      if (unverified.length > 0) {
+        return NextResponse.json(
+          {
+            error: `Cannot verify user: ${unverified.length} document(s) are not verified yet. Please review and verify all documents first.`,
+          },
+          { status: 400 }
+        );
+      }
+      data.verified = true;
+      data.verificationStatus = "ACTIVE";
+      data.verifiedAt = new Date();
+      data.rejectedAt = null;
+      data.rejectionReason = null;
+    } else {
+      data.verified = false;
+      data.verifiedAt = null;
+      if (target.verificationStatus !== "REJECTED" && !data.verificationStatus) {
+        data.verificationStatus = "PENDING";
+      }
+    }
+  }
   if (!Object.keys(data).length) return NextResponse.json({ error: "No changes supplied" }, { status: 400 });
   const user = await prisma.user.update({ where: { id: target.id }, data: { ...data }, select: safeUser });
-  await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: "USER_UPDATED", targetType: "USER", targetId: target.id, metadata: { changedFields: Object.keys(data), previousRole: target.role, nextRole: user.role, verified: user.verified } } });
+  await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: data.verificationStatus === "REJECTED" ? "USER_REJECTED" : "USER_UPDATED", targetType: "USER", targetId: target.id, metadata: { changedFields: Object.keys(data), previousRole: target.role, nextRole: user.role, verified: user.verified, verificationStatus: user.verificationStatus, rejectionReason: data.rejectionReason || null } } });
   return NextResponse.json({ user });
 }

@@ -14,8 +14,9 @@ const TYPES = {
   OFFICE: "Office Space",
   PG: "PG / Co-living",
 };
-export default function PropertyCard({ listing, variant }) {
+export default function PropertyCard({ listing, variant, actions, children }) {
   if (variant === "trending") return <TrendingCard listing={listing} />;
+  if (variant === "dashboard") return <DashboardCard listing={listing} actions={actions || children} />;
   const photo = listing.photos?.[0]?.url;
   const facts =
     listing.propertyType === "PLOT"
@@ -227,3 +228,94 @@ function TrendingCard({ listing }) {
     </div>
   );
 }
+
+function DashboardCard({ listing, actions }) {
+  const photo = listing.photos?.[0]?.url;
+  const location = [listing.area, listing.city].filter(Boolean).join(", ") || "Location on request";
+  const price = formatPrice(listing.price, listing.purpose);
+
+  return (
+    <div className="group relative flex flex-col w-full max-w-[290px] sm:w-[285px] shrink-0 rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#c41920] overflow-hidden">
+      {/* TOP IMAGE - exact 175px height matching homepage recommended */}
+      <div className="relative h-[175px] w-full overflow-hidden bg-slate-100">
+        <Link href={`/listings/${listing.id}`} className="block h-full w-full">
+          {photo ? (
+            <img
+              src={photo}
+              alt={listing.title}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="grid h-full place-items-center text-xs text-gray-400">
+              Photo coming soon
+            </div>
+          )}
+        </Link>
+
+        {/* Top-Left RERA / Verified Badge */}
+        <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-gray-800 shadow-sm backdrop-blur-xs pointer-events-none">
+          <span className="font-bold text-[#c41920]">✓</span>
+          <span>{listing.reraNumber ? "RERA" : listing.owner?.verified ? "Verified" : "Reviewed"}</span>
+        </div>
+
+        {/* Top-Right Wishlist Button */}
+        <div className="absolute right-3 top-3">
+          <SaveListingButton
+            listingId={listing.id}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow-sm transition hover:scale-110 hover:text-[#c41920]"
+          />
+        </div>
+
+        {/* Photos count */}
+        {(listing.photos?.length || 0) > 0 && (
+          <span className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-xs">
+            {listing.photos.length} photos
+          </span>
+        )}
+      </div>
+
+      {/* CARD CONTENT */}
+      <div className="flex flex-1 flex-col p-4">
+        {/* Property Name */}
+        <Link href={`/listings/${listing.id}`}>
+          <h3 className="line-clamp-1 text-[15px] sm:text-base font-bold text-[#171717] transition-colors hover:text-[#c41920]">
+            {listing.title}
+          </h3>
+        </Link>
+
+        {/* Price in Bold Red */}
+        <p className="mt-1 text-base font-bold text-[#c41920] sm:text-lg">
+          {price}
+        </p>
+
+        {/* Location */}
+        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-500">
+          <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920]" />
+          <span className="truncate">{location}</span>
+        </div>
+
+        {/* Property Type / Area */}
+        <div className="mt-2 flex items-center justify-between text-[11px] text-gray-500 font-medium">
+          <span>{TYPES[listing.propertyType] || listing.propertyType || "Property"}</span>
+          {listing.sizeValue && (
+            <span>{listing.sizeValue} {listing.sizeUnit || "sq ft"}</span>
+          )}
+        </div>
+
+        {/* Actions or View Property */}
+        <div className="mt-3.5 flex items-center gap-2 pt-3 border-t border-gray-100">
+          {actions || (
+            <Link
+              href={`/listings/${listing.id}`}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#c41920] py-2 text-xs font-bold text-[#c41920] transition-all hover:bg-[#c41920] hover:text-white"
+            >
+              View Property
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+

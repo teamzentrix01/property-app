@@ -15,12 +15,14 @@ import {
   Heart,
   Plus,
   Phone,
+  Lock,
 } from "lucide-react";
 
 export default function Navbar() {
   const [user, setUser] = useState(undefined);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [lockedNotice, setLockedNotice] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -93,6 +95,8 @@ export default function Navbar() {
     router.push("/");
     router.refresh();
   }
+
+  const isVerified = user && (user.verificationStatus === "ACTIVE" || ["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role));
 
   return (
     <>
@@ -205,16 +209,31 @@ export default function Navbar() {
 
               {/* POST PROPERTY */}
               {user && (
-                <Link
-                  href="/post-property"
-                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-[#c41920]/20 transition hover:from-[#8e1016] hover:to-[#c41920]"
-                >
-                  <Plus size={14} />
-                  Post Property
-                  <span className="ml-1 rounded bg-[#8e1016] px-1.5 py-0.5 text-[8px]">
-                    FREE
-                  </span>
-                </Link>
+                isVerified ? (
+                  <Link
+                    href="/post-property"
+                    className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-[#c41920]/20 transition hover:from-[#8e1016] hover:to-[#c41920]"
+                  >
+                    <Plus size={14} />
+                    Post Property
+                    <span className="ml-1 rounded bg-[#8e1016] px-1.5 py-0.5 text-[8px]">
+                      FREE
+                    </span>
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setLockedNotice(true)}
+                    className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-amber-50 border border-amber-300 px-3.5 py-2 text-xs font-semibold text-amber-900 shadow-sm transition hover:bg-amber-100"
+                    title="Account not verified by admin"
+                  >
+                    <Lock size={13} className="text-amber-700" />
+                    Post Property
+                    <span className="ml-1 rounded bg-amber-200/90 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-amber-900">
+                      LOCKED
+                    </span>
+                  </button>
+                )
               )}
 
               {/* CONTACT NUMBER */}
@@ -460,14 +479,33 @@ export default function Navbar() {
                 )}
 
                 {user && (
-                  <Link
-                    href="/post-property"
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white"
-                    onClick={() => setMobileMenu(false)}
-                  >
-                    <Plus size={14} />
-                    Post Property FREE
-                  </Link>
+                  isVerified ? (
+                    <Link
+                      href="/post-property"
+                      className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white"
+                      onClick={() => setMobileMenu(false)}
+                    >
+                      <Plus size={14} />
+                      Post Property FREE
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenu(false);
+                        setLockedNotice(true);
+                      }}
+                      className="flex items-center justify-between rounded-lg bg-amber-50 border border-amber-300 px-4 py-2 text-xs font-semibold text-amber-900"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Lock size={14} className="text-amber-700" />
+                        Post Property
+                      </span>
+                      <span className="rounded bg-amber-200/90 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-amber-900">
+                        LOCKED
+                      </span>
+                    </button>
+                  )
                 )}
 
                 <a
@@ -533,16 +571,30 @@ export default function Navbar() {
 
         {/* Post */}
         {user && (
-          <Link
-            href="/post-property"
-            className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
-          >
-            <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
-              <Plus size={27} />
-            </span>
+          isVerified ? (
+            <Link
+              href="/post-property"
+              className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
+            >
+              <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
+                <Plus size={27} />
+              </span>
 
-            <span>Post</span>
-          </Link>
+              <span>Post</span>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setLockedNotice(true)}
+              className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
+            >
+              <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg">
+                <Lock size={24} />
+              </span>
+
+              <span>Post (Locked)</span>
+            </button>
+          )
         )}
 
         {/* Saved */}
@@ -563,6 +615,63 @@ export default function Navbar() {
           Profile
         </Link>
       </nav>
+
+      {/* Account Verification Required Modal */}
+      {lockedNotice && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLockedNotice(false)}
+        >
+          <div
+            className="relative flex flex-col w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-7 text-center border border-gray-100 animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setLockedNotice(false)}
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/80 mb-4">
+              <Lock size={30} />
+            </div>
+
+            <h3 className="font-display text-xl font-extrabold text-gray-950">
+              Account Not Verified
+            </h3>
+
+            <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3.5 text-xs font-semibold text-amber-900 leading-relaxed">
+              Your account is not verified by the admin so you cannot post any property.
+            </div>
+
+            <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+              Please make sure your verification documents (Aadhaar, PAN, Address Proof) are submitted. Once reviewed and approved by the admin, property posting will be unlocked.
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
+              <Link
+                href="/dashboard"
+                onClick={() => setLockedNotice(false)}
+                className="flex-1 rounded-xl bg-green-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-green-800 flex items-center justify-center"
+              >
+                Go to Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={() => setLockedNotice(false)}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-100 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

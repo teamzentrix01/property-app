@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Lock } from "lucide-react";
 import { PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
 import { PURPOSES, PROPERTY_TYPES, validateListingRequiredFields } from "@/lib/validation";
 import PropertyCategorySelector from "@/components/PropertyCategorySelector";
@@ -53,6 +55,10 @@ export default function NewListingPage() {
           router.replace(`/login?next=${encodeURIComponent(pathname)}&redirect=${encodeURIComponent(pathname)}`);
           return;
         }
+        if (user.verificationStatus !== "ACTIVE" && !["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role)) {
+          setAccess("LOCKED");
+          return;
+        }
         setAccess(true);
       })
       .catch(() => {
@@ -60,6 +66,41 @@ export default function NewListingPage() {
       });
     return () => { active = false; };
   }, [pathname, router]);
+
+  if (access === "LOCKED") {
+    return (
+      <main className="flex flex-1 items-center justify-center px-4 py-16 bg-slate-50">
+        <div className="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 text-center shadow-xl">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/80 mb-4">
+            <Lock size={32} />
+          </div>
+          <h1 className="font-display text-2xl font-extrabold text-gray-950">
+            Account Not Verified
+          </h1>
+          <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3.5 text-xs font-semibold text-amber-900 leading-relaxed">
+            Your account is not verified by the admin so you cannot post any property.
+          </div>
+          <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+            Please make sure your verification documents (Aadhaar, PAN, Address Proof) are submitted in your dashboard. Once reviewed and approved by the admin, property posting will be unlocked.
+          </p>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/dashboard"
+              className="flex-1 rounded-xl bg-green-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-green-800 flex items-center justify-center"
+            >
+              Go to Dashboard
+            </Link>
+            <Link
+              href="/"
+              className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-100 transition flex items-center justify-center"
+            >
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (access !== true) {
     return <main className="flex flex-1 items-center justify-center px-6 py-16 text-sm text-ink-soft">Checking your account…</main>;

@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
-
-const statuses = ["DRAFT", "PENDING", "UNDER_REVIEW", "APPROVED", "ACTIVE", "REJECTED", "INACTIVE"];
+const statuses = ["DRAFT", "PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED"];
 export default function PropertyReviewPage() {
   const { id } = useParams(); const router = useRouter(); const [listing, setListing] = useState(null); const [error, setError] = useState(""); const [saving, setSaving] = useState(false);
   useEffect(() => { fetch(`/api/admin/properties/${id}`).then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.error); setListing(data.listing); }).catch((reason) => setError(reason.message)); }, [id]);

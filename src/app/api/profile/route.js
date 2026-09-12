@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/serverAuth";
 import { personName, phone, text } from "@/lib/validation";
 
-const select = { id: true, name: true, email: true, phone: true, role: true, createdAt: true, verificationStatus: true, preferredCity: true, preferredLocation: true, preferredPropertyType: true, budgetRange: true, preferredBhk: true, searchPurpose: true };
+const select = { id: true, name: true, email: true, phone: true, role: true, createdAt: true, verificationStatus: true, rejectionReason: true, rejectedAt: true, preferredCity: true, preferredLocation: true, preferredPropertyType: true, budgetRange: true, preferredBhk: true, searchPurpose: true };
 
 export async function GET() {
   const auth = await requireUser();

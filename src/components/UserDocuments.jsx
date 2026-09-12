@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X, FileText, Image as ImageIcon } from "lucide-react";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 const labels = { AADHAAR: "Aadhaar Card", PAN: "PAN Card", ADDRESS_PROOF: "Address Proof", ID_PROOF: "ID Proof", OTHER: "Other" };
+
+const isPdf = (doc) => {
+  if (!doc) return false;
+  const name = (doc.originalName || "").toLowerCase();
+  const url = (doc.cloudinaryUrl || "").toLowerCase();
+  const type = (doc.fileType || "").toLowerCase();
+  return type.includes("pdf") || name.endsWith(".pdf") || url.endsWith(".pdf");
+};
 
 export default function UserDocuments() {
   const [documents, setDocuments] = useState([]);
@@ -13,6 +22,7 @@ export default function UserDocuments() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   async function load() {
     try {
@@ -27,7 +37,14 @@ export default function UserDocuments() {
 
   useEffect(() => {
     const loadTimer = setTimeout(() => { load(); }, 0);
-    return () => clearTimeout(loadTimer);
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setPreviewDoc(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(loadTimer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   function selectFile(event) {
@@ -109,13 +126,100 @@ export default function UserDocuments() {
               <p className="text-xs text-gray-500">{document.originalName} · {new Date(document.uploadedAt).toLocaleDateString("en-IN")} · <span className="font-semibold text-green-800">{document.verificationStatus}</span></p>
               {document.rejectionReason && <p className="mt-1 text-xs text-red-700">Reason: {document.rejectionReason}</p>}
             </div>
-            <a href={document.cloudinaryUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-green-700 hover:text-green-800 hover:underline">
+            <button
+              type="button"
+              onClick={() => setPreviewDoc(document)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-green-200 bg-green-50 px-3.5 py-1.5 text-xs font-bold text-green-800 transition hover:bg-green-700 hover:text-white"
+            >
               View / Open →
-            </a>
+            </button>
           </div>
         ))}
         {!documents.length && <p className="py-4 text-center text-sm text-gray-400">No documents uploaded yet.</p>}
       </div>
+
+      {/* Document Preview Pop-up Modal */}
+      {previewDoc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 sm:p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setPreviewDoc(null)}
+        >
+          <div
+            className="relative flex flex-col w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4 border-b border-gray-200 bg-white">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
+                  {isPdf(previewDoc) ? <FileText size={20} /> : <ImageIcon size={20} />}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                      {labels[previewDoc.documentType] || previewDoc.documentType}
+                    </h3>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                      previewDoc.verificationStatus === "VERIFIED"
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : previewDoc.verificationStatus === "REJECTED"
+                        ? "bg-red-50 text-red-700 border border-red-200"
+                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                    }`}>
+                      {previewDoc.verificationStatus}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 truncate max-w-xs sm:max-w-md">
+                    {previewDoc.originalName} · Uploaded on {new Date(previewDoc.uploadedAt).toLocaleDateString("en-IN")}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPreviewDoc(null)}
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
+                aria-label="Close popup"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body / Viewer */}
+            <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-900/5 flex items-center justify-center min-h-[350px]">
+              {isPdf(previewDoc) ? (
+                <iframe
+                  src={previewDoc.cloudinaryUrl}
+                  title={previewDoc.originalName}
+                  className="w-full h-[65vh] rounded-xl border border-gray-200 bg-white shadow-sm"
+                />
+              ) : (
+                <div className="relative max-h-[68vh] flex items-center justify-center">
+                  <img
+                    src={previewDoc.cloudinaryUrl}
+                    alt={previewDoc.originalName}
+                    className="max-h-[68vh] max-w-full object-contain rounded-xl shadow-md bg-white"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-white text-xs text-gray-500">
+              <span className="hidden sm:inline">Press <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border text-[11px] font-mono">Esc</kbd> or click outside to close</span>
+              <button
+                type="button"
+                onClick={() => setPreviewDoc(null)}
+                className="ml-auto rounded-xl bg-gray-100 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-200 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
