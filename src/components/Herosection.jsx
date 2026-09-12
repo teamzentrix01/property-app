@@ -1,1996 +1,409 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   MapPin,
+  Mic,
   ChevronDown,
-  Home,
-  Building2,
-  KeyRound,
-  Ruler,
-  BedDouble,
-  Layers3,
-  Car,
-  Bath,
-  Wallet,
-  Sparkles,
-  ShieldCheck,
-  ArrowRight,
-  LandPlot,
-  Route,
-  Compass,
-  SquareDashed,
+  Map as MapIcon,
 } from "lucide-react";
 
 export default function HeroSection() {
-  const [activeTab, setActiveTab] = useState("Buy");
+  const router = useRouter();
+
+  // Active Category Tab
+  const [activeTab, setActiveTab] = useState("Cities");
   const [propertyType, setPropertyType] = useState("");
   const [location, setLocation] = useState("");
-  const [user, setUser] = useState(undefined);
   const [showLocations, setShowLocations] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const emptyRequirements = {
-    bhk: "",
-    floor: "",
-    minArea: "",
-    maxArea: "",
-    areaUnit: "sq.ft",
-    bathrooms: "",
-    parking: "",
-    furnishing: "",
-    facing: "",
-    possession: "",
-    minBudget: "",
-    maxBudget: "",
-    rent: "",
-    totalFloors: "",
-    plotArea: "",
-    builtUpArea: "",
-    availability: "",
+  const tabs = [
+    { label: "Cities", key: "Cities" },
+    { label: "Apartments", key: "Apartments" },
+    { label: "Branded", key: "Branded" },
+    { label: "Luxury", key: "Luxury" },
+    { label: "Commercial", key: "Commercial" },
+    { label: "Rental", key: "Rental" },
+    { label: "Villas", key: "Villas" },
+    { label: "Plots / Land", key: "Plots" },
+    { label: "Farmhouses", key: "Farmhouses" },
+  ];
 
-    // PLOT
-    plotType: "",
-    roadWidth: "",
-    cornerPlot: "",
-    gatedSociety: "",
-  };
-
-  const [requirements, setRequirements] = useState(emptyRequirements);
-
-  const propertyTypes = {
-    Buy: ["Plot", "House", "Flat", "Builder Floor"],
-    Rent: ["Flat", "House", "Plot", "PG / Room"],
-  };
+  const propertyTypeOptions = [
+    { label: "All Types", value: "" },
+    { label: "Apartment / Flat", value: "FLAT" },
+    { label: "Independent House", value: "HOUSE" },
+    { label: "Luxury Villa", value: "VILLA" },
+    { label: "Plots / Land", value: "PLOT" },
+    { label: "Commercial Space", value: "COMMERCIAL" },
+    { label: "Builder Floor", value: "BUILDER_FLOOR" },
+    { label: "Farmhouse", value: "FARMHOUSE" },
+  ];
 
   const locations = {
-    Moradabad: [
-      "New Moradabad",
-      "Ram Ganga Vihar",
-      "Ram Ganga Vihar Phase 2",
-      "Kashiram Nagar",
-      "Buddhi Vihar",
-      "Civil Lines",
-      "Harthala",
-      "Kanth Road",
-      "Delhi Road",
-      "Rampur Road",
-      "Majhola",
-      "Pakwara",
-      "Ashiyana Colony",
+    Gurugram: [
+      "Golf Course Road",
+      "Golf Course Extension",
+      "Sector 54",
+      "Sector 56",
+      "Sector 65",
+      "Sector 68",
+      "Sector 79",
+      "Dwarka Expressway",
+      "Sohna Road",
     ],
-
-    Meerut: [
-      "Shastri Nagar",
-      "Ganga Nagar",
-      "Pallavpuram",
-      "Modipuram",
-      "Saket",
-      "Civil Lines",
-      "Garh Road",
-      "Delhi Road",
-      "Rohta Road",
-      "Kanker Khera",
-      "Lohia Nagar",
-    ],
-
     Delhi: [
       "Dwarka",
       "Rohini",
       "Pitampura",
       "Janakpuri",
-      "Laxmi Nagar",
-      "Mayur Vihar",
       "Saket",
       "Vasant Kunj",
       "Greater Kailash",
       "Rajouri Garden",
     ],
-
     Noida: [
       "Sector 15",
       "Sector 18",
       "Sector 50",
-      "Sector 51",
       "Sector 62",
       "Sector 75",
-      "Sector 76",
-      "Sector 78",
       "Sector 137",
       "Sector 150",
     ],
-
     "Greater Noida": [
-      "Alpha 1",
-      "Alpha 2",
-      "Beta 1",
-      "Beta 2",
-      "Gamma",
       "Pari Chowk",
+      "Alpha 1",
+      "Beta 1",
       "Greater Noida West",
       "Techzone",
       "Gaur City",
-      "Knowledge Park",
     ],
-
-    Ghaziabad: [
-      "Indirapuram",
-      "Vaishali",
-      "Vasundhara",
-      "Raj Nagar",
-      "Raj Nagar Extension",
-      "Crossings Republik",
-      "Kaushambi",
-      "Shalimar Garden",
+    Moradabad: [
+      "New Moradabad",
+      "Ram Ganga Vihar",
+      "Civil Lines",
+      "Delhi Road",
+      "Kanth Road",
     ],
-
-    Lucknow: [
-      "Gomti Nagar",
-      "Gomti Nagar Extension",
-      "Hazratganj",
-      "Aliganj",
-      "Indira Nagar",
-      "Faizabad Road",
-      "Sushant Golf City",
-      "Shaheed Path",
+    Meerut: [
+      "Shastri Nagar",
+      "Pallavpuram",
+      "Modipuram",
+      "Civil Lines",
+      "Delhi Road",
     ],
   };
 
-  /* =========================================================
-     LOCATION SEARCH
-  ========================================================= */
-
+  // Filter location suggestions
   const getLocationSuggestions = () => {
     if (!location.trim()) return [];
-
     const searchValue = location.toLowerCase().trim();
-    let suggestions = [];
+    const results = [];
 
     Object.keys(locations).forEach((city) => {
       if (city.toLowerCase().includes(searchValue)) {
-        suggestions.push({
-          name: city,
-          type: "City",
-        });
-
-        locations[city].forEach((area) => {
-          suggestions.push({
-            name: area,
-            type: "Area",
-            city,
-          });
-        });
+        results.push({ name: city, type: "City" });
       }
-
       locations[city].forEach((area) => {
         if (area.toLowerCase().includes(searchValue)) {
-          suggestions.push({
-            name: area,
-            type: "Area",
-            city,
-          });
+          results.push({ name: area, type: "Area", city });
         }
       });
     });
 
-    const uniqueSuggestions = suggestions.filter(
-      (item, index, self) =>
-        index ===
-        self.findIndex(
-          (x) => x.name === item.name && x.city === item.city
-        )
-    );
-
-    return uniqueSuggestions.slice(0, 10);
+    return results.slice(0, 8);
   };
 
-  const locationSuggestions = getLocationSuggestions();
+  const suggestions = getLocationSuggestions();
 
-  /* =========================================================
-     AUTH
-  ========================================================= */
-
+  // Close suggestions when clicked outside
   useEffect(() => {
-    const loadUser = () => {
-      fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
-        .then((response) =>
-          response.ok ? response.json() : { user: null }
-        )
-        .then((data) => setUser(data.user))
-        .catch(() => setUser(null));
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowLocations(false);
+      }
     };
-
-    loadUser();
-    window.addEventListener("bhoomi-auth-changed", loadUser);
-    return () => window.removeEventListener("bhoomi-auth-changed", loadUser);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* =========================================================
-     HELPERS
-  ========================================================= */
-
-  const resetRequirements = () => {
-    setRequirements({ ...emptyRequirements });
-  };
-
-  const updateRequirement = (field, value) => {
-    setRequirements((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setPropertyType("");
-    setLocation("");
-    setShowLocations(false);
-    resetRequirements();
-  };
-
-  const handlePropertyTypeChange = (type) => {
-    setPropertyType(type);
-    resetRequirements();
-  };
-
-  const handleLocationSelect = (selectedLocation) => {
-    setLocation(selectedLocation.name);
-    setShowLocations(false);
-  };
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (activeTab === "Rent") params.set("purpose", "RENT");
-    else if (activeTab === "Buy") params.set("purpose", "SALE");
-    if (location.trim()) params.set("search", location.trim());
-    if (propertyType) {
-      const typeMap = { Plot: "PLOT", House: "HOUSE", Flat: "FLAT", "Builder Floor": "FLAT", "PG / Room": "PG" };
-      params.set("propertyType", typeMap[propertyType] || propertyType);
+  // Speech Recognition (Mic)
+  const handleVoiceSearch = () => {
+    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+      alert("Voice search is not supported in your browser.");
+      return;
     }
-    window.location.assign(`/listings${params.size ? `?${params.toString()}` : ""}`);
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-IN";
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setLocation(transcript);
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
   };
 
-  /* =========================================================
-     INPUT FIELD
-  ========================================================= */
+  // Perform search
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    const params = new URLSearchParams();
 
+    if (location.trim()) {
+      params.set("search", location.trim());
+    }
+
+    if (propertyType) {
+      params.set("propertyType", propertyType);
+    }
+
+    if (activeTab === "Rental") {
+      params.set("purpose", "RENT");
+    } else if (activeTab === "Commercial") {
+      params.set("category", "COMMERCIAL");
+    } else if (activeTab === "Luxury") {
+      params.set("category", "LUXURY");
+    } else if (activeTab === "Branded") {
+      params.set("category", "BRANDED");
+    } else if (activeTab === "Villas") {
+      params.set("propertyType", "HOUSE");
+    } else if (activeTab === "Plots") {
+      params.set("propertyType", "PLOT");
+    } else if (activeTab === "Apartments") {
+      params.set("propertyType", "FLAT");
+    }
+
+    router.push(`/properties?${params.toString()}`);
+  };
+
+  // Open map view
+  const handleOpenMap = () => {
+    const params = new URLSearchParams();
+    if (location.trim()) params.set("search", location.trim());
+    params.set("view", "map");
+    router.push(`/properties?${params.toString()}`);
+  };
+
+  // Handle Tab Click
+  const handleTabClick = (tab) => {
+    setActiveTab(tab.key);
+    if (tab.key === "Cities") {
+      // default
+    } else if (tab.key === "Apartments") {
+      setPropertyType("FLAT");
+    } else if (tab.key === "Villas") {
+      setPropertyType("HOUSE");
+    } else if (tab.key === "Plots") {
+      setPropertyType("PLOT");
+    } else if (tab.key === "Commercial") {
+      setPropertyType("COMMERCIAL");
+    }
+  };
 
   return (
-    <section className="site-hero relative w-full max-w-full overflow-hidden bg-slate-950">
+    <section className="relative w-full bg-slate-100/60">
+      {/* =========================================================
+          SLIM HERO BANNER (IMAGE FROM BHOOMI WEBSITE)
+      ========================================================= */}
+      <div className="relative h-[270px] sm:h-[310px] md:h-[340px] w-full overflow-hidden">
+        {/* Background Image - Bhoomi website luxury property */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2400&q=90')",
+          }}
+        />
 
-      {/* =====================================================
-          BACKGROUND
-      ====================================================== */}
+        {/* Multi-layer luxury overlay: Dark silk sheen + warm gold/bronze atmosphere */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/55 to-black/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/30 via-transparent to-black/60" />
 
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('/login-hero.jpg')",
-        }}
-      />
+        {/* Subtle decorative grid lines */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_60%,transparent_100%)]" />
 
-      {/* DARK OVERLAY */}
-
-      <div className="absolute inset-0 bg-black/55" />
-
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30" />
-
-      {/* =====================================================
-          MAIN CONTENT
-      ====================================================== */}
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-8 pt-10 sm:px-6 lg:px-8">
-
-        {/* BADGE */}
-
-        <div className="flex justify-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-xl">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute h-full w-full rounded-full bg-green-400 opacity-60" />
-              <span className="relative h-2 w-2 rounded-full bg-green-400" />
-            </span>
-
-            <ShieldCheck className="h-4 w-4 text-green-300" />
-
-            Verified Properties Across India
-          </div>
-        </div>
-
-        {/* HEADING */}
-
-        <div className="mx-auto mt-5 max-w-4xl text-center">
-          <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Find Your{" "}
-            <span className="text-emerald-400">
-              Perfect Property
-            </span>
+        {/* BANNER CONTENT (Title + Luxury Brands strip) */}
+        <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-start px-4 pt-8 sm:pt-11 text-center">
+          {/* Main Title: BRANDED RESIDENCES */}
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-normal tracking-[0.2em] sm:tracking-[0.25em] text-[#f2e6cb] drop-shadow-[0_2px_15px_rgba(0,0,0,0.8)] uppercase">
+            BRANDED RESIDENCES
           </h1>
 
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-            Discover verified homes, apartments, plots and properties
-            at the right price and the right location.
-          </p>
-        </div>
-
-        {/* =====================================================
-            SEARCH CARD
-        ====================================================== */}
-
-        <div className="mx-auto mt-6 w-full max-w-5xl rounded-2xl border border-gray-200 bg-white p-4 shadow-xl sm:p-6">
-
-          {/* BUY / RENT */}
-
-          <div className="flex justify-center sm:justify-start">
-            <div className="inline-flex max-w-full items-center border-b border-gray-200">
-              {["Buy", "Rent"].map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => handleTabChange(tab)}
-                  className={`flex items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-all ${
-                    activeTab === tab
-                      ? "border-green-700 bg-green-50 text-green-700"
-                      : "border-transparent text-gray-500 hover:text-green-700"
-                  }`}
-                >
-                  {tab === "Buy" ? (
-                    <Home className="h-4 w-4" />
-                  ) : (
-                    <KeyRound className="h-4 w-4" />
-                  )}
-
-                  {tab}
-                </button>
-              ))}
-              <Link href="/categories/commercial" className="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-gray-500 hover:border-green-700 hover:text-green-700">Commercial</Link>
-            </div>
+          {/* Subtitle with elegant ornament dashes */}
+          <div className="mt-1 sm:mt-2 flex items-center gap-3">
+            <span className="h-[1px] w-6 sm:w-12 bg-gradient-to-r from-transparent to-[#d4af37]" />
+            <p className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.22em] text-[#e0cfab] uppercase">
+              EXCEPTIONAL BRANDS. EXTRAORDINARY LIVING
+            </p>
+            <span className="h-[1px] w-6 sm:w-12 bg-gradient-to-l from-transparent to-[#d4af37]" />
           </div>
 
-          {/* =================================================
-              LOCATION + PROPERTY TYPE
-          ================================================== */}
 
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        </div>
+      </div>
 
-            {/* LOCATION */}
+      {/* =========================================================
+          SLIM FLOATING SEARCH BAR (EXACTLY LIKE THE REFERENCE IMAGE)
+      ========================================================= */}
+      <div className="relative z-20 mx-auto max-w-5xl px-4 -mt-12 sm:-mt-14 md:-mt-16 pb-8 sm:pb-12">
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-3.5 sm:p-5 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.18)]">
+          {/* CATEGORY TABS ROW */}
+          <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar border-b border-slate-100 pb-2 mb-3.5">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => handleTabClick(tab)}
+                  className={`relative shrink-0 pb-1.5 text-xs sm:text-[13px] transition-all duration-200 ${
+                    isActive
+                      ? "font-bold text-slate-900"
+                      : "font-medium text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  {tab.label}
+                  {/* Red underline on active tab like in reference image */}
+                  {isActive && (
+                    <span className="absolute bottom-[-9px] left-0 right-0 h-[2.5px] rounded-full bg-[#c41920]" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-            <div className="relative rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition-all hover:border-green-700/60 focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
+          {/* SEARCH INPUT ROW */}
+          <form
+            onSubmit={handleSearch}
+            className="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3"
+          >
+            {/* 1. Location Input with Pin & Mic */}
+            <div
+              ref={dropdownRef}
+              className="relative flex-1 w-full flex items-center rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 transition-all focus-within:border-[#c41920] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#c41920]/10"
+            >
+              <MapPin className="h-4 w-4 shrink-0 text-slate-400 mr-2.5" />
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => {
+                  setLocation(e.target.value);
+                  setShowLocations(true);
+                }}
+                onFocus={() => {
+                  if (location.trim()) setShowLocations(true);
+                }}
+                placeholder="Search City, Locality or Project..."
+                className="w-full bg-transparent text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 outline-none"
+              />
 
-              <div className="flex items-center gap-3">
-
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-700/10">
-                  <MapPin className="h-5 w-5 text-red-600" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                    Location
-                  </p>
-
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => {
-                      setLocation(e.target.value);
-                      setShowLocations(true);
-                    }}
-                    onFocus={() => {
-                      if (location.trim()) {
-                        setShowLocations(true);
-                      }
-                    }}
-                    placeholder="Search city, locality or project"
-                    className="mt-1.5 w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400 sm:text-base"
-                  />
-                </div>
-
-                {location && (
-                  <span className="hidden rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-600 sm:block">
-                    Selected
-                  </span>
+              {/* Mic Icon */}
+              <button
+                type="button"
+                onClick={handleVoiceSearch}
+                title={isListening ? "Listening..." : "Search by voice"}
+                className={`ml-2 shrink-0 p-1 rounded-lg transition-colors ${
+                  isListening
+                    ? "text-[#c41920] animate-pulse bg-red-50"
+                    : "text-slate-400 hover:text-[#c41920]"
+                }`}
+              >
+                {isListening ? (
+                  <Mic className="h-4 w-4 text-[#c41920]" />
+                ) : (
+                  <Mic className="h-4 w-4" />
                 )}
-              </div>
+              </button>
 
-              {/* LOCATION DROPDOWN */}
-
-              {showLocations && locationSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 top-[82px] z-[100] max-h-72 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
-
-                  <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                      Suggested Locations
-                    </p>
-
-                    <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-500">
-                      {locationSuggestions.length} results
-                    </span>
-                  </div>
-
-                  {locationSuggestions.map((item, index) => (
+              {/* Suggestions Dropdown */}
+              {showLocations && suggestions.length > 0 && (
+                <div className="absolute left-0 right-0 top-[110%] z-50 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl">
+                  {suggestions.map((item, idx) => (
                     <button
-                      key={`${item.name}-${item.city || ""}-${index}`}
+                      key={idx}
                       type="button"
-                      onClick={() => handleLocationSelect(item)}
-                      className="group flex w-full items-center gap-3 border-b border-slate-50 px-4 py-3 text-left last:border-0 hover:bg-slate-50"
+                      onClick={() => {
+                        setLocation(item.name);
+                        setShowLocations(false);
+                      }}
+                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm hover:bg-red-50/70 hover:text-[#c41920] transition-colors"
                     >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 group-hover:bg-green-700/10">
-                        <MapPin className="h-4 w-4 text-slate-400 group-hover:text-green-700" />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-slate-800">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                        <span className="font-medium text-slate-800">
                           {item.name}
-                        </p>
-
-                        <p className="mt-0.5 text-xs text-slate-400">
-                          {item.type === "City"
-                            ? "City"
-                            : item.city}
-                        </p>
+                        </span>
                       </div>
-
-                      <ArrowRight className="h-4 w-4 text-slate-300 group-hover:translate-x-1 group-hover:text-green-700" />
+                      <span className="text-[11px] text-slate-400">
+                        {item.type === "City" ? "City" : item.city}
+                      </span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* PROPERTY TYPE */}
-
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition-all hover:border-green-700/60 focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
-
-              <div className="flex items-center gap-3">
-
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-700/10">
-                  <Home className="h-5 w-5 text-green-700" />
-                </div>
-
-                <div className="relative flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                    Property Type
-                  </p>
-
-                  <select
-                    value={propertyType}
-                    onChange={(e) =>
-                      handlePropertyTypeChange(e.target.value)
-                    }
-                    className="mt-1.5 w-full cursor-pointer appearance-none bg-transparent pr-8 text-sm font-semibold text-slate-800 outline-none sm:text-base"
-                  >
-                    <option value="">
-                      Select Property Type
-                    </option>
-
-                    {propertyTypes[activeTab].map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-
-                  <ChevronDown className="pointer-events-none absolute right-1 bottom-0 h-5 w-5 text-slate-400" />
-                </div>
-              </div>
+            {/* 2. All Types Select Dropdown */}
+            <div className="relative w-full sm:w-44 shrink-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 transition-all focus-within:border-[#c41920] focus-within:bg-white">
+              <select
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
+                className="w-full cursor-pointer appearance-none bg-transparent pr-6 text-xs sm:text-sm font-medium text-slate-800 outline-none"
+              >
+                {propertyTypeOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             </div>
-          </div>
 
-          {/* =================================================
-              DYNAMIC REQUIREMENTS
-          ================================================== */}
-
-          {propertyType && (
-            <details className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-green-700">More preferences for {propertyType}</summary>
-              <div className="mt-4">
-
-              {/* HEADER */}
-
-              <div className="mb-7 flex items-center gap-3 border-b border-slate-200 pb-5">
-
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green-700/10 text-green-700">
-                  {propertyType === "Plot" ? (
-                    <LandPlot className="h-5 w-5" />
-                  ) : (
-                    <Sparkles className="h-5 w-5" />
-                  )}
-                </div>
-
-                <div>
-                  <h3 className="text-base font-extrabold text-slate-900">
-                    {activeTab} {propertyType} Requirements
-                  </h3>
-
-                  <p className="mt-1 text-xs text-slate-500">
-                    Tell us what you are looking for
-                  </p>
-                </div>
-              </div>
-
-              {/* =================================================
-                  PLOT
-              ================================================== */}
-
-              {propertyType === "Plot" && (
-                <div className="space-y-7">
-
-                  {/* PLOT DETAILS */}
-
-                  <div>
-                    <SectionTitle
-                      icon={<LandPlot className="h-4 w-4" />}
-                      title="Plot Details"
-                      description="Choose your preferred plot type and size"
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      <SelectField
-                        label="Plot Type"
-                        placeholder="Select Plot Type"
-                        value={requirements.plotType}
-                        onChange={(value) =>
-                          updateRequirement("plotType", value)
-                        }
-                        options={[
-                          "Residential Plot",
-                          "Commercial Plot",
-                          "Agricultural Land",
-                          "Industrial Plot",
-                        ]}
-                        icon={<LandPlot className="h-4 w-4" />}
-                      />
-
-                      <InputField
-                        label="Minimum Area"
-                        placeholder="e.g. 1000"
-                        type="number"
-                        value={requirements.minArea}
-                        onChange={(value) =>
-                          updateRequirement("minArea", value)
-                        }
-                        icon={<Ruler className="h-4 w-4" />}
-                      />
-
-                      <InputField
-                        label="Maximum Area"
-                        placeholder="e.g. 2000"
-                        type="number"
-                        value={requirements.maxArea}
-                        onChange={(value) =>
-                          updateRequirement("maxArea", value)
-                        }
-                      />
-
-                      <SelectField
-                        label="Area Unit"
-                        placeholder="Select Unit"
-                        value={requirements.areaUnit}
-                        onChange={(value) =>
-                          updateRequirement("areaUnit", value)
-                        }
-                        options={[
-                          "sq.ft",
-                          "sq.yd",
-                          "sq.m",
-                          "Bigha",
-                          "Acre",
-                        ]}
-                        icon={<SquareDashed className="h-4 w-4" />}
-                      />
-                    </div>
-                  </div>
-
-                  {/* PLOT PREFERENCE */}
-
-                  <div className="border-t border-slate-200 pt-7">
-
-                    <SectionTitle
-                      icon={<Compass className="h-4 w-4" />}
-                      title="Plot Preference"
-                      description="Select facing, road and plot preferences"
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      <SelectField
-                        label="Facing"
-                        placeholder="Any Facing"
-                        value={requirements.facing}
-                        onChange={(value) =>
-                          updateRequirement("facing", value)
-                        }
-                        options={[
-                          "East",
-                          "West",
-                          "North",
-                          "South",
-                          "North-East",
-                          "North-West",
-                          "South-East",
-                          "South-West",
-                        ]}
-                        icon={<Compass className="h-4 w-4" />}
-                      />
-
-                      <SelectField
-                        label="Road Width"
-                        placeholder="Any Width"
-                        value={requirements.roadWidth}
-                        onChange={(value) =>
-                          updateRequirement("roadWidth", value)
-                        }
-                        options={[
-                          "20 ft",
-                          "25 ft",
-                          "30 ft",
-                          "40 ft",
-                          "50 ft",
-                          "60 ft+",
-                        ]}
-                        icon={<Route className="h-4 w-4" />}
-                      />
-
-                      <SelectField
-                        label="Corner Plot"
-                        placeholder="Any"
-                        value={requirements.cornerPlot}
-                        onChange={(value) =>
-                          updateRequirement("cornerPlot", value)
-                        }
-                        options={[
-                          "Yes - Corner Plot",
-                          "No",
-                          "Any",
-                        ]}
-                        icon={<SquareDashed className="h-4 w-4" />}
-                      />
-
-                      <SelectField
-                        label="Gated Society"
-                        placeholder="Any"
-                        value={requirements.gatedSociety}
-                        onChange={(value) =>
-                          updateRequirement("gatedSociety", value)
-                        }
-                        options={[
-                          "Yes",
-                          "No",
-                          "Any",
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {/* BUDGET / RENT */}
-
-                  <div className="border-t border-slate-200 pt-7">
-
-                    <SectionTitle
-                      icon={<Wallet className="h-4 w-4" />}
-                      title={
-                        activeTab === "Buy"
-                          ? "Budget"
-                          : "Rental Preference"
-                      }
-                      description={
-                        activeTab === "Buy"
-                          ? "Set your preferred property budget"
-                          : "Set your preferred monthly rent"
-                      }
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      {activeTab === "Buy" ? (
-                        <>
-                          <InputField
-                            label="Minimum Budget"
-                            placeholder="₹ Min"
-                            type="number"
-                            value={requirements.minBudget}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "minBudget",
-                                value
-                              )
-                            }
-                            icon={
-                              <Wallet className="h-4 w-4" />
-                            }
-                          />
-
-                          <InputField
-                            label="Maximum Budget"
-                            placeholder="₹ Max"
-                            type="number"
-                            value={requirements.maxBudget}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "maxBudget",
-                                value
-                              )
-                            }
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <InputField
-                            label="Monthly Rent"
-                            placeholder="₹ e.g. 15000"
-                            type="number"
-                            value={requirements.rent}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "rent",
-                                value
-                              )
-                            }
-                            icon={
-                              <Wallet className="h-4 w-4" />
-                            }
-                          />
-
-                          <SelectField
-                            label="Availability"
-                            placeholder="Any"
-                            value={requirements.availability}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "availability",
-                                value
-                              )
-                            }
-                            options={[
-                              "Immediately",
-                              "Within 15 Days",
-                              "Within 1 Month",
-                            ]}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* =================================================
-                  HOUSE
-              ================================================== */}
-
-              {propertyType === "House" && (
-                <div className="space-y-7">
-
-                  {/* BASIC DETAILS */}
-
-                  <div>
-                    <SectionTitle
-                      icon={<Home className="h-4 w-4" />}
-                      title="Basic Details"
-                      description="Tell us about the house you need"
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      <SelectField
-                        label="BHK"
-                        placeholder="Select BHK"
-                        value={requirements.bhk}
-                        onChange={(value) =>
-                          updateRequirement("bhk", value)
-                        }
-                        options={[
-                          "1 BHK",
-                          "2 BHK",
-                          "3 BHK",
-                          "4 BHK",
-                          "5 BHK",
-                          "5+ BHK",
-                        ]}
-                        icon={
-                          <BedDouble className="h-4 w-4" />
-                        }
-                      />
-
-                      <InputField
-                        label="Built-up Area"
-                        placeholder="e.g. 1500 sq.ft"
-                        type="number"
-                        value={requirements.builtUpArea}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "builtUpArea",
-                            value
-                          )
-                        }
-                        icon={
-                          <Ruler className="h-4 w-4" />
-                        }
-                      />
-
-                      <InputField
-                        label="Plot Area"
-                        placeholder="e.g. 1000 sq.ft"
-                        type="number"
-                        value={requirements.plotArea}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "plotArea",
-                            value
-                          )
-                        }
-                      />
-
-                      <SelectField
-                        label="Bathrooms"
-                        placeholder="Any"
-                        value={requirements.bathrooms}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "bathrooms",
-                            value
-                          )
-                        }
-                        options={[
-                          "1",
-                          "2",
-                          "3",
-                          "4",
-                          "5+",
-                        ]}
-                        icon={<Bath className="h-4 w-4" />}
-                      />
-                    </div>
-                  </div>
-
-                  {/* FEATURES */}
-
-                  <div className="border-t border-slate-200 pt-7">
-
-                    <SectionTitle
-                      icon={<Sparkles className="h-4 w-4" />}
-                      title="Property Features"
-                      description="Choose your preferred features"
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      <SelectField
-                        label="Floors"
-                        placeholder="Any"
-                        value={requirements.totalFloors}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "totalFloors",
-                            value
-                          )
-                        }
-                        options={[
-                          "Ground Floor",
-                          "G+1",
-                          "G+2",
-                          "G+3",
-                          "G+4",
-                          "G+5+",
-                        ]}
-                        icon={
-                          <Layers3 className="h-4 w-4" />
-                        }
-                      />
-
-                      <SelectField
-                        label="Parking"
-                        placeholder="Any"
-                        value={requirements.parking}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "parking",
-                            value
-                          )
-                        }
-                        options={[
-                          "No Parking",
-                          "1 Car",
-                          "2 Cars",
-                          "3+ Cars",
-                        ]}
-                        icon={<Car className="h-4 w-4" />}
-                      />
-
-                      <SelectField
-                        label="Furnishing"
-                        placeholder="Any"
-                        value={requirements.furnishing}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "furnishing",
-                            value
-                          )
-                        }
-                        options={[
-                          "Unfurnished",
-                          "Semi Furnished",
-                          "Fully Furnished",
-                        ]}
-                      />
-
-                      <SelectField
-                        label="Facing"
-                        placeholder="Any Facing"
-                        value={requirements.facing}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "facing",
-                            value
-                          )
-                        }
-                        options={[
-                          "East",
-                          "West",
-                          "North",
-                          "South",
-                          "North-East",
-                          "North-West",
-                          "South-East",
-                          "South-West",
-                        ]}
-                        icon={
-                          <Compass className="h-4 w-4" />
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* BUDGET */}
-
-                  <div className="border-t border-slate-200 pt-7">
-
-                    <SectionTitle
-                      icon={<Wallet className="h-4 w-4" />}
-                      title={
-                        activeTab === "Buy"
-                          ? "Budget"
-                          : "Rental Preference"
-                      }
-                      description={
-                        activeTab === "Buy"
-                          ? "Set your preferred budget"
-                          : "Set your monthly rent preference"
-                      }
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      {activeTab === "Buy" ? (
-                        <>
-                          <InputField
-                            label="Minimum Budget"
-                            placeholder="₹ Min"
-                            type="number"
-                            value={requirements.minBudget}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "minBudget",
-                                value
-                              )
-                            }
-                            icon={
-                              <Wallet className="h-4 w-4" />
-                            }
-                          />
-
-                          <InputField
-                            label="Maximum Budget"
-                            placeholder="₹ Max"
-                            type="number"
-                            value={requirements.maxBudget}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "maxBudget",
-                                value
-                              )
-                            }
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <InputField
-                            label="Monthly Rent"
-                            placeholder="₹ e.g. 20000"
-                            type="number"
-                            value={requirements.rent}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "rent",
-                                value
-                              )
-                            }
-                            icon={
-                              <Wallet className="h-4 w-4" />
-                            }
-                          />
-
-                          <SelectField
-                            label="Availability"
-                            placeholder="Any"
-                            value={requirements.availability}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "availability",
-                                value
-                              )
-                            }
-                            options={[
-                              "Immediately",
-                              "Within 15 Days",
-                              "Within 1 Month",
-                            ]}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* =================================================
-                  FLAT
-              ================================================== */}
-
-              {propertyType === "Flat" && (
-                <div className="space-y-7">
-
-                  {/* BASIC */}
-
-                  <div>
-                    <SectionTitle
-                      icon={<Home className="h-4 w-4" />}
-                      title="Basic Details"
-                      description="Choose your preferred flat"
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      <SelectField
-                        label="BHK"
-                        placeholder="Select BHK"
-                        value={requirements.bhk}
-                        onChange={(value) =>
-                          updateRequirement("bhk", value)
-                        }
-                        options={[
-                          "1 BHK",
-                          "2 BHK",
-                          "3 BHK",
-                          "4 BHK",
-                          "5 BHK",
-                          "5+ BHK",
-                        ]}
-                        icon={
-                          <BedDouble className="h-4 w-4" />
-                        }
-                      />
-
-                      <SelectField
-                        label="Preferred Floor"
-                        placeholder="Any Floor"
-                        value={requirements.floor}
-                        onChange={(value) =>
-                          updateRequirement("floor", value)
-                        }
-                        options={[
-                          "Ground Floor",
-                          "1st Floor",
-                          "2nd Floor",
-                          "3rd Floor",
-                          "4th Floor",
-                          "5th Floor",
-                          "6th Floor",
-                          "7th Floor",
-                          "8th Floor",
-                          "9th Floor",
-                          "10th Floor",
-                          "11th Floor",
-                          "12th Floor",
-                          "13th Floor",
-                          "14th Floor",
-                          "15th Floor",
-                          "16th Floor",
-                          "17th Floor",
-                          "18th Floor",
-                          "19th Floor",
-                          "20th Floor",
-                          "21st+ Floor",
-                        ]}
-                        icon={
-                          <Layers3 className="h-4 w-4" />
-                        }
-                      />
-
-                      <InputField
-                        label="Min Carpet Area"
-                        placeholder="e.g. 800"
-                        type="number"
-                        value={requirements.minArea}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "minArea",
-                            value
-                          )
-                        }
-                        icon={
-                          <Ruler className="h-4 w-4" />
-                        }
-                      />
-
-                      <InputField
-                        label="Max Carpet Area"
-                        placeholder="e.g. 1500"
-                        type="number"
-                        value={requirements.maxArea}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "maxArea",
-                            value
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* FEATURES */}
-
-                  <div className="border-t border-slate-200 pt-7">
-
-                    <SectionTitle
-                      icon={<Sparkles className="h-4 w-4" />}
-                      title="Property Features"
-                      description="Select additional preferences"
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      <SelectField
-                        label="Bathrooms"
-                        placeholder="Any"
-                        value={requirements.bathrooms}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "bathrooms",
-                            value
-                          )
-                        }
-                        options={[
-                          "1",
-                          "2",
-                          "3",
-                          "4",
-                          "5+",
-                        ]}
-                        icon={<Bath className="h-4 w-4" />}
-                      />
-
-                      <SelectField
-                        label="Parking"
-                        placeholder="Any"
-                        value={requirements.parking}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "parking",
-                            value
-                          )
-                        }
-                        options={[
-                          "No Parking",
-                          "1 Car",
-                          "2 Cars",
-                          "3+ Cars",
-                        ]}
-                        icon={<Car className="h-4 w-4" />}
-                      />
-
-                      <SelectField
-                        label="Furnishing"
-                        placeholder="Any"
-                        value={requirements.furnishing}
-                        onChange={(value) =>
-                          updateRequirement(
-                            "furnishing",
-                            value
-                          )
-                        }
-                        options={[
-                          "Unfurnished",
-                          "Semi Furnished",
-                          "Fully Furnished",
-                        ]}
-                      />
-
-                      {activeTab === "Buy" && (
-                        <SelectField
-                          label="Possession"
-                          placeholder="Any"
-                          value={requirements.possession}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "possession",
-                              value
-                            )
-                          }
-                          options={[
-                            "Ready to Move",
-                            "Within 3 Months",
-                            "Within 6 Months",
-                            "Under Construction",
-                            "New Launch",
-                          ]}
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* BUDGET */}
-
-                  <div className="border-t border-slate-200 pt-7">
-
-                    <SectionTitle
-                      icon={<Wallet className="h-4 w-4" />}
-                      title={
-                        activeTab === "Buy"
-                          ? "Budget"
-                          : "Rental Preference"
-                      }
-                      description={
-                        activeTab === "Buy"
-                          ? "Set your preferred budget"
-                          : "Set your monthly rent"
-                      }
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-
-                      {activeTab === "Buy" ? (
-                        <>
-                          <InputField
-                            label="Minimum Budget"
-                            placeholder="₹ Min"
-                            type="number"
-                            value={requirements.minBudget}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "minBudget",
-                                value
-                              )
-                            }
-                            icon={
-                              <Wallet className="h-4 w-4" />
-                            }
-                          />
-
-                          <InputField
-                            label="Maximum Budget"
-                            placeholder="₹ Max"
-                            type="number"
-                            value={requirements.maxBudget}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "maxBudget",
-                                value
-                              )
-                            }
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <InputField
-                            label="Monthly Rent"
-                            placeholder="₹ e.g. 20000"
-                            type="number"
-                            value={requirements.rent}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "rent",
-                                value
-                              )
-                            }
-                            icon={
-                              <Wallet className="h-4 w-4" />
-                            }
-                          />
-
-                          <SelectField
-                            label="Availability"
-                            placeholder="Any"
-                            value={requirements.availability}
-                            onChange={(value) =>
-                              updateRequirement(
-                                "availability",
-                                value
-                              )
-                            }
-                            options={[
-                              "Immediately",
-                              "Within 15 Days",
-                              "Within 1 Month",
-                            ]}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* =================================================
-                  BUILDER FLOOR
-              ================================================== */}
-
-              {activeTab === "Buy" &&
-                propertyType === "Builder Floor" && (
-                  <div className="space-y-7">
-
-                    <div>
-                      <SectionTitle
-                        icon={<Building2 className="h-4 w-4" />}
-                        title="Basic Details"
-                        description="Choose your preferred builder floor"
-                      />
-
-                      <div className="grid gap-4 sm:grid-cols-2">
-
-                        <SelectField
-                          label="BHK"
-                          placeholder="Select BHK"
-                          value={requirements.bhk}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "bhk",
-                              value
-                            )
-                          }
-                          options={[
-                            "1 BHK",
-                            "2 BHK",
-                            "3 BHK",
-                            "4 BHK",
-                            "5 BHK",
-                          ]}
-                          icon={
-                            <BedDouble className="h-4 w-4" />
-                          }
-                        />
-
-                        <SelectField
-                          label="Preferred Floor"
-                          placeholder="Any Floor"
-                          value={requirements.floor}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "floor",
-                              value
-                            )
-                          }
-                          options={[
-                            "Ground Floor",
-                            "1st Floor",
-                            "2nd Floor",
-                            "3rd Floor",
-                            "4th Floor",
-                            "5th Floor",
-                          ]}
-                          icon={
-                            <Layers3 className="h-4 w-4" />
-                          }
-                        />
-
-                        <InputField
-                          label="Carpet Area"
-                          placeholder="e.g. 1200"
-                          type="number"
-                          value={requirements.minArea}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "minArea",
-                              value
-                            )
-                          }
-                          icon={
-                            <Ruler className="h-4 w-4" />
-                          }
-                        />
-
-                        <SelectField
-                          label="Bathrooms"
-                          placeholder="Any"
-                          value={requirements.bathrooms}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "bathrooms",
-                              value
-                            )
-                          }
-                          options={[
-                            "1",
-                            "2",
-                            "3",
-                            "4",
-                            "5+",
-                          ]}
-                          icon={
-                            <Bath className="h-4 w-4" />
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="border-t border-slate-200 pt-7">
-
-                      <SectionTitle
-                        icon={<Sparkles className="h-4 w-4" />}
-                        title="Property Features"
-                        description="Choose your preferred features"
-                      />
-
-                      <div className="grid gap-4 sm:grid-cols-2">
-
-                        <SelectField
-                          label="Parking"
-                          placeholder="Any"
-                          value={requirements.parking}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "parking",
-                              value
-                            )
-                          }
-                          options={[
-                            "No Parking",
-                            "1 Car",
-                            "2 Cars",
-                            "3+ Cars",
-                          ]}
-                          icon={
-                            <Car className="h-4 w-4" />
-                          }
-                        />
-
-                        <SelectField
-                          label="Furnishing"
-                          placeholder="Any"
-                          value={requirements.furnishing}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "furnishing",
-                              value
-                            )
-                          }
-                          options={[
-                            "Unfurnished",
-                            "Semi Furnished",
-                            "Fully Furnished",
-                          ]}
-                        />
-
-                        <InputField
-                          label="Minimum Budget"
-                          placeholder="₹ Min"
-                          type="number"
-                          value={requirements.minBudget}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "minBudget",
-                              value
-                            )
-                          }
-                          icon={
-                            <Wallet className="h-4 w-4" />
-                          }
-                        />
-
-                        <InputField
-                          label="Maximum Budget"
-                          placeholder="₹ Max"
-                          type="number"
-                          value={requirements.maxBudget}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "maxBudget",
-                              value
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              {/* =================================================
-                  PG / ROOM
-              ================================================== */}
-
-              {activeTab === "Rent" &&
-                propertyType === "PG / Room" && (
-                  <div className="space-y-7">
-
-                    <div>
-                      <SectionTitle
-                        icon={<BedDouble className="h-4 w-4" />}
-                        title="Room Details"
-                        description="Tell us about your room preference"
-                      />
-
-                      <div className="grid gap-4 sm:grid-cols-2">
-
-                        <SelectField
-                          label="Room Type"
-                          placeholder="Select Room"
-                          value={requirements.bhk}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "bhk",
-                              value
-                            )
-                          }
-                          options={[
-                            "Single Room",
-                            "Double Sharing",
-                            "Triple Sharing",
-                            "1 BHK",
-                            "2 BHK",
-                          ]}
-                          icon={
-                            <BedDouble className="h-4 w-4" />
-                          }
-                        />
-
-                        <InputField
-                          label="Monthly Rent"
-                          placeholder="₹ e.g. 10000"
-                          type="number"
-                          value={requirements.rent}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "rent",
-                              value
-                            )
-                          }
-                          icon={
-                            <Wallet className="h-4 w-4" />
-                          }
-                        />
-
-                        <SelectField
-                          label="Furnishing"
-                          placeholder="Any"
-                          value={requirements.furnishing}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "furnishing",
-                              value
-                            )
-                          }
-                          options={[
-                            "Unfurnished",
-                            "Semi Furnished",
-                            "Fully Furnished",
-                          ]}
-                        />
-
-                        <SelectField
-                          label="Availability"
-                          placeholder="Any"
-                          value={requirements.availability}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "availability",
-                              value
-                            )
-                          }
-                          options={[
-                            "Immediately",
-                            "Within 15 Days",
-                            "Within 1 Month",
-                          ]}
-                        />
-
-                        <SelectField
-                          label="Parking"
-                          placeholder="Any"
-                          value={requirements.parking}
-                          onChange={(value) =>
-                            updateRequirement(
-                              "parking",
-                              value
-                            )
-                          }
-                          options={[
-                            "No Parking",
-                            "1 Car",
-                            "2 Cars",
-                          ]}
-                          icon={
-                            <Car className="h-4 w-4" />
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </details>
-          )}
-
-          {/* =================================================
-              SEARCH BUTTON
-          ================================================== */}
-
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="group mt-5 flex min-h-[50px] w-full items-center justify-center gap-3 rounded-xl bg-green-700 text-sm font-bold text-white shadow-md shadow-green-950/20 transition-all duration-200 hover:bg-green-800 active:scale-[0.99]"
-          >
-            <Search className="h-5 w-5 text-white" />
-            <span>Search Properties</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </button>
-
-          {/* =================================================
-              SEARCH SUMMARY
-          ================================================== */}
-
-          {(propertyType || location) && (
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-
-              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-
-                <span>Searching for</span>
-
-                <span className="rounded-full bg-slate-900 px-3 py-1 font-bold text-white">
-                  {activeTab}
-                </span>
-
-                {propertyType && (
-                  <>
-                    <span className="text-slate-300">
-                      •
-                    </span>
-
-                    <span className="rounded-full bg-green-700/10 px-3 py-1 font-bold text-green-700">
-                      {propertyType}
-                    </span>
-                  </>
-                )}
-
-                {location && (
-                  <>
-                    <span className="text-slate-300">
-                      •
-                    </span>
-
-                    <span className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 font-bold text-green-700">
-                      <MapPin className="h-3 w-3" />
-                      {location}
-                    </span>
-                  </>
-                )}
-              </div>
-
-              {/* FLAT SUMMARY */}
-
-              {propertyType === "Flat" &&
-                requirements.bhk && (
-                  <div className="mt-2 text-xs font-medium text-slate-500">
-                    {requirements.bhk}
-
-                    {requirements.floor &&
-                      ` • ${requirements.floor}`}
-
-                    {requirements.minArea &&
-                      ` • ${requirements.minArea}+ sq.ft`}
-
-                    {activeTab === "Rent" &&
-                      requirements.rent &&
-                      ` • ₹${requirements.rent}/month`}
-
-                    {activeTab === "Buy" &&
-                      requirements.maxBudget &&
-                      ` • Budget ₹${requirements.maxBudget}`}
-                  </div>
-                )}
-
-              {/* PLOT SUMMARY */}
-
-              {propertyType === "Plot" &&
-                (requirements.minArea ||
-                  requirements.plotType ||
-                  requirements.facing ||
-                  requirements.maxBudget ||
-                  requirements.rent) && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-
-                    {requirements.plotType && (
-                      <span className="rounded-full bg-green-700/10 px-2.5 py-1 font-semibold text-green-900">
-                        {requirements.plotType}
-                      </span>
-                    )}
-
-                    {requirements.minArea && (
-                      <span className="rounded-full bg-white px-2.5 py-1 font-semibold text-slate-600">
-                        {requirements.minArea}
-
-                        {requirements.maxArea
-                          ? ` - ${requirements.maxArea}`
-                          : "+"}{" "}
-
-                        {requirements.areaUnit}
-                      </span>
-                    )}
-
-                    {requirements.facing && (
-                      <span className="rounded-full bg-white px-2.5 py-1 font-semibold text-slate-600">
-                        {requirements.facing} Facing
-                      </span>
-                    )}
-
-                    {requirements.roadWidth && (
-                      <span className="rounded-full bg-white px-2.5 py-1 font-semibold text-slate-600">
-                        {requirements.roadWidth} Road
-                      </span>
-                    )}
-
-                    {requirements.cornerPlot ===
-                      "Yes - Corner Plot" && (
-                      <span className="rounded-full bg-green-50 px-2.5 py-1 font-semibold text-green-700">
-                        Corner Plot
-                      </span>
-                    )}
-
-                    {requirements.gatedSociety === "Yes" && (
-                      <span className="rounded-full bg-green-50 px-2.5 py-1 font-semibold text-green-700">
-                        Gated Society
-                      </span>
-                    )}
-
-                    {activeTab === "Rent" &&
-                      requirements.rent && (
-                        <span className="rounded-full bg-green-700/10 px-2.5 py-1 font-semibold text-green-900">
-                          ₹{requirements.rent}/month
-                        </span>
-                      )}
-
-                    {activeTab === "Buy" &&
-                      requirements.maxBudget && (
-                        <span className="rounded-full bg-green-700/10 px-2.5 py-1 font-semibold text-green-900">
-                          Budget ₹{requirements.maxBudget}
-                        </span>
-                      )}
-                  </div>
-                )}
-
-              {/* HOUSE SUMMARY */}
-
-              {propertyType === "House" &&
-                requirements.bhk && (
-                  <div className="mt-2 text-xs font-medium text-slate-500">
-                    {requirements.bhk}
-
-                    {requirements.builtUpArea &&
-                      ` • ${requirements.builtUpArea} sq.ft built-up`}
-
-                    {activeTab === "Rent" &&
-                      requirements.rent &&
-                      ` • ₹${requirements.rent}/month`}
-                  </div>
-                )}
-
-              {/* BUILDER FLOOR SUMMARY */}
-
-              {propertyType === "Builder Floor" &&
-                requirements.bhk && (
-                  <div className="mt-2 text-xs font-medium text-slate-500">
-                    {requirements.bhk}
-
-                    {requirements.floor &&
-                      ` • ${requirements.floor}`}
-
-                    {requirements.minArea &&
-                      ` • ${requirements.minArea} sq.ft`}
-                  </div>
-                )}
-
-              {/* PG SUMMARY */}
-
-              {propertyType === "PG / Room" &&
-                requirements.rent && (
-                  <div className="mt-2 text-xs font-medium text-slate-500">
-                    ₹{requirements.rent}/month
-                  </div>
-                )}
-            </div>
-          )}
-        </div>
-
-        {/* =====================================================
-            QUICK ACTIONS
-        ====================================================== */}
-
-        <div className="mt-5 flex flex-wrap justify-center gap-3">
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("Buy");
-              setPropertyType("");
-              setLocation("");
-              resetRequirements();
-            }}
-            className="group flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white hover:text-slate-900"
-          >
-            <Building2 className="h-4 w-4" />
-
-            New Projects
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("Buy");
-              setPropertyType("House");
-              setLocation("");
-              resetRequirements();
-            }}
-            className="group flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white hover:text-slate-900"
-          >
-            <KeyRound className="h-4 w-4" />
-
-            Resale Properties
-          </button>
-
-          {user?.verificationStatus === "ACTIVE" && (
+            {/* 3. Red Search Button */}
+            <button
+              type="submit"
+              className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 rounded-xl bg-[#c41920] hover:bg-[#b0161c] px-6 sm:px-7 py-2.5 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+            >
+              <Search className="h-4 w-4" />
+              <span>Search</span>
+            </button>
+
+            {/* 4. Red Map Button */}
             <button
               type="button"
-              onClick={() =>
-                window.location.assign("/listings/new")
-              }
-              className="group flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:bg-green-700 hover:text-white"
+              onClick={handleOpenMap}
+              title="View on Map"
+              className="hidden sm:flex shrink-0 items-center justify-center rounded-xl bg-[#c41920] hover:bg-[#b0161c] p-2.5 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
             >
-              Post Property FREE
-
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <MapIcon className="h-4 w-4" />
             </button>
-          )}
+          </form>
         </div>
-
-
       </div>
     </section>
   );
 }
-
-  const InputField = ({
-    label,
-    placeholder,
-    value,
-    onChange,
-    type = "text",
-    icon,
-  }) => {
-    return (
-      <div className="group rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-all duration-200 hover:border-green-700/60 hover:shadow-md focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
-        <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-            {label}
-          </label>
-
-          {icon && (
-            <span className="text-green-700 opacity-70">
-              {icon}
-            </span>
-          )}
-        </div>
-
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className="mt-2 w-full bg-transparent text-[15px] font-semibold text-slate-800 outline-none placeholder:text-slate-400"
-        />
-      </div>
-    );
-  };
-
-  /* =========================================================
-     SELECT FIELD
-  ========================================================= */
-
-  const SelectField = ({
-    label,
-    value,
-    onChange,
-    options,
-    placeholder,
-    icon,
-  }) => {
-    return (
-      <div className="group rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-all duration-200 hover:border-green-700/60 hover:shadow-md focus-within:border-green-700 focus-within:ring-4 focus-within:ring-green-700/10">
-        <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-            {label}
-          </label>
-
-          {icon && (
-            <span className="text-green-700 opacity-70">
-              {icon}
-            </span>
-          )}
-        </div>
-
-        <div className="relative">
-          <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="mt-2 w-full cursor-pointer appearance-none bg-transparent pr-7 text-[15px] font-semibold text-slate-800 outline-none"
-          >
-            <option value="">{placeholder}</option>
-
-            {options.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-
-          <ChevronDown className="pointer-events-none absolute right-0 bottom-0.5 h-4 w-4 text-slate-400" />
-        </div>
-      </div>
-    );
-  };
-
-  /* =========================================================
-     SECTION TITLE
-  ========================================================= */
-
-  const SectionTitle = ({ icon, title, description }) => {
-    return (
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-700/10 text-green-700">
-          {icon}
-        </div>
-
-        <div>
-          <h4 className="text-sm font-extrabold text-slate-800">
-            {title}
-          </h4>
-
-          {description && (
-            <p className="mt-0.5 text-[11px] text-slate-400">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  };

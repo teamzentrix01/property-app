@@ -100,11 +100,11 @@ export default function Navbar() {
           STICKY NAVBAR - PREMIUM DESIGN
       ====================================================== */}
 
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm transition-all">
+      <header className="sticky top-0 z-50 w-full border-b border-[#fecdd3] bg-gradient-to-b from-[#fff1f2] to-white shadow-sm transition-all">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
 
           {/* ================= HEADER BAR ================= */}
-          <div className="flex h-18 items-center justify-between gap-3">
+          <div className="flex h-20 items-center justify-between gap-5">
 
             {/* Logo */}
             <Link
@@ -112,23 +112,37 @@ export default function Navbar() {
               aria-label="Bhoomi home"
               className="shrink-0"
             >
-              <BhoomiMark />
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#c41920] to-[#8e1016] text-sm font-bold text-white shadow-sm shadow-[#c41920]/25">
+                  ₹
+                </div>
+
+                <div>
+                  <h1 className="text-lg font-bold tracking-tight text-[#8e1016]">
+                    BHOOMI
+                  </h1>
+
+                  <p className="text-[9px] font-medium leading-none tracking-widest text-[#c41920]">
+                    REAL ESTATE
+                  </p>
+                </div>
+              </div>
             </Link>
 
             {/* Category Tabs - Hidden on Mobile */}
-            <div className="hidden items-center gap-4 xl:flex">
+            <div className="hidden items-center gap-6 lg:flex">
 
               {/* Cities */}
               <div className="group relative">
                 <button
                   type="button"
-                  className="nav-link flex items-center gap-1 text-xs font-semibold"
+                  className="flex items-center gap-1 text-xs font-semibold text-[#180e0f] transition hover:text-[#c41920]"
                 >
                   Cities
                   <ChevronDown size={13} />
                 </button>
 
-                <div className="invisible absolute left-0 top-full z-50 mt-2 w-40 rounded-lg border border-gray-200 bg-white p-1.5 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <div className="invisible absolute left-0 top-full z-50 mt-2 w-40 rounded-lg border border-[#fecdd3] bg-white p-1.5 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                   {[
                     ["Moradabad", "/listings?city=Moradabad"],
                     ["Bareilly", "/listings?city=Bareilly"],
@@ -137,7 +151,7 @@ export default function Navbar() {
                     <Link
                       key={city}
                       href={href}
-                      className="block rounded-md px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-50 hover:text-red-600"
+                      className="block rounded-md px-3 py-2 text-xs font-semibold text-[#180e0f] hover:bg-[#fff1f2] hover:text-[#c41920]"
                     >
                       {city}
                     </Link>
@@ -157,8 +171,7 @@ export default function Navbar() {
                 <Link
                   href={href}
                   key={category}
-                  aria-current={pathname === href ? "page" : undefined}
-                  className="nav-link whitespace-nowrap text-xs font-semibold"
+                  className="whitespace-nowrap text-xs font-semibold text-[#180e0f] transition hover:text-[#c41920]"
                 >
                   {category}
                 </Link>
@@ -168,81 +181,86 @@ export default function Navbar() {
             {/* =================================================
                 DESKTOP RIGHT SECTION
             ================================================= */}
-            <div className="ml-auto hidden items-center gap-2.5 xl:flex">
-              {/* CONTACT NUMBER */}
-              <a
-                href="tel:+919999999999"
-                className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 transition hover:text-green-700 hover:bg-green-50"
-                aria-label="Call Bhoomi Real Estate"
-              >
-                <Phone size={15} className="text-red-600" />
-                <span>+91 99999 99999</span>
-              </a>
-
-              {/* POST PROPERTY CTA */}
-              <Link
-                href="/post-property"
-                className="flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-green-700 px-3.5 py-2 text-xs font-bold text-white shadow-sm shadow-green-900/15 transition duration-200 hover:bg-green-800"
-              >
-                <Plus size={15} />
-                <span>Post Property</span>
-                <span className="rounded bg-green-900/80 px-1.5 py-0.5 text-[9px] font-extrabold text-green-100">
-                  FREE
-                </span>
-              </Link>
-
-              {/* LOGGED IN OR LOGIN */}
+            <div className="ml-auto hidden items-center gap-3 lg:flex">
+              {/* LOGGED IN */}
               {user ? (
                 <>
                   <Link
                     href="/profile"
-                    className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-800 transition hover:bg-green-50 hover:text-green-700 hover:border-green-300"
+                    className="flex items-center gap-1.5 rounded-lg bg-[#8e1016] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#c41920]"
                   >
-                    <User size={14} className="text-green-700" />
+                    <User size={14} />
                     Profile
                   </Link>
-                  <button
-                    onClick={logout}
-                    className="rounded-xl px-2.5 py-2 text-xs font-semibold text-gray-600 transition hover:text-red-600 hover:bg-red-50"
-                  >
-                    Logout
-                  </button>
                 </>
               ) : user === null ? (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 rounded-xl border-1.5 border-red-600 px-3.5 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-600 hover:text-white"
+                  className="flex items-center gap-1.5 rounded-lg bg-[#c41920] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#8e1016]"
                 >
                   <User size={14} />
                   Log in
                 </Link>
               ) : null}
+
+              {/* POST PROPERTY */}
+              {user && (
+                <Link
+                  href="/post-property"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-[#c41920]/20 transition hover:from-[#8e1016] hover:to-[#c41920]"
+                >
+                  <Plus size={14} />
+                  Post Property
+                  <span className="ml-1 rounded bg-[#8e1016] px-1.5 py-0.5 text-[8px]">
+                    FREE
+                  </span>
+                </Link>
+              )}
+
+              {/* CONTACT NUMBER */}
+              <a
+                href="9999999999"
+                className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-[#180e0f] transition hover:text-[#c41920]"
+                aria-label="Call Bhoomi Real Estate"
+              >
+                <Phone size={16} className="text-[#c41920]" />
+                <span>+91 9999999999</span>
+              </a>
+
+              {user && (
+                <button
+                  onClick={logout}
+                  className="px-2.5 text-xs font-medium text-[#180e0f] hover:text-[#c41920]"
+                >
+                  Logout
+                </button>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenu(!mobileMenu)}
-              className="grid h-10 w-10 place-items-center rounded-xl border border-gray-200 bg-gray-50 text-gray-800 hover:bg-green-50 hover:text-green-700 xl:hidden"
+              className="grid h-10 w-10 place-items-center rounded-lg bg-[#fff1f2] text-[#c41920] lg:hidden"
               aria-label="Menu"
             >
-              {mobileMenu ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenu ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
 
           {/* =================================================
               SEARCH BAR
           ================================================== */}
-          <div className="hidden border-t border-gray-100 bg-white py-2.5 lg:block">
+          <div className="hidden border-t border-[#fecdd3] bg-[#fff1f2]/70 py-4 lg:block">
 
             <form
               key={`desktop-search-${searchParams.toString()}`}
               onSubmit={submitListingSearch}
-              className="site-search grid gap-2 rounded-xl bg-white md:grid-cols-[1fr_1fr_1fr_auto]"
+              className="site-search grid gap-2 rounded-xl bg-[#8e1016] p-2 shadow-sm shadow-[#200406]/20 md:grid-cols-[1fr_1fr_1fr_auto]"
             >
               {/* Location */}
-              <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-white px-3 py-2 transition focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100">
+              <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 transition focus-within:border-[#c41920] focus-within:ring-2 focus-within:ring-[#fff1f2]">
                 <MapPin
-                  className="shrink-0 text-red-600"
+                  className="shrink-0 text-[#c41920]"
                   size={18}
                 />
 
@@ -251,19 +269,19 @@ export default function Navbar() {
                   type="text"
                   defaultValue={searchParams.get("search") || ""}
                   placeholder="Search City, Locality or Project..."
-                  className="w-full bg-transparent text-xs font-semibold text-gray-900 outline-none placeholder:text-gray-400"
+                  className="w-full bg-transparent text-xs font-semibold text-[#180e0f] outline-none placeholder:text-gray-400"
                 />
               </div>
 
               {/* Property Type */}
-              <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-white px-3 py-2 transition focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100">
-                <span className="shrink-0 text-sm font-bold text-green-700">
+              <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 transition focus-within:border-[#c41920] focus-within:ring-2 focus-within:ring-[#fff1f2]">
+                <span className="shrink-0 text-sm font-bold text-[#c41920]">
                   🏢
                 </span>
 
                 <select
                   name="propertyType"
-                  className="w-full bg-transparent text-xs font-semibold text-gray-900 outline-none"
+                  className="w-full bg-transparent text-xs font-semibold text-[#180e0f] outline-none"
                 >
                   <option value="">All Types</option>
                   <option value="FLAT">Apartments</option>
@@ -273,19 +291,19 @@ export default function Navbar() {
 
                 <ChevronDown
                   size={12}
-                  className="shrink-0 text-gray-700"
+                  className="shrink-0 text-[#c41920]"
                 />
               </div>
 
               {/* Budget */}
-              <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-white px-3 py-2 transition focus-within:border-green-600 focus-within:ring-2 focus-within:ring-green-100">
-                <span className="shrink-0 text-sm font-bold text-green-700">
+              <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 transition focus-within:border-[#c41920] focus-within:ring-2 focus-within:ring-[#fff1f2]">
+                <span className="shrink-0 text-sm font-bold text-[#c41920]">
                   ₹
                 </span>
 
                 <select
                   name="budget"
-                  className="w-full bg-transparent text-xs font-semibold text-gray-900 outline-none"
+                  className="w-full bg-transparent text-xs font-semibold text-[#180e0f] outline-none"
                 >
                   <option>Any Budget</option>
                   <option>Below ₹50 Lakh</option>
@@ -296,14 +314,14 @@ export default function Navbar() {
 
                 <ChevronDown
                   size={12}
-                  className="shrink-0 text-gray-700"
+                  className="shrink-0 text-[#c41920]"
                 />
               </div>
 
               {/* Search Button */}
               <button
                 type="submit"
-                className="flex items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-2 text-xs font-semibold text-white shadow-sm shadow-green-950/15 transition hover:bg-green-900"
+                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-6 py-2 text-xs font-semibold text-white shadow-sm shadow-[#200406]/15 transition hover:from-[#8e1016] hover:to-[#c41920]"
               >
                 <Search size={16} />
                 Search
@@ -317,16 +335,16 @@ export default function Navbar() {
         ====================================================== */}
 
         {mobileMenu && (
-          <div className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t border-gray-200 bg-white shadow-sm xl:hidden">
+          <div className="border-t border-[#fecdd3] bg-white shadow-xl lg:hidden">
 
             <div className="space-y-3 px-4 py-4">
 
               {/* Mobile Search */}
-              <form key={`mobile-search-${searchParams.toString()}`} onSubmit={submitListingSearch} className="site-search space-y-2 rounded-xl bg-white p-2">
+              <form key={`mobile-search-${searchParams.toString()}`} onSubmit={submitListingSearch} className="site-search space-y-2 rounded-xl bg-[#8e1016] p-2 shadow-sm shadow-[#200406]/20">
 
-                <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2">
+                <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2">
                   <MapPin
-                    className="shrink-0 text-green-700"
+                    className="shrink-0 text-[#c41920]"
                     size={18}
                   />
 
@@ -334,19 +352,19 @@ export default function Navbar() {
                     name="search"
                     defaultValue={searchParams.get("search") || ""}
                     placeholder="Search City, Locality..."
-                    className="flex-1 bg-transparent text-xs font-semibold text-gray-900 outline-none"
+                    className="flex-1 bg-transparent text-xs font-semibold text-[#180e0f] outline-none"
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  <select name="propertyType" className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-900 outline-none">
+                  <select name="propertyType" className="flex-1 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-xs font-semibold text-[#180e0f] outline-none">
                     <option>All Types</option>
                     <option>Apartments</option>
                     <option>Villas</option>
                     <option>Commercial</option>
                   </select>
 
-                  <select name="budget" className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-900 outline-none">
+                  <select name="budget" className="flex-1 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-xs font-semibold text-[#180e0f] outline-none">
                     <option>Any Budget</option>
                     <option>Below ₹50L</option>
                     <option>₹50L+</option>
@@ -355,7 +373,7 @@ export default function Navbar() {
 
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-semibold text-white"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white"
                 >
                   <Search size={16} />
                   Search
@@ -366,11 +384,11 @@ export default function Navbar() {
               <div className="flex flex-wrap gap-2 pt-2">
 
                 <details className="relative">
-                  <summary className="cursor-pointer list-none rounded-lg bg-gray-100 px-3 py-1.5 text-[10px] font-semibold text-gray-900 hover:bg-gray-200">
+                  <summary className="cursor-pointer list-none rounded-lg bg-[#fff1f2] px-3 py-1.5 text-[10px] font-semibold text-[#c41920] hover:bg-[#ffe4e6]">
                     Cities ▾
                   </summary>
 
-                  <div className="absolute left-0 z-50 mt-1 w-36 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                  <div className="absolute left-0 z-50 mt-1 w-36 rounded-lg border border-[#fecdd3] bg-white p-1 shadow-lg">
                     {[
                       ["Moradabad", "/listings?city=Moradabad"],
                       ["Bareilly", "/listings?city=Bareilly"],
@@ -380,7 +398,7 @@ export default function Navbar() {
                         key={city}
                         href={href}
                         onClick={() => setMobileMenu(false)}
-                        className="block rounded px-2 py-1.5 text-[10px] font-semibold text-gray-900 hover:bg-gray-50"
+                        className="block rounded px-2 py-1.5 text-[10px] font-semibold text-[#180e0f] hover:bg-[#fff1f2]"
                       >
                         {city}
                       </Link>
@@ -400,7 +418,7 @@ export default function Navbar() {
                     href={href}
                     key={cat}
                     onClick={() => setMobileMenu(false)}
-                    className="rounded-lg bg-gray-100 px-3 py-1.5 text-[10px] font-semibold text-gray-900 hover:bg-gray-200"
+                    className="rounded-lg bg-[#fff1f2] px-3 py-1.5 text-[10px] font-semibold text-[#c41920] hover:bg-[#ffe4e6]"
                   >
                     {cat}
                   </Link>
@@ -408,11 +426,11 @@ export default function Navbar() {
               </div>
 
               {/* Mobile Links */}
-              <div className="space-y-1.5 border-t border-gray-200 pt-3">
+              <div className="space-y-1.5 border-t border-[#fecdd3] pt-3">
 
                 <Link
                   href="/listings"
-                  className="block px-4 py-2 text-xs font-semibold text-gray-900 hover:text-red-600"
+                  className="block px-4 py-2 text-xs font-semibold text-[#180e0f] hover:text-[#c41920]"
                   onClick={() => setMobileMenu(false)}
                 >
                   All Projects
@@ -423,7 +441,7 @@ export default function Navbar() {
                   <>
                     <Link
                       href="/profile"
-                      className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-xs font-semibold text-white"
+                      className="flex items-center gap-2 rounded-lg bg-[#8e1016] px-4 py-2 text-xs font-semibold text-white"
                       onClick={() => setMobileMenu(false)}
                     >
                       <User size={14} />
@@ -433,7 +451,7 @@ export default function Navbar() {
                 ) : (
                   <Link
                     href="/login"
-                    className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-semibold text-white"
+                    className="flex items-center gap-2 rounded-lg bg-[#c41920] px-4 py-2 text-xs font-semibold text-white"
                     onClick={() => setMobileMenu(false)}
                   >
                     <User size={14} />
@@ -444,7 +462,7 @@ export default function Navbar() {
                 {user && (
                   <Link
                     href="/post-property"
-                    className="flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-semibold text-white"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-4 py-2 text-xs font-semibold text-white"
                     onClick={() => setMobileMenu(false)}
                   >
                     <Plus size={14} />
@@ -454,9 +472,9 @@ export default function Navbar() {
 
                 <a
                   href="9999999999"
-                  className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-xs font-semibold text-gray-900 transition hover:bg-gray-100"
+                  className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-4 py-2.5 text-xs font-semibold text-[#180e0f] transition hover:bg-[#ffe4e6]"
                 >
-                  <Phone size={17} className="text-red-600" />
+                  <Phone size={17} className="text-[#c41920]" />
                   <span>+91 63970 36898</span>
                 </a>
 
@@ -481,14 +499,14 @@ export default function Navbar() {
           MOBILE BOTTOM NAV
       ====================================================== */}
 
-      <nav className={`fixed inset-x-0 bottom-0 z-50 grid ${user ? "grid-cols-5" : "grid-cols-4"} border-t border-gray-200 bg-white px-2 pb-[max(.45rem,env(safe-area-inset-bottom))] pt-2 shadow-sm md:hidden`}>
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-amber-200 bg-white/95 px-2 pb-[max(.45rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_30px_rgba(0,0,0,.08)] backdrop-blur-xl lg:hidden">
 
         {/* Home */}
         <Link
           href="/"
           className={`flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] ${pathname === "/"
-            ? "font-bold text-green-700"
-            : "text-gray-700 hover:text-green-700"
+            ? "font-bold text-red-600"
+            : "text-amber-900"
             }`}
         >
           <svg
@@ -507,10 +525,7 @@ export default function Navbar() {
         {/* Search */}
         <Link
           href="/listings"
-          className={`flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] ${pathname.startsWith("/listings")
-            ? "font-bold text-green-700"
-            : "text-gray-700 hover:text-green-700"
-            }`}
+          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-amber-900"
         >
           <Search size={20} />
           Search
@@ -520,9 +535,9 @@ export default function Navbar() {
         {user && (
           <Link
             href="/post-property"
-            className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-gray-700 hover:text-green-700"
+            className="relative flex min-h-12 flex-col items-center justify-end gap-1 text-[10px] text-amber-900"
           >
-            <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-green-700 text-white shadow-lg shadow-green-900/30">
+            <span className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full border-4 border-white bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg">
               <Plus size={27} />
             </span>
 
@@ -533,16 +548,16 @@ export default function Navbar() {
         {/* Saved */}
         <Link
           href="/dashboard#saved"
-          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-gray-700 hover:text-red-600"
+          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-amber-900"
         >
-          <Heart size={20} className="text-red-600" />
+          <Heart size={20} />
           Saved
         </Link>
 
         {/* Profile */}
         <Link
           href={user ? "/dashboard" : "/login"}
-          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-gray-900"
+          className="flex min-h-12 flex-col items-center justify-center gap-1 text-[10px] text-amber-900"
         >
           <User size={20} />
           Profile

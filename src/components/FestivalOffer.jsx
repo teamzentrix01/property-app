@@ -11,40 +11,40 @@ import {
 
 export default function FestivalOffer() {
   return (
-    <section className="w-full bg-white py-12 sm:py-16">
+    <section className="w-full bg-white py-14 sm:py-18 lg:py-20">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* MAIN OFFER BANNER */}
-        <div className="relative min-h-[340px] overflow-hidden rounded-2xl bg-[#052E16] shadow-xl">
+        <div className="relative min-h-[430px] overflow-hidden rounded-2xl bg-[#171717]">
 
           {/* Background Image */}
           <img
             src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1800&q=90"
             alt="Luxury Property"
-            className="absolute inset-0 h-full w-full object-cover mix-blend-luminosity opacity-40"
+            className="absolute inset-0 h-full w-full object-cover"
           />
 
           {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-black/65" />
 
-          {/* Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#052E16] via-[#052E16]/80 to-transparent" />
+          {/* Gold Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/20" />
 
           {/* Decorative Circle */}
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-green-600/30" />
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-[#c49a4a]/30" />
 
-          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full border border-green-600/20" />
+          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full border border-[#c49a4a]/20" />
 
           {/* CONTENT */}
-          <div className="relative z-10 flex min-h-[340px] items-center">
+          <div className="relative z-10 flex min-h-[430px] items-center">
 
             <div className="max-w-3xl px-6 py-12 sm:px-10 lg:px-14">
 
               {/* Festival Badge */}
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-red-500/40 bg-red-600/20 px-4 py-2 backdrop-blur-sm">
-                <Sparkles className="h-4 w-4 text-red-300" />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#c49a4a]/50 bg-[#c49a4a]/10 px-4 py-2 backdrop-blur-sm">
+                <Sparkles className="h-4 w-4 text-[#d5ae62]" />
 
-                <span className="text-xs font-bold uppercase tracking-[0.18em] text-red-200">
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#e0bc72]">
                   Exclusive Festival Offer 2026
                 </span>
               </div>
@@ -52,7 +52,7 @@ export default function FestivalOffer() {
               {/* Heading */}
               <h2 className="max-w-3xl text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[50px]">
                 Best Festival Offer in{" "}
-                <span className="text-emerald-400">
+                <span className="text-[#ff4d4f]">
                   2026
                 </span>
               </h2>
@@ -62,29 +62,44 @@ export default function FestivalOffer() {
               </h3>
 
               {/* Description */}
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
+              <p className="mt-4 max-w-xl text-sm leading-6 text-white/65 sm:text-base">
                 Unlock exclusive festive offers on premium apartments,
-                luxury residences and high-value properties across India.
+                luxury residences and high-value properties across Gurugram.
               </p>
+
+              {/* Offer Points */}
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
+
+                <div className="flex items-center gap-2 text-sm text-white/85">
+                  <ShieldCheck className="h-4 w-4 text-[#ff4d4f]" />
+                  Verified Properties
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-white/85">
+                  <Sparkles className="h-4 w-4 text-[#ff4d4f]" />
+                  Exclusive Deals
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-white/85">
+                  <Clock3 className="h-4 w-4 text-[#ff4d4f]" />
+                  Limited Period
+                </div>
+
+              </div>
 
               {/* BUTTONS */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
 
-                <a
-                  href="/listings"
-                  className="group flex items-center justify-center gap-2 rounded-xl bg-red-600 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-red-950/30 transition-all duration-200 hover:bg-red-700 hover:shadow-xl"
-                >
+                <button className="group flex items-center justify-center gap-2 rounded-lg bg-[#c41920] px-7 py-3.5 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:bg-[#a51319] hover:shadow-xl">
                   Explore Festival Deals
-                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </a>
 
-                <a
-                  href="tel:+919999999999"
-                  className="flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-gray-900"
-                >
-                  <PhoneCall className="h-4 w-4 text-emerald-400" />
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </button>
+
+                <button className="flex items-center justify-center gap-2 rounded-lg border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-black">
+                  <PhoneCall className="h-4 w-4" />
                   Get Expert Advice
-                </a>
+                </button>
 
               </div>
             </div>
@@ -105,7 +120,7 @@ export default function FestivalOffer() {
                   Special Offers
                 </span>
 
-                <span className="font-bold text-green-700">
+                <span className="font-bold text-[#ff4d4f]">
                   Exclusive
                 </span>
               </div>
@@ -142,8 +157,8 @@ export default function FestivalOffer() {
           {/* Card 1 */}
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
 
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-50">
-              <Sparkles className="h-5 w-5 text-green-700" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-red-50 border border-red-100">
+              <Sparkles className="h-5 w-5 text-[#c41920]" />
             </div>
 
             <div>
@@ -160,8 +175,8 @@ export default function FestivalOffer() {
           {/* Card 2 */}
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
 
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-50">
-              <Clock3 className="h-5 w-5 text-green-700" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-red-50 border border-red-100">
+              <Clock3 className="h-5 w-5 text-[#c41920]" />
             </div>
 
             <div>
@@ -178,8 +193,8 @@ export default function FestivalOffer() {
           {/* Card 3 */}
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
 
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-50">
-              <ShieldCheck className="h-5 w-5 text-green-700" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-red-50 border border-red-100">
+              <ShieldCheck className="h-5 w-5 text-[#c41920]" />
             </div>
 
             <div>

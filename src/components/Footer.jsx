@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Building2,
   Clock3,
+  CheckCircle2,
 } from "lucide-react";
 
 const quickLinks = [
@@ -18,26 +19,26 @@ const quickLinks = [
   { name: "About Us", href: "/about-us" },
   { name: "Properties", href: "/properties" },
   { name: "Projects", href: "/projects" },
-  { name: "Post Property", href: "/listings/new" },
+  { name: "Post Property", href: "/post-property" },
   { name: "Contact Us", href: "/contact-us" },
 ];
 
 const propertyLinks = [
-  { name: "Residential Properties", href: "/residential-property" },
-  { name: "Commercial Properties", href: "/commercial-property" },
-  { name: "Luxury Properties", href: "/luxury-properties" },
-  { name: "Plots", href: "/plots" },
-  { name: "Flats", href: "/flats" },
-  { name: "Villas", href: "/villas" },
+  { name: "Residential Properties", href: "/properties?propertyType=FLAT" },
+  { name: "Commercial Properties", href: "/categories/commercial" },
+  { name: "Luxury Properties", href: "/categories/luxury" },
+  { name: "Plots", href: "/properties?propertyType=PLOT" },
+  { name: "Flats", href: "/categories/apartment" },
+  { name: "Villas", href: "/categories/villas" },
 ];
 
 const popularLocations = [
-  { name: "Gurugram", href: "/property-in-gurugram" },
-  { name: "Delhi", href: "/property-in-delhi" },
-  { name: "Noida", href: "/property-in-noida" },
-  { name: "Greater Noida", href: "/property-in-greater-noida" },
-  { name: "Faridabad", href: "/property-in-faridabad" },
-  { name: "Dubai", href: "/property-in-dubai" },
+  { name: "Gurugram", href: "/properties?city=Gurugram" },
+  { name: "Delhi", href: "/properties?city=Delhi" },
+  { name: "Noida", href: "/properties?city=Noida" },
+  { name: "Greater Noida", href: "/properties?city=Greater+Noida" },
+  { name: "Faridabad", href: "/properties?city=Faridabad" },
+  { name: "Dubai", href: "/properties?city=Dubai" },
 ];
 
 const legalLinks = [
@@ -48,28 +49,39 @@ const legalLinks = [
 ];
 
 const socialLinks = [
-  { name: "Facebook", short: "f", href: "#" },
-  { name: "Instagram", short: "ig", href: "#" },
-  { name: "LinkedIn", short: "in", href: "#" },
-  { name: "YouTube", short: "▶", href: "#" },
-  { name: "Twitter", short: "𝕏", href: "#" },
+  { name: "Facebook", short: "f", href: "https://facebook.com" },
+  { name: "Instagram", short: "ig", href: "https://instagram.com" },
+  { name: "LinkedIn", short: "in", href: "https://linkedin.com" },
+  { name: "YouTube", short: "▶", href: "https://youtube.com" },
+  { name: "Twitter", short: "𝕏", href: "https://x.com" },
+];
+
+const popularSearches = [
+  { name: "Flats in Gurugram", href: "/properties?propertyType=FLAT&city=Gurugram" },
+  { name: "Luxury Apartments", href: "/categories/luxury" },
+  { name: "Plots in Gurugram", href: "/properties?propertyType=PLOT&city=Gurugram" },
+  { name: "New Launch Projects", href: "/projects" },
+  { name: "Commercial Properties", href: "/categories/commercial" },
+  { name: "SCO Plots", href: "/properties?propertyType=PLOT&search=SCO" },
+  { name: "Luxury Villas", href: "/categories/villas" },
+  { name: "Properties in Delhi NCR", href: "/properties?city=Delhi" },
 ];
 
 export default function Footer() {
-  const [user, setUser] = useState(undefined);
-  useEffect(() => {
-    const loadUser = () => {
-      fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
-        .then((response) => (response.ok ? response.json() : { user: null }))
-        .then((data) => setUser(data.user))
-        .catch(() => setUser(null));
-    };
-    loadUser();
-    window.addEventListener("bhoomi-auth-changed", loadUser);
-    return () => window.removeEventListener("bhoomi-auth-changed", loadUser);
-  }, []);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (newsletterEmail.trim()) {
+      setNewsletterStatus(true);
+      setNewsletterEmail("");
+      setTimeout(() => setNewsletterStatus(false), 5000);
+    }
+  };
+
   return (
-    <footer className="site-footer w-full bg-[#052E16] text-white border-t-2 border-red-600">
+    <footer className="site-footer w-full bg-[#111111] text-white">
 
       {/* =====================================================
           TOP CTA
@@ -77,20 +89,19 @@ export default function Footer() {
       <div className="border-b border-white/10">
         <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8 lg:px-10">
 
-          <div className="relative overflow-hidden rounded-2xl bg-[#14532D]">
+          <div className="relative overflow-hidden rounded-2xl bg-[#1c1c1c]">
 
             {/* Decorative circles */}
-            <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full border border-green-700/20" />
-
-            <div className="absolute -right-5 -top-10 h-48 w-48 rounded-full border border-green-700/15" />
+            <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full border border-[#c41920]/20" />
+            <div className="absolute -right-5 -top-10 h-48 w-48 rounded-full border border-[#c41920]/15" />
 
             <div className="relative z-10 flex flex-col gap-7 px-6 py-8 sm:px-9 lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:py-10">
 
               <div>
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-green-100" />
+                  <ShieldCheck className="h-4 w-4 text-[#ff4d4f]" />
 
-                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-green-100">
+                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#ff4d4f]">
                     Looking for your dream property?
                   </span>
                 </div>
@@ -99,7 +110,7 @@ export default function Footer() {
                   Let our property experts help you.
                 </h2>
 
-                <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
+                <p className="mt-2 max-w-xl text-sm leading-6 text-white/50">
                   Get personalised property recommendations based on your
                   location, budget and lifestyle.
                 </p>
@@ -109,16 +120,15 @@ export default function Footer() {
 
                 <Link
                   href="/properties"
-                  className="group flex items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-green-700"
+                  className="group flex items-center justify-center gap-2 rounded-lg bg-[#c41920] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#a51319]"
                 >
                   Explore Properties
-
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
 
                 <a
                   href="tel:+918500900100"
-                  className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-green-700 hover:text-green-100"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-[#c41920] hover:text-[#c41920]"
                 >
                   <Phone className="h-4 w-4" />
                   Call Now
@@ -147,22 +157,22 @@ export default function Footer() {
               href="/"
               className="inline-flex items-center gap-3"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-700">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#c41920]">
                 <Building2 className="h-6 w-6 text-white" />
               </div>
 
               <div>
                 <span className="block text-xl font-black tracking-tight text-white">
-                  Bhoomi
+                  100<span className="text-[#c41920]">acress</span>
                 </span>
 
-                <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/70">
+                <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/40">
                   Real Estate
                 </span>
               </div>
             </Link>
 
-            <p className="mt-6 max-w-sm text-sm leading-7 text-white/70">
+            <p className="mt-6 max-w-sm text-sm leading-7 text-white/50">
               Your trusted destination for premium residential and
               commercial properties, new launches, luxury projects
               and real estate investments.
@@ -173,29 +183,29 @@ export default function Footer() {
 
               <a
                 href="tel:+918500900100"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-green-100"
+                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[#c41920]"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
-                  <Phone className="h-4 w-4 text-green-100" />
+                  <Phone className="h-4 w-4 text-[#c41920]" />
                 </span>
 
                 <span>+91 8500 900 100</span>
               </a>
 
               <a
-                href="mailto:support@Bhoomi"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-green-100"
+                href="mailto:support@100acress.com"
+                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[#c41920]"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
-                  <Mail className="h-4 w-4 text-green-100" />
+                  <Mail className="h-4 w-4 text-[#c41920]" />
                 </span>
 
-                <span>support@Bhoomi</span>
+                <span>support@100acress.com</span>
               </a>
 
               <div className="flex items-start gap-3 text-sm text-white/60">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5">
-                  <MapPin className="h-4 w-4 text-green-100" />
+                  <MapPin className="h-4 w-4 text-[#c41920]" />
                 </span>
 
                 <span className="leading-6">
@@ -204,7 +214,6 @@ export default function Footer() {
                   India & Dubai, UAE
                 </span>
               </div>
-
             </div>
           </div>
 
@@ -217,19 +226,16 @@ export default function Footer() {
             </h3>
 
             <div className="mt-6 space-y-3.5">
-
-              {quickLinks.filter((link) => user?.verificationStatus === "ACTIVE" || link.name !== "Post Property").map((link) => (
+              {quickLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group flex items-center gap-2 text-sm text-white/70 transition hover:text-green-100"
+                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[#c41920]"
                 >
-                  <ChevronRight className="h-3.5 w-3.5 text-green-100 transition-transform group-hover:translate-x-1" />
-
+                  <ChevronRight className="h-3.5 w-3.5 text-[#c41920] transition-transform group-hover:translate-x-1" />
                   {link.name}
                 </Link>
               ))}
-
             </div>
           </div>
 
@@ -242,19 +248,16 @@ export default function Footer() {
             </h3>
 
             <div className="mt-6 space-y-3.5">
-
               {propertyLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="group flex items-center gap-2 text-sm text-white/70 transition hover:text-green-100"
+                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[#c41920]"
                 >
-                  <ChevronRight className="h-3.5 w-3.5 text-green-100 transition-transform group-hover:translate-x-1" />
-
+                  <ChevronRight className="h-3.5 w-3.5 text-[#c41920] transition-transform group-hover:translate-x-1" />
                   {link.name}
                 </Link>
               ))}
-
             </div>
           </div>
 
@@ -267,19 +270,16 @@ export default function Footer() {
             </h3>
 
             <div className="mt-6 space-y-3.5">
-
               {popularLocations.map((location) => (
                 <Link
                   key={location.name}
                   href={location.href}
-                  className="group flex items-center gap-2 text-sm text-white/70 transition hover:text-green-100"
+                  className="group flex items-center gap-2 text-sm text-white/50 transition hover:text-[#c41920]"
                 >
-                  <MapPin className="h-3.5 w-3.5 text-green-100" />
-
+                  <MapPin className="h-3.5 w-3.5 text-[#c41920]" />
                   {location.name}
                 </Link>
               ))}
-
             </div>
           </div>
 
@@ -292,43 +292,49 @@ export default function Footer() {
               Get Property Updates
             </h3>
 
-            <p className="mt-6 text-sm leading-6 text-white/70">
+            <p className="mt-6 text-sm leading-6 text-white/50">
               Stay updated with new launches, premium projects and
               exclusive property opportunities.
             </p>
 
-            {/* Email */}
-            <div className="mt-5 flex overflow-hidden rounded-lg border border-white/10 bg-white/[0.04]">
+            {/* Email Form */}
+            <form onSubmit={handleSubscribe} className="mt-5">
+              <div className="flex overflow-hidden rounded-lg border border-white/10 bg-white/[0.04]">
+                <input
+                  type="email"
+                  required
+                  placeholder="Your email address"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
+                />
 
-              <input
-                type="email"
-                suppressHydrationWarning
-                placeholder="Your email address"
-                className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
-              />
-
-              <button
-                type="button"
-                suppressHydrationWarning
-                aria-label="Subscribe"
-                className="flex w-12 shrink-0 items-center justify-center bg-green-700 transition hover:bg-green-700"
-              >
-                <ArrowRight className="h-4 w-4 text-white" />
-              </button>
-
-            </div>
+                <button
+                  type="submit"
+                  aria-label="Subscribe to property updates"
+                  className="flex w-12 shrink-0 items-center justify-center bg-[#c41920] transition hover:bg-[#a51319]"
+                >
+                  <ArrowRight className="h-4 w-4 text-white" />
+                </button>
+              </div>
+              {newsletterStatus && (
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-green-400">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Thank you for subscribing!</span>
+                </div>
+              )}
+            </form>
 
             {/* Assistance */}
-            <div className="mt-4 flex items-center gap-2 text-xs text-white/35">
-              <Clock3 className="h-3.5 w-3.5 text-green-100" />
-
+            <div className="mt-4 flex items-center gap-2 text-xs text-white/50">
+              <Clock3 className="h-3.5 w-3.5 text-[#c41920]" />
               Expert assistance available
             </div>
 
             {/* Social */}
             <div className="mt-7">
 
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/70">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/40">
                 Follow Us
               </p>
 
@@ -338,8 +344,10 @@ export default function Footer() {
                   <a
                     key={social.name}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={social.name}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-extrabold text-[#14532D] shadow-sm transition-all duration-200 hover:scale-110 hover:bg-[#15803D] hover:text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-white/50 transition hover:border-[#c41920] hover:bg-[#c41920] hover:text-white"
                   >
                     {social.short}
                   </a>
@@ -354,7 +362,7 @@ export default function Footer() {
       {/* =====================================================
           POPULAR SEARCHES
       ===================================================== */}
-      <div className="border-y border-white/10 bg-[#042411]">
+      <div className="border-y border-white/10 bg-[#0d0d0d]">
 
         <div className="mx-auto max-w-[1400px] px-5 py-8 sm:px-8 lg:px-10">
 
@@ -364,22 +372,13 @@ export default function Footer() {
 
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
 
-            {[
-              "Flats in Gurugram",
-              "Luxury Apartments",
-              "Plots in Gurugram",
-              "New Launch Projects",
-              "Commercial Properties",
-              "SCO Plots",
-              "Luxury Villas",
-              "Properties in Delhi NCR",
-            ].map((item) => (
+            {popularSearches.map((item) => (
               <Link
-                key={item}
-                href="/properties"
-                className="text-xs text-white/40 transition hover:text-green-300"
+                key={item.name}
+                href={item.href}
+                className="text-xs text-white/35 transition hover:text-[#c41920]"
               >
-                {item}
+                {item.name}
               </Link>
             ))}
 
@@ -394,8 +393,8 @@ export default function Footer() {
 
         <div className="flex flex-col gap-5 py-6 md:flex-row md:items-center md:justify-between">
 
-          <p className="text-xs leading-5 text-white/40">
-            © 2019–{new Date().getFullYear()} Bhoomi. All Rights Reserved.
+          <p className="text-xs leading-5 text-white/35">
+            © 2019–{new Date().getFullYear()} 100acress.com. All Rights Reserved.
             <span className="hidden sm:inline"> · </span>
             A Venture of Kaushraj Global LLP
           </p>
@@ -406,7 +405,7 @@ export default function Footer() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-xs text-white/40 transition hover:text-green-300"
+                className="text-xs text-white/35 transition hover:text-[#c41920]"
               >
                 {link.name}
               </Link>
@@ -418,9 +417,9 @@ export default function Footer() {
         {/* Made in India */}
         <div className="border-t border-white/10 py-5 text-center">
 
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-white/30">
             Made with{" "}
-            <span className="text-red-500">♥</span>{" "}
+            <span className="text-[#c41920]">♥</span>{" "}
             in India
           </p>
 

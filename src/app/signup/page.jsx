@@ -611,7 +611,7 @@ export default function SignupPage() {
                           <div className="signup-doc-uploaded">
                             <div className="signup-doc-uploaded-info">
                               <FileText size={18} className="signup-doc-uploaded-icon" />
-                              <span className="signup-doc-uploaded-name">
+                              <span className="signup-doc-uploaded-name" title={documents[field].name}>
                                 {documents[field].name}
                               </span>
                             </div>

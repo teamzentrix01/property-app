@@ -70,7 +70,7 @@ const builders = [
 
 export default function PopularBuilders() {
   return (
-    <section className="w-full bg-white py-12 sm:py-16">
+    <section className="w-full bg-white py-16 sm:py-20 lg:py-12">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -79,17 +79,17 @@ export default function PopularBuilders() {
           <div>
             {/* Small Label */}
             <div className="mb-3 flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-green-700" />
+              <Building2 className="h-4 w-4 text-[#c41920]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-green-700">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#c41920]">
                 Trusted Developers
               </span>
             </div>
 
             {/* Heading */}
-            <h2 className="section-title text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+            <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               Popular{" "}
-              <span className="text-green-700">
+              <span className="text-[#c41920]">
                 Builders
               </span>
             </h2>
@@ -101,7 +101,7 @@ export default function PopularBuilders() {
           </div>
 
           {/* View All */}
-          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-green-700">
+          <button className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[#c41920]">
             View All Builders
 
             <ArrowRight
@@ -112,45 +112,39 @@ export default function PopularBuilders() {
 
         {/* ================= BUILDER GRID ================= */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-
           {builders.map((builder) => (
             <button
               key={builder.id}
-              className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 text-left shadow-[0_4px_18px_rgba(0,0,0,0.045)] transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_15px_35px_rgba(0,0,0,0.09)]"
+              className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 text-left shadow-[0_4px_18px_rgba(0,0,0,0.045)] transition-all duration-300 hover:-translate-y-1.5 hover:border-red-200 hover:shadow-[0_18px_35px_rgba(196,25,32,0.08)]"
             >
-
-              {/* Gold corner */}
+              {/* Crimson accent corner */}
               <div className="absolute right-0 top-0 h-16 w-16 overflow-hidden">
-                <div className="absolute right-[-25px] top-[-25px] h-16 w-16 rounded-full bg-slate-50" />
+                <div className="absolute right-[-25px] top-[-25px] h-16 w-16 rounded-full bg-red-50 transition-all duration-300 group-hover:bg-red-100" />
               </div>
 
               {/* Logo / Initial */}
               <div className="relative flex items-center justify-between">
-
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-gray-200 bg-slate-50">
-
-                  <span className="text-sm font-black tracking-tight text-green-700">
+                <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-red-100 bg-red-50/60 transition-all duration-300 group-hover:border-[#c41920] group-hover:bg-[#c41920]">
+                  <span className="text-sm font-black tracking-tight text-[#c41920] transition-colors duration-300 group-hover:text-white">
                     {builder.initial}
                   </span>
-
                 </div>
 
                 {/* Arrow */}
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-100 bg-white transition-all duration-300 group-hover:border-green-700 group-hover:bg-green-700">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-100 bg-white transition-all duration-300 group-hover:border-[#c41920] group-hover:bg-[#c41920]">
                   <ChevronRight className="h-4 w-4 text-gray-400 transition group-hover:text-white" />
                 </div>
               </div>
 
               {/* Builder Name */}
-              <h3 className="mt-5 text-base font-bold text-[#171717] transition group-hover:text-green-700 sm:text-lg">
+              <h3 className="mt-5 text-base font-bold text-[#171717] transition group-hover:text-[#c41920] sm:text-lg">
                 {builder.name}
               </h3>
 
               {/* Projects */}
               <div className="mt-2 flex items-center gap-1.5">
-                <Star className="h-3.5 w-3.5 fill-[#15803d] text-green-700" />
-
-                <span className="text-xs font-semibold text-green-700">
+                <Star className="h-3.5 w-3.5 fill-[#c41920] text-[#c41920]" />
+                <span className="text-xs font-semibold text-[#c41920]">
                   {builder.projects}
                 </span>
               </div>
@@ -162,35 +156,34 @@ export default function PopularBuilders() {
 
               {/* Bottom */}
               <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
-
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-gray-400">
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-gray-400 transition-colors group-hover:text-[#c41920]">
                   View Projects
                 </span>
 
-                <ArrowRight className="h-3.5 w-3.5 text-green-700 transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight className="h-3.5 w-3.5 text-[#c41920] transition-transform duration-300 group-hover:translate-x-1.5" />
               </div>
             </button>
           ))}
         </div>
 
         {/* ================= TRUST BANNER ================= */}
-        <div className="relative mt-10 overflow-hidden rounded-2xl bg-green-900">
+        <div className="relative mt-10 overflow-hidden rounded-2xl bg-[#191919]">
 
           {/* Decorative circles */}
-          <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full border border-green-700/20" />
+          <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full border border-[#c41920]/20" />
 
-          <div className="absolute -right-3 -top-9 h-44 w-44 rounded-full border border-green-700/15" />
+          <div className="absolute -right-3 -top-9 h-44 w-44 rounded-full border border-[#c41920]/15" />
 
           <div className="relative z-10 flex flex-col gap-6 px-6 py-8 sm:px-9 lg:flex-row lg:items-center lg:justify-between lg:px-12">
 
             <div className="flex items-start gap-4">
 
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-700/15">
-                <ShieldCheck className="h-6 w-6 text-green-700" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#c41920]/20 border border-[#c41920]/30 shadow-inner">
+                <ShieldCheck className="h-6 w-6 text-[#ff4d4f]" />
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-green-700">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#ff4d4f]">
                   Trusted Developers
                 </p>
 
@@ -198,7 +191,7 @@ export default function PopularBuilders() {
                   Find your property from trusted builders.
                 </h3>
 
-                <p className="mt-1 text-sm text-white/50">
+                <p className="mt-1 text-sm text-white/70">
                   Compare projects, locations, prices and amenities
                   before making your decision.
                 </p>
@@ -206,7 +199,7 @@ export default function PopularBuilders() {
 
             </div>
 
-            <button className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-green-700 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-green-700">
+            <button className="group flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#c41920] px-7 py-3.5 text-sm font-bold text-white transition hover:bg-[#a51319]">
               Explore Builders
 
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

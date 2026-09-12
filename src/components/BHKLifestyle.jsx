@@ -91,7 +91,7 @@ export default function BHKLifestyle() {
     bhkOptions.find((item) => item.id === activeBhk) || bhkOptions[2];
 
   return (
-    <section className="w-full bg-slate-50 py-12 sm:py-16">
+    <section className="w-full bg-[#f7f6f3] py-16 sm:py-20 lg:py-12">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -99,17 +99,17 @@ export default function BHKLifestyle() {
 
           {/* Label */}
           <div className="mb-4 flex items-center justify-center gap-2">
-            <Sparkles className="h-4 w-4 text-green-700" />
+            <Sparkles className="h-4 w-4 text-[#c41920]" />
 
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-green-700">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#c41920]">
               Find Your Perfect Home
             </span>
           </div>
 
           {/* Heading */}
-          <h2 className="section-title text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+          <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
             Which BHK suits your{" "}
-            <span className="text-green-700">
+            <span className="text-[#c41920]">
               lifestyle best?
             </span>
           </h2>
@@ -127,11 +127,10 @@ export default function BHKLifestyle() {
             <button
               key={bhk.id}
               onClick={() => setActiveBhk(bhk.id)}
-              className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-300 sm:px-7 ${
-                activeBhk === bhk.id
-                  ? "border-green-700 bg-green-700 text-white shadow-md"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-green-700 hover:text-green-700"
-              }`}
+              className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-300 sm:px-7 ${activeBhk === bhk.id
+                  ? "border-[#c41920] bg-[#c41920] text-white shadow-md"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-[#c41920] hover:text-[#c41920]"
+                }`}
             >
               {bhk.id}
             </button>
@@ -139,7 +138,7 @@ export default function BHKLifestyle() {
         </div>
 
         {/* ================= MAIN CONTENT ================= */}
-        <div className="mt-10 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_8px_35px_rgba(0,0,0,0.06)]">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-[#e7e2d8] bg-white shadow-[0_8px_35px_rgba(0,0,0,0.06)]">
 
           <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
 
@@ -157,13 +156,13 @@ export default function BHKLifestyle() {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-black/10" />
 
               {/* Decorative */}
-              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-green-700/25" />
+              <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full border border-[#c41920]/25" />
 
               <div className="absolute bottom-0 left-0 right-0 p-7 sm:p-10">
 
                 {/* BHK */}
                 <div className="flex h-20 w-20 items-center justify-center rounded-xl border border-white/20 bg-black/35 backdrop-blur-md">
-                  <span className="text-2xl font-black text-green-100">
+                  <span className="text-2xl font-black text-[#ff4d4f]">
                     {selected.id.replace(" BHK", "")}
                     <span className="text-sm"> BHK</span>
                   </span>
@@ -173,13 +172,13 @@ export default function BHKLifestyle() {
                   {selected.title}
                 </h3>
 
-                <p className="mt-2 text-sm font-medium text-green-700">
+                <p className="mt-2 text-sm font-medium text-[#ff4d4f]">
                   {selected.subtitle}
                 </p>
 
                 {/* Size */}
                 <div className="mt-6 flex items-center gap-2 text-sm text-white/70">
-                  <Home className="h-4 w-4 text-green-700" />
+                  <Home className="h-4 w-4 text-[#ff4d4f]" />
                   Typical Size:{" "}
                   <span className="font-semibold text-white">
                     {selected.size}
@@ -194,8 +193,8 @@ export default function BHKLifestyle() {
               {/* Ideal For */}
               <div className="flex items-center gap-3">
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-slate-50">
-                  <Users className="h-5 w-5 text-green-700" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-red-50 border border-red-100">
+                  <Users className="h-5 w-5 text-[#c41920]" />
                 </div>
 
                 <div>
@@ -203,53 +202,69 @@ export default function BHKLifestyle() {
                     Ideal For
                   </p>
 
-                  <p className="mt-1 text-sm font-bold text-[#171717]">
+                  <p className="text-base font-bold text-[#171717]">
                     {selected.idealFor}
                   </p>
                 </div>
-
               </div>
 
-              {/* Description */}
-              <p className="mt-7 text-sm leading-7 text-gray-500 sm:text-base">
-                {selected.description}
-              </p>
+              {/* Features List */}
+              <div className="mt-7 space-y-3">
+                {selected.features.map((feature, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-[#c41920]" />
 
-              {/* Features */}
-              <div className="mt-7 border-t border-gray-100 pt-6">
+                    <span className="text-sm font-medium text-gray-700">
+                      {feature}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-                <p className="text-xs font-bold uppercase tracking-[0.15em] text-gray-400">
-                  Why choose this configuration?
+              {/* Lifestyle Description */}
+              <div className="mt-8 rounded-xl border border-gray-100 bg-[#fafafa] p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Lifestyle Perspective
                 </p>
 
-                <div className="mt-4 space-y-3">
+                <p className="mt-2 text-sm leading-6 text-gray-600">
+                  {selected.lifestyle}
+                </p>
+              </div>
 
-                  {selected.features.map((feature, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3"
-                    >
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-green-700" />
+              {/* Price Guidance */}
+              <div className="mt-7 flex items-center justify-between border-t border-gray-100 pt-6">
+                <div>
+                  <span className="text-xs text-gray-400">
+                    Price Guidance
+                  </span>
 
-                      <span className="text-sm text-gray-600">
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
+                  <p className="text-xl font-bold text-[#171717]">
+                    {selected.priceRange}
+                  </p>
+                </div>
 
+                <div className="text-right">
+                  <span className="text-xs text-gray-400">
+                    Growth Potential
+                  </span>
+
+                  <p className="text-sm font-semibold text-green-600">
+                    High Demand Category
+                  </p>
                 </div>
               </div>
 
               {/* CTA */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
 
-                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg bg-green-700 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700">
+                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg bg-[#c41920] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#a51319]">
                   Explore {selected.id} Properties
 
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
 
-                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-green-700 hover:text-green-700">
+                <Link href="/properties" className="group flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:border-[#c41920] hover:text-[#c41920]">
                   View All
 
                   <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -263,13 +278,13 @@ export default function BHKLifestyle() {
         {/* ================= BOTTOM MESSAGE ================= */}
         <div className="mt-7 flex flex-col items-center justify-center gap-2 text-center sm:flex-row">
 
-          <Home className="h-4 w-4 text-green-700" />
+          <Home className="h-4 w-4 text-[#c41920]" />
 
           <p className="text-sm text-gray-500">
             Not sure which BHK is right for you?
           </p>
 
-          <button className="text-sm font-bold text-green-700 underline underline-offset-4 hover:text-green-900">
+          <button className="text-sm font-bold text-[#c41920] underline underline-offset-4 hover:text-[#a51319]">
             Get personalised recommendations
           </button>
 
