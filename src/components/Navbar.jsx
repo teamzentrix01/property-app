@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import BhoomiMark from "@/components/BhoomiMark";
-
 import {
   Search,
   MapPin,
@@ -16,7 +15,88 @@ import {
   Plus,
   Phone,
   Lock,
+  Mic,
+  Map as MapIcon,
+  ChevronsUpDown,
 } from "lucide-react";
+
+const searchTabs = [
+  { label: "Cities", key: "Cities" },
+  { label: "Apartments", key: "Apartments" },
+  { label: "Branded", key: "Branded" },
+  { label: "Luxury", key: "Luxury" },
+  { label: "Commercial", key: "Commercial" },
+  { label: "Rental", key: "Rental" },
+  { label: "Villas", key: "Villas" },
+  { label: "Plots / Land", key: "Plots" },
+  { label: "Farmhouses", key: "Farmhouses" },
+];
+
+const propertyTypeOptions = [
+  { label: "All Types", value: "" },
+  { label: "Apartment / Flat", value: "FLAT" },
+  { label: "Independent House", value: "HOUSE" },
+  { label: "Luxury Villa", value: "VILLA" },
+  { label: "Plots / Land", value: "PLOT" },
+  { label: "Commercial Space", value: "COMMERCIAL" },
+  { label: "Builder Floor", value: "BUILDER_FLOOR" },
+  { label: "Farmhouse", value: "FARMHOUSE" },
+];
+
+const locationsData = {
+  Gurugram: [
+    "Golf Course Road",
+    "Golf Course Extension",
+    "Sector 54",
+    "Sector 56",
+    "Sector 65",
+    "Sector 68",
+    "Sector 79",
+    "Dwarka Expressway",
+    "Sohna Road",
+  ],
+  Delhi: [
+    "Dwarka",
+    "Rohini",
+    "Pitampura",
+    "Janakpuri",
+    "Saket",
+    "Vasant Kunj",
+    "Greater Kailash",
+    "Rajouri Garden",
+  ],
+  Noida: [
+    "Sector 15",
+    "Sector 18",
+    "Sector 50",
+    "Sector 62",
+    "Sector 75",
+    "Sector 137",
+    "Sector 150",
+  ],
+  "Greater Noida": [
+    "Pari Chowk",
+    "Alpha 1",
+    "Beta 1",
+    "Greater Noida West",
+    "Techzone",
+    "Gaur City",
+  ],
+  Moradabad: [
+    "New Moradabad",
+    "Ram Ganga Vihar",
+    "Civil Lines",
+    "Delhi Road",
+    "Kanth Road",
+  ],
+  Meerut: [
+    "Shastri Nagar",
+    "Pallavpuram",
+    "Modipuram",
+    "Civil Lines",
+    "Delhi Road",
+  ],
+};
 
 export default function Navbar() {
   const [user, setUser] = useState(undefined);
@@ -24,9 +104,132 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [lockedNotice, setLockedNotice] = useState(false);
 
+  // Scrolled search bar states matching hero widget
+  const [activeTab, setActiveTab] = useState("Cities");
+  const [propertyType, setPropertyType] = useState("");
+  const [location, setLocation] = useState("");
+  const [showLocations, setShowLocations] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const dropdownRef = useRef(null);
+
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Location suggestions logic
+  const getLocationSuggestions = () => {
+    if (!location.trim()) return [];
+    const searchValue = location.toLowerCase().trim();
+    const results = [];
+
+    Object.keys(locationsData).forEach((city) => {
+      if (city.toLowerCase().includes(searchValue)) {
+        results.push({ name: city, type: "City" });
+      }
+      locationsData[city].forEach((area) => {
+        if (area.toLowerCase().includes(searchValue)) {
+          results.push({ name: area, type: "Area", city });
+        }
+      });
+    });
+
+    return results.slice(0, 8);
+  };
+
+  const suggestions = getLocationSuggestions();
+
+  // Close suggestions when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowLocations(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Voice Search Handler
+  const handleVoiceSearch = () => {
+    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+      alert("Voice search is not supported in your browser.");
+      return;
+    }
+
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-IN";
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setLocation(transcript);
+      setIsListening(false);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
+  };
+
+  // Tab click handler
+  const handleTabClick = (tab) => {
+    setActiveTab(tab.key);
+    if (tab.key === "Cities") {
+      setPropertyType("");
+    } else if (tab.key === "Apartments") {
+      setPropertyType("FLAT");
+    } else if (tab.key === "Villas") {
+      setPropertyType("HOUSE");
+    } else if (tab.key === "Plots") {
+      setPropertyType("PLOT");
+    } else if (tab.key === "Commercial") {
+      setPropertyType("COMMERCIAL");
+    }
+  };
+
+  // Scrolled Search Submission
+  const handleScrolledSearch = (e) => {
+    if (e) e.preventDefault();
+    const params = new URLSearchParams();
+
+    if (location.trim()) {
+      params.set("search", location.trim());
+    }
+
+    if (propertyType) {
+      params.set("propertyType", propertyType);
+    }
+
+    if (activeTab === "Rental") {
+      params.set("purpose", "RENT");
+    } else if (activeTab === "Commercial") {
+      params.set("category", "COMMERCIAL");
+    } else if (activeTab === "Luxury") {
+      params.set("category", "LUXURY");
+    } else if (activeTab === "Branded") {
+      params.set("category", "BRANDED");
+    } else if (activeTab === "Villas") {
+      params.set("propertyType", "HOUSE");
+    } else if (activeTab === "Plots") {
+      params.set("propertyType", "PLOT");
+    } else if (activeTab === "Apartments") {
+      params.set("propertyType", "FLAT");
+    }
+
+    router.push(`/properties?${params.toString()}`);
+  };
+
+  // Scrolled Open Map Handler
+  const handleOpenMap = () => {
+    const params = new URLSearchParams();
+    if (location.trim()) params.set("search", location.trim());
+    params.set("view", "map");
+    router.push(`/properties?${params.toString()}`);
+  };
 
   function submitListingSearch(event) {
     event.preventDefault();
@@ -34,10 +237,10 @@ export default function Navbar() {
     const params = new URLSearchParams();
     const search = String(form.get("search") || "").trim();
     const selectedType = String(form.get("propertyType") || "");
-    const propertyType = { Apartments: "FLAT", Villas: "HOUSE", Commercial: "COMMERCIAL" }[selectedType] || selectedType;
+    const propType = { Apartments: "FLAT", Villas: "HOUSE", Commercial: "COMMERCIAL" }[selectedType] || selectedType;
     const budget = String(form.get("budget") || "");
     if (search) params.set("search", search);
-    if (propertyType) params.set("propertyType", propertyType);
+    if (propType) params.set("propertyType", propType);
     if (budget.startsWith("Below")) {
       params.set("maxPrice", "5000000");
     } else if (budget.startsWith("Above")) {
@@ -59,13 +262,17 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      // On homepage, trigger once user scrolls past hero banner (~200px)
+      // On other pages, trigger when scrolling starts (~60px)
+      const threshold = pathname === "/" ? 200 : 60;
+      setScrolled(window.scrollY > threshold);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     let active = true;
@@ -108,7 +315,10 @@ export default function Navbar() {
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
 
           {/* ================= HEADER BAR ================= */}
-          <div className="flex h-20 items-center justify-between gap-5">
+          <div
+            className={`flex items-center justify-between gap-5 transition-all duration-300 ${scrolled ? "h-14 sm:h-16" : "h-20"
+              }`}
+          >
 
             {/* Logo */}
             <Link
@@ -266,87 +476,153 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* =================================================
-              SEARCH BAR
-          ================================================== */}
-          <div className="hidden border-t border-[#fecdd3] bg-[#fff1f2]/70 py-4 lg:block">
+          {/* =====================================================
+              SCROLLED SEARCH BAR & OPTIONS TABS (EXACTLY AS SCREENSHOT)
+          ====================================================== */}
+          <div
+            className={`transition-all duration-300 ease-in-out border-t border-[#fecdd3]/60 ${scrolled
+                ? "max-h-[220px] opacity-100 py-3 block"
+                : "max-h-0 opacity-0 py-0 overflow-hidden pointer-events-none hidden"
+              }`}
+          >
+            <div className="mx-auto max-w-5xl">
+              <div className="rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)]">
+                {/* 1. Category Tabs Row */}
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+                  <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar py-0.5">
+                    {searchTabs.map((tab) => {
+                      const isActive = activeTab === tab.key;
+                      return (
+                        <button
+                          key={tab.key}
+                          type="button"
+                          onClick={() => handleTabClick(tab)}
+                          className={`relative shrink-0 pb-1.5 text-xs sm:text-[13px] transition-all duration-200 ${isActive
+                              ? "font-bold text-slate-900"
+                              : "font-medium text-slate-500 hover:text-slate-800"
+                            }`}
+                        >
+                          {tab.label}
+                          {isActive && (
+                            <span className="absolute bottom-[-9px] left-0 right-0 h-[2.5px] rounded-full bg-[#c41920]" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-            <form
-              key={`desktop-search-${searchParams.toString()}`}
-              onSubmit={submitListingSearch}
-              className="site-search grid gap-2 rounded-xl bg-[#8e1016] p-2 shadow-sm shadow-[#200406]/20 md:grid-cols-[1fr_1fr_1fr_auto]"
-            >
-              {/* Location */}
-              <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 transition focus-within:border-[#c41920] focus-within:ring-2 focus-within:ring-[#fff1f2]">
-                <MapPin
-                  className="shrink-0 text-[#c41920]"
-                  size={18}
-                />
+                  {/* Vertical Scroll / Arrow Icon matching screenshot */}
+                  <div className="hidden sm:flex shrink-0 items-center text-slate-400 pl-3">
+                    <ChevronsUpDown size={16} />
+                  </div>
+                </div>
 
-                <input
-                  name="search"
-                  type="text"
-                  defaultValue={searchParams.get("search") || ""}
-                  placeholder="Search City, Locality or Project..."
-                  className="w-full bg-transparent text-xs font-semibold text-[#180e0f] outline-none placeholder:text-gray-400"
-                />
-              </div>
-
-              {/* Property Type */}
-              <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 transition focus-within:border-[#c41920] focus-within:ring-2 focus-within:ring-[#fff1f2]">
-                <span className="shrink-0 text-sm font-bold text-[#c41920]">
-                  🏢
-                </span>
-
-                <select
-                  name="propertyType"
-                  className="w-full bg-transparent text-xs font-semibold text-[#180e0f] outline-none"
+                {/* 2. Search Input Row */}
+                <form
+                  onSubmit={handleScrolledSearch}
+                  className="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3"
                 >
-                  <option value="">All Types</option>
-                  <option value="FLAT">Apartments</option>
-                  <option value="HOUSE">Villas / Houses</option>
-                  <option value="COMMERCIAL">Commercial</option>
-                </select>
+                  {/* Location Input with Pin & Mic */}
+                  <div
+                    ref={dropdownRef}
+                    className="relative flex-1 w-full flex items-center rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2 transition-all focus-within:border-[#c41920] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#c41920]/10"
+                  >
+                    <MapPin className="h-4 w-4 shrink-0 text-slate-400 mr-2.5" />
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(e) => {
+                        setLocation(e.target.value);
+                        setShowLocations(true);
+                      }}
+                      onFocus={() => {
+                        if (location.trim()) setShowLocations(true);
+                      }}
+                      placeholder="Search City, Locality or Project..."
+                      className="w-full bg-transparent text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 outline-none"
+                    />
 
-                <ChevronDown
-                  size={12}
-                  className="shrink-0 text-[#c41920]"
-                />
+                    {/* Mic Icon */}
+                    <button
+                      type="button"
+                      onClick={handleVoiceSearch}
+                      title={isListening ? "Listening..." : "Search by voice"}
+                      className={`ml-2 shrink-0 p-1 rounded-lg transition-colors ${isListening
+                          ? "text-[#c41920] animate-pulse bg-red-50"
+                          : "text-slate-400 hover:text-[#c41920]"
+                        }`}
+                    >
+                      <Mic className="h-4 w-4" />
+                    </button>
+
+                    {/* Suggestions Dropdown */}
+                    {showLocations && suggestions.length > 0 && (
+                      <div className="absolute left-0 right-0 top-[115%] z-50 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl">
+                        {suggestions.map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setLocation(item.name);
+                              setShowLocations(false);
+                            }}
+                            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm hover:bg-red-50/70 hover:text-[#c41920] transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                              <span className="font-medium text-slate-800">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-slate-400">
+                              {item.type === "City" ? "City" : item.city}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* All Types Select Dropdown */}
+                  <div className="relative w-full sm:w-44 shrink-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2 transition-all focus-within:border-[#c41920] focus-within:bg-white">
+                    <select
+                      value={propertyType}
+                      onChange={(e) => setPropertyType(e.target.value)}
+                      className="w-full cursor-pointer appearance-none bg-transparent pr-6 text-xs sm:text-sm font-medium text-slate-800 outline-none"
+                    >
+                      {propertyTypeOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  </div>
+
+                  {/* Red Search Button */}
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 rounded-xl bg-[#c41920] hover:bg-[#b0161c] px-6 sm:px-7 py-2 text-xs sm:text-sm font-bold text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                  >
+                    <Search className="h-4 w-4" />
+                    <span>Search</span>
+                  </button>
+
+                  {/* Red Map Button */}
+                  <button
+                    type="button"
+                    onClick={handleOpenMap}
+                    title="View on Map"
+                    className="hidden sm:flex shrink-0 items-center justify-center rounded-xl bg-[#c41920] hover:bg-[#b0161c] p-2 text-white shadow-md hover:shadow-lg transition-all active:scale-95"
+                  >
+                    <MapIcon className="h-4 w-4" />
+                  </button>
+                </form>
               </div>
-
-              {/* Budget */}
-              <div className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-white px-3 py-2 transition focus-within:border-[#c41920] focus-within:ring-2 focus-within:ring-[#fff1f2]">
-                <span className="shrink-0 text-sm font-bold text-[#c41920]">
-                  ₹
-                </span>
-
-                <select
-                  name="budget"
-                  className="w-full bg-transparent text-xs font-semibold text-[#180e0f] outline-none"
-                >
-                  <option>Any Budget</option>
-                  <option>Below ₹50 Lakh</option>
-                  <option>₹50L - ₹1 Cr</option>
-                  <option>₹1 Cr - ₹5 Cr</option>
-                  <option>Above ₹5 Cr</option>
-                </select>
-
-                <ChevronDown
-                  size={12}
-                  className="shrink-0 text-[#c41920]"
-                />
-              </div>
-
-              {/* Search Button */}
-              <button
-                type="submit"
-                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#c41920] to-[#d9252c] px-6 py-2 text-xs font-semibold text-white shadow-sm shadow-[#200406]/15 transition hover:from-[#8e1016] hover:to-[#c41920]"
-              >
-                <Search size={16} />
-                Search
-              </button>
-            </form>
+            </div>
           </div>
+
+
         </div>
 
         {/* =====================================================

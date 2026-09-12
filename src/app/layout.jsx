@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import RegisterSW from "@/components/RegisterSW";
 import Footer from "@/components/Footer";
 import LoginPopupModal from "@/components/LoginPopupModal";
+import AccountVerifiedModal from "@/components/AccountVerifiedModal";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -58,6 +59,7 @@ export default async function RootLayout({ children }) {
           {children}
           {!isAdminRoute && <Footer />}
           {!isAdminRoute && <LoginPopupModal />}
+          {!isAdminRoute && <AccountVerifiedModal />}
         </SmoothScroll>
       </body>
     </html>

@@ -40,9 +40,10 @@ export default function ManageUsers() {
   const [loadingDocId, setLoadingDocId] = useState(null);
   const [statusTab, setStatusTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc"); // Default FIFO: First In, First Out
 
   const loadUsers = () => {
-    fetch("/api/admin/users").then(async (r) => {
+    fetch(`/api/admin/users?order=${sortOrder}`).then(async (r) => {
       const data = await r.json();
       if (!r.ok) return setError(data.error || "Not authorized");
       setUsers(data.users);
@@ -55,7 +56,7 @@ export default function ManageUsers() {
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [sortOrder]);
 
   async function update(userId, patch) {
     const res = await fetch("/api/admin/users", {
@@ -65,12 +66,33 @@ export default function ManageUsers() {
     });
     const data = await res.json();
     if (res.ok) {
+      if (patch.verified === true) {
+        alert(data.emailSent ? "User verified! Confirmation email sent to " + (data.user?.email || "user") : "User verified successfully.");
+      }
       setUsers((us) => us.map((u) => (u.id === userId ? data.user : u)));
       if (selectedUser && selectedUser.id === userId) {
         setSelectedUser(data.user);
       }
     } else {
       alert(data.error || "Update failed");
+    }
+  }
+
+  async function resendVerificationEmail(userId, userEmail) {
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, action: "RESEND_VERIFICATION_EMAIL" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.emailSent) {
+        alert("Verification email sent successfully to " + userEmail);
+      } else {
+        alert(data.error || data.message || "Failed to send verification email");
+      }
+    } catch (err) {
+      alert("Error sending email: " + err.message);
     }
   }
 
@@ -223,15 +245,30 @@ export default function ManageUsers() {
           </button>
         </div>
 
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search name, email, phone..."
-            className="rounded-xl border border-gray-200 bg-white pl-8 pr-3.5 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600/30 w-64"
-          />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* FIFO / LIFO Order Toggle */}
+          <button
+            type="button"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-2xs cursor-pointer"
+            title="Toggle FIFO (First In First Out) or LIFO (Newest First)"
+          >
+            <span className="text-gray-400">Order:</span>
+            <span className={sortOrder === "asc" ? "text-emerald-700 font-bold" : "text-blue-700 font-bold"}>
+              {sortOrder === "asc" ? "FIFO (Oldest First)" : "LIFO (Newest First)"}
+            </span>
+          </button>
+
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search name, email, phone..."
+              className="rounded-xl border border-gray-200 bg-white pl-8 pr-3.5 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600/30 w-56"
+            />
+          </div>
         </div>
       </div>
 
@@ -240,8 +277,10 @@ export default function ManageUsers() {
         <table className="w-full text-sm">
           <thead className="bg-paper-dim font-data text-xs uppercase text-ink-soft">
             <tr>
+              <th className="text-left p-3">#</th>
               <th className="text-left p-3">Name</th>
               <th className="text-left p-3">Contact</th>
+              <th className="text-left p-3">Joined</th>
               <th className="text-left p-3">Role</th>
               <th className="text-left p-3">Admin area</th>
               <th className="text-left p-3">Documents</th>
@@ -252,7 +291,7 @@ export default function ManageUsers() {
           <tbody>
             {displayedUsers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-sm text-slate-400">
+                <td colSpan={9} className="p-8 text-center text-sm text-slate-400">
                   {statusTab === "rejected"
                     ? "No rejected accounts."
                     : statusTab === "verified"
@@ -263,35 +302,62 @@ export default function ManageUsers() {
                 </td>
               </tr>
             ) : (
-              displayedUsers.map((u) => {
-                const docs = u.documents || [];
-                const verifiedDocs = docs.filter((d) => d.verificationStatus === "VERIFIED");
-                const pendingDocs = docs.filter((d) => d.verificationStatus === "PENDING");
-                const rejectedDocs = docs.filter((d) => d.verificationStatus === "REJECTED");
-                const allDocsVerified = docs.length > 0 && docs.length === verifiedDocs.length;
-                const isRejected = u.verificationStatus === "REJECTED";
+              [...displayedUsers]
+                .sort((a, b) => {
+                  const tA = new Date(a.createdAt).getTime() || 0;
+                  const tB = new Date(b.createdAt).getTime() || 0;
+                  return sortOrder === "asc" ? tA - tB : tB - tA;
+                })
+                .map((u, index) => {
+                  const docs = u.documents || [];
+                  const verifiedDocs = docs.filter((d) => d.verificationStatus === "VERIFIED");
+                  const pendingDocs = docs.filter((d) => d.verificationStatus === "PENDING");
+                  const rejectedDocs = docs.filter((d) => d.verificationStatus === "REJECTED");
+                  const allDocsVerified = docs.length > 0 && docs.length === verifiedDocs.length;
+                  const isRejected = u.verificationStatus === "REJECTED";
 
-                return (
-                  <tr key={u.id} className="border-t border-ink/10 hover:bg-slate-50/50 transition">
-                    <td className="p-3">
-                      <Link
-                        href={`/admin/users/${u.id}`}
-                        className="font-semibold text-gray-900 hover:text-green-800 hover:underline"
-                      >
-                        {u.name}
-                      </Link>
-                      <p className="mt-0.5 text-[10px] text-slate-400">{u.id}</p>
-                      {isRejected && u.rejectionReason && (
-                        <p className="mt-1 text-[11px] text-red-600 bg-red-50 p-1 rounded border border-red-100 max-w-xs">
-                          Reason: {u.rejectionReason}
-                        </p>
-                      )}
-                    </td>
-                    <td className="p-3 font-data text-xs">
-                      {u.email}
-                      <br />
-                      <span className="text-slate-500">{u.phone}</span>
-                    </td>
+                  return (
+                    <tr key={u.id} className="border-t border-ink/10 hover:bg-slate-50/50 transition">
+                      <td className="p-3 font-data text-xs text-slate-400 font-bold">
+                        #{index + 1}
+                      </td>
+                      <td className="p-3">
+                        <Link
+                          href={`/admin/users/${u.id}`}
+                          className="font-semibold text-gray-900 hover:text-green-800 hover:underline"
+                        >
+                          {u.name}
+                        </Link>
+                        <p className="mt-0.5 text-[10px] text-slate-400">{u.id}</p>
+                        {isRejected && u.rejectionReason && (
+                          <p className="mt-1 text-[11px] text-red-600 bg-red-50 p-1 rounded border border-red-100 max-w-xs">
+                            Reason: {u.rejectionReason}
+                          </p>
+                        )}
+                      </td>
+                      <td className="p-3 font-data text-xs">
+                        {u.email}
+                        <br />
+                        <span className="text-slate-500">{u.phone}</span>
+                      </td>
+                      <td className="p-3 font-data text-xs text-slate-600 whitespace-nowrap">
+                        {u.createdAt
+                          ? new Date(u.createdAt).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "-"}
+                        <br />
+                        <span className="text-[10px] text-slate-400">
+                          {u.createdAt
+                            ? new Date(u.createdAt).toLocaleTimeString("en-IN", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : ""}
+                        </span>
+                      </td>
                     <td className="p-3">
                       <select
                         value={u.role}
@@ -660,15 +726,24 @@ export default function ManageUsers() {
                       )}
 
                       {selectedUser.verified ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            update(selectedUser.id, { verified: false });
-                          }}
-                          className="flex-1 sm:flex-none rounded-xl border border-amber-300 px-4 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 transition"
-                        >
-                          Revoke Verification
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => resendVerificationEmail(selectedUser.id, selectedUser.email)}
+                            className="flex-1 sm:flex-none rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition cursor-pointer"
+                          >
+                            ✉️ Resend Verification Email
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              update(selectedUser.id, { verified: false });
+                            }}
+                            className="flex-1 sm:flex-none rounded-xl border border-amber-300 px-4 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 transition"
+                          >
+                            Revoke Verification
+                          </button>
+                        </>
                       ) : (
                         <button
                           type="button"
