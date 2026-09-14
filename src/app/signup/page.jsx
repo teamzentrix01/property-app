@@ -221,7 +221,7 @@ export default function SignupPage() {
       // normal login page; signup no longer creates an implicit session.
       setSuccess(data.message || "Account created successfully. Redirecting to login…");
       await new Promise((resolve) => setTimeout(resolve, 700));
-      router.replace("/login");
+      router.replace(`/verify-email?email=${encodeURIComponent(data.email || form.email)}&sent=${data.emailSent === false ? "0" : "1"}`);
       router.refresh();
     } catch (error) {
       console.error("Signup error:", error);

@@ -41,6 +41,9 @@ export async function POST(req) {
     if (!user || !(await verifyPassword(body.password, user.passwordHash))) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
+    if (!user.emailVerifiedAt) {
+      return NextResponse.json({ error: "Please verify your email before logging in.", requiresEmailVerification: true, email: user.email }, { status: 403 });
+    }
 
     const token = signToken({ id: user.id, userId: user.id, email: user.email, sessionVersion: user.sessionVersion });
     const response = NextResponse.json({ id: user.id, name: user.name, role: user.role }, { status: 200 });

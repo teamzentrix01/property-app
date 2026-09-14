@@ -12,7 +12,7 @@ import {
   phone,
 } from "@/lib/validation";
 
-import { notifyEmail } from "@/lib/mailer";
+import { sendEmailVerificationOtp } from "@/lib/emailVerification";
 
 import {
   uploadUserDocument,
@@ -339,51 +339,17 @@ export async function POST(req) {
       }
     }
 
-    /* =======================================================
-       RESPONSE
-    ======================================================= */
+    const verificationEmail = await sendEmailVerificationOtp({ user, origin: new URL(req.url).origin });
 
-    const res =
-      NextResponse.json({
-        ok: true,
-        message: "Account created successfully.",
-        documentsUploadPending: documentUploadPending,
-      }, { status: 201 });
-
-    /* =======================================================
-       WELCOME EMAIL
-    ======================================================= */
-
-    // notifyEmail catches delivery errors itself. It is intentionally not part
-    // of the successful registration response path.
-    notifyEmail({
-      to: user.email,
-
-      subject:
-        "Welcome to Bhoomi",
-
-      heading:
-        `Welcome, ${user.name}`,
-
-      message:
-        "Your Bhoomi account is ready. You can now browse properties and manage your activity from the dashboard.",
-
-      action: {
-        label:
-          "Open dashboard",
-
-        url:
-          `${new URL(
-            req.url
-          ).origin}/dashboard`,
-      },
-    });
-
-    /* =======================================================
-       SUCCESS
-    ======================================================= */
-
-    return res;
+    return NextResponse.json({
+      ok: true,
+      email: user.email,
+      emailSent: verificationEmail.ok,
+      message: verificationEmail.ok
+        ? "We sent a verification code to your email."
+        : "Your account was saved, but we could not send the verification code. Please request a new code.",
+      documentsUploadPending: documentUploadPending,
+    }, { status: 201 });
   } catch (error) {
     console.error(
       "SIGNUP API ERROR:",

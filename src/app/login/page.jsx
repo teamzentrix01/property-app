@@ -104,6 +104,10 @@ function LoginForm() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        if (data.requiresEmailVerification && data.email) {
+          router.replace(`/verify-email?email=${encodeURIComponent(data.email)}`);
+          return;
+        }
         setErrors({
           form: res.status === 401 ? "Invalid email or password" : (data.error || "Login failed. Please try again."),
         });
