@@ -280,11 +280,10 @@ export default function HeroSection() {
                   key={tab.key}
                   type="button"
                   onClick={() => handleTabClick(tab)}
-                  className={`relative shrink-0 pb-1.5 text-xs sm:text-[13px] transition-all duration-200 ${
-                    isActive
+                  className={`relative shrink-0 pb-1.5 text-xs sm:text-[13px] transition-all duration-200 ${isActive
                       ? "font-bold text-slate-900"
                       : "font-medium text-slate-500 hover:text-slate-800"
-                  }`}
+                    }`}
                 >
                   {tab.label}
                   {/* Red underline on active tab like in reference image */}
@@ -326,11 +325,10 @@ export default function HeroSection() {
                 type="button"
                 onClick={handleVoiceSearch}
                 title={isListening ? "Listening..." : "Search by voice"}
-                className={`ml-2 shrink-0 p-1 rounded-lg transition-colors ${
-                  isListening
+                className={`ml-2 shrink-0 p-1 rounded-lg transition-colors ${isListening
                     ? "text-[#c41920] animate-pulse bg-red-50"
                     : "text-slate-400 hover:text-[#c41920]"
-                }`}
+                  }`}
               >
                 {isListening ? (
                   <Mic className="h-4 w-4 text-[#c41920]" />

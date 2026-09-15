@@ -98,8 +98,11 @@ export default function SignupPage() {
     if (!form.password) {
       newErrors.password = "Please enter a password.";
     } else if (form.password.length < 12) {
-      newErrors.password =
-        "Password must be at least 12 characters.";
+      newErrors.password = "Password must be at least 12 characters.";
+    } else if (!/[A-Z]/.test(form.password)) {
+      newErrors.password = "Password must contain at least one uppercase letter.";
+    } else if (!/[0-9]/.test(form.password)) {
+      newErrors.password = "Password must contain at least one number.";
     }
 
     setErrors(newErrors);

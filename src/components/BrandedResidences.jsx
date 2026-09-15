@@ -84,7 +84,7 @@ export default function BrandedResidences({ listings = [] }) {
               <Crown className="h-4 w-4 text-[#b58a3a]" />
 
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
-                100acress Private Collection
+                Bhoomi Private Collection
               </span>
             </div>
 
@@ -245,7 +245,7 @@ export default function BrandedResidences({ listings = [] }) {
                 <Crown className="h-5 w-5 text-[Explore Gurugram]" />
 
                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-[Explore Gurugram]">
-                  100acress Private Collection
+                  Bhoomi Private Collection
                 </span>
               </div>
 

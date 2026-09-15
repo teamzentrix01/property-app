@@ -27,7 +27,7 @@ export default function TermsAndConditionsPage() {
           <div>
             <h2 className="text-xl font-bold text-[#180e0f] mb-3">1. Agreement to Terms</h2>
             <p>
-              By accessing, browsing, or utilizing Bhoomi Real Estate ("100acress.com", "we", "our"), you agree to be bound by these Terms and Conditions. If you do not agree to all terms, you must refrain from using the platform.
+              By accessing, browsing, or utilizing Bhoomi Real Estate ("bhoomi.com", "we", "our"), you agree to be bound by these Terms and Conditions. If you do not agree to all terms, you must refrain from using the platform.
             </p>
           </div>
 

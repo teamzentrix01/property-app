@@ -261,11 +261,17 @@ export default function Navbar() {
   }
 
   useEffect(() => {
+    // Scrolled search bar should ONLY ever appear on the home page past the hero section
+    const isHomePage = pathname === "/";
+
+    if (!isHomePage) {
+      setScrolled(false);
+      return;
+    }
+
     const handleScroll = () => {
-      // On homepage, trigger once user scrolls past hero banner (~200px)
-      // On other pages, trigger when scrolling starts (~60px)
-      const threshold = pathname === "/" ? 200 : 60;
-      setScrolled(window.scrollY > threshold);
+      // On homepage, trigger once user scrolls past the Hero Section search bar (~350px)
+      setScrolled(window.scrollY > 350);
     };
 
     handleScroll();
@@ -477,14 +483,15 @@ export default function Navbar() {
           </div>
 
           {/* =====================================================
-              SCROLLED SEARCH BAR & OPTIONS TABS (EXACTLY AS SCREENSHOT)
+              SCROLLED SEARCH BAR & OPTIONS TABS (HOME PAGE ONLY)
           ====================================================== */}
-          <div
-            className={`transition-all duration-300 ease-in-out border-t border-[#fecdd3]/60 ${scrolled
-                ? "max-h-[220px] opacity-100 py-3 block"
-                : "max-h-0 opacity-0 py-0 overflow-hidden pointer-events-none hidden"
-              }`}
-          >
+          {pathname === "/" && (
+            <div
+              className={`transition-all duration-300 ease-in-out border-t border-[#fecdd3]/60 ${scrolled
+                  ? "max-h-[220px] opacity-100 py-3 block"
+                  : "max-h-0 opacity-0 py-0 overflow-hidden pointer-events-none hidden"
+                }`}
+            >
             <div className="mx-auto max-w-5xl">
               <div className="rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)]">
                 {/* 1. Category Tabs Row */}
@@ -621,6 +628,7 @@ export default function Navbar() {
               </div>
             </div>
           </div>
+        )}
 
 
         </div>

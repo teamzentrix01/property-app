@@ -163,7 +163,7 @@ export default function Footer() {
 
               <div>
                 <span className="block text-xl font-black tracking-tight text-white">
-                  100<span className="text-[#c41920]">acress</span>
+                  Bhoomi<span className="text-[#c41920]">Real Estate</span>
                 </span>
 
                 <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/40">
@@ -394,7 +394,7 @@ export default function Footer() {
         <div className="flex flex-col gap-5 py-6 md:flex-row md:items-center md:justify-between">
 
           <p className="text-xs leading-5 text-white/35">
-            © 2019–{new Date().getFullYear()} 100acress.com. All Rights Reserved.
+            © 2019–{new Date().getFullYear()} bhoomi.com. All Rights Reserved.
             <span className="hidden sm:inline"> · </span>
             A Venture of Kaushraj Global LLP
           </p>

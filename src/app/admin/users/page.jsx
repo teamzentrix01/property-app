@@ -10,9 +10,14 @@ import {
   ShieldCheck,
   AlertTriangle,
   Eye,
+  EyeOff,
   Ban,
   RotateCcw,
   Search,
+  Trash2,
+  UserX,
+  Copy,
+  Pencil,
 } from "lucide-react";
 
 const ROLES = ["BUYER", "OWNER", "BROKER", "AREA_ADMIN", "SUPER_ADMIN"];
@@ -40,18 +45,50 @@ export default function ManageUsers() {
   const [loadingDocId, setLoadingDocId] = useState(null);
   const [statusTab, setStatusTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc"); // Default FIFO: First In, First Out
+  const [sortOrder, setSortOrder] = useState("asc");
+  // Track which row's password is currently visible (by user id)
+  const [showPasswordId, setShowPasswordId] = useState(null);
+  const [copiedPasswordId, setCopiedPasswordId] = useState(null);
+
+  const copyPassword = (pwd, id) => {
+    if (!pwd) return;
+    navigator.clipboard.writeText(pwd).then(() => {
+      setCopiedPasswordId(id);
+      setTimeout(() => setCopiedPasswordId(null), 2000);
+    });
+  };
+
+  const setPasswordPrompt = async (u) => {
+    const newPwd = window.prompt(`Set new password for ${u.name || u.email} (min 6 characters):`);
+    if (newPwd === null) return;
+    if (!newPwd.trim() || newPwd.trim().length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
+    await update(u.id, { plainPassword: newPwd.trim() });
+  };
 
   const loadUsers = () => {
-    fetch(`/api/admin/users?order=${sortOrder}`).then(async (r) => {
-      const data = await r.json();
-      if (!r.ok) return setError(data.error || "Not authorized");
-      setUsers(data.users);
-      if (selectedUser) {
-        const refreshed = data.users.find((u) => u.id === selectedUser.id);
-        if (refreshed) setSelectedUser(refreshed);
-      }
-    });
+    fetch(`/api/admin/users?order=${sortOrder}`)
+      .then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          setError(data?.error || "Not authorized");
+          setUsers([]);
+          return;
+        }
+        setError("");
+        setUsers(data?.users || []);
+        if (selectedUser) {
+          const refreshed = (data?.users || []).find((u) => u.id === selectedUser.id);
+          if (refreshed) setSelectedUser(refreshed);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load users:", err);
+        setError(err.message || "Failed to load users");
+        setUsers([]);
+      });
   };
 
   useEffect(() => {
@@ -111,6 +148,27 @@ export default function ManageUsers() {
   async function restoreAccount(userId) {
     if (!window.confirm("Are you sure you want to move this account back to Pending review?")) return;
     await update(userId, { action: "RESTORE" });
+  }
+
+  async function deleteUser(userId, userName) {
+    const note = window.prompt(
+      `Delete account for "${userName}"?\nThis will archive their data (email, phone, password hash) so you can view it later.\n\nOptional note for deletion (press OK to skip):`,
+      ""
+    );
+    if (note === null) return; // user pressed Cancel
+    const res = await fetch("/api/admin/users/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, note: note.trim() || null }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message || "User deleted and archived.");
+      setUsers((us) => us.filter((u) => u.id !== userId));
+      if (selectedUser?.id === userId) setSelectedUser(null);
+    } else {
+      alert(data.error || "Delete failed.");
+    }
   }
 
   async function updateDocumentStatus(docId, status) {
@@ -183,115 +241,129 @@ export default function ManageUsers() {
   });
 
   return (
-    <main className="flex-1 max-w-6xl mx-auto px-6 py-12 w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+    <main className="flex-1 w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-6 sm:py-10">
+      {/* PAGE HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
-          <h1 className="font-display text-3xl mb-1 text-gray-900">Manage users</h1>
-          <p className="text-ink-soft text-sm">
-            Review user documents, verify accounts, manage rejected submissions, and set roles.
+          <h1 className="font-display text-2xl sm:text-3xl mb-1 text-gray-900">Manage Users</h1>
+          <p className="text-ink-soft text-xs sm:text-sm">
+            Review documents, verify accounts, manage rejections, and set roles.
           </p>
         </div>
+        <Link
+          href="/admin/deleted-users"
+          className="self-start sm:self-center inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 text-xs font-semibold text-[#c41920] hover:bg-rose-100 hover:border-rose-300 transition shadow-xs"
+        >
+          <UserX size={15} />
+          Deleted Accounts Archive
+        </Link>
       </div>
 
       {/* FILTER TABS & SEARCH BAR */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mt-6 mb-5">
-        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-gray-200 text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setStatusTab("all")}
-            className={`px-3 py-1.5 rounded-lg transition ${
-              statusTab === "all"
-                ? "bg-white text-gray-900 shadow-xs font-bold"
-                : "text-slate-600 hover:text-gray-900"
-            }`}
-          >
-            All Users ({allNonRejected.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatusTab("verified")}
-            className={`px-3 py-1.5 rounded-lg transition ${
-              statusTab === "verified"
-                ? "bg-white text-green-800 shadow-xs font-bold"
-                : "text-slate-600 hover:text-gray-900"
-            }`}
-          >
-            Verified ({verifiedList.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatusTab("pending")}
-            className={`px-3 py-1.5 rounded-lg transition ${
-              statusTab === "pending"
-                ? "bg-white text-amber-800 shadow-xs font-bold"
-                : "text-slate-600 hover:text-gray-900"
-            }`}
-          >
-            Pending ({pendingList.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatusTab("rejected")}
-            className={`px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              statusTab === "rejected"
-                ? "bg-red-600 text-white shadow-xs font-bold"
-                : "text-red-700 hover:bg-red-50"
-            }`}
-          >
-            <span>Rejected ({rejectedList.length})</span>
-            {rejectedList.length > 0 && statusTab !== "rejected" && (
-              <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse" />
-            )}
-          </button>
+      <div className="flex flex-col gap-3 mt-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Status tabs — scroll horizontally on very small screens */}
+        <div className="overflow-x-auto pb-0.5">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-gray-200 text-xs font-semibold w-max">
+            <button
+              type="button"
+              onClick={() => setStatusTab("all")}
+              className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
+                statusTab === "all"
+                  ? "bg-white text-gray-900 shadow-xs font-bold"
+                  : "text-slate-600 hover:text-gray-900"
+              }`}
+            >
+              All ({allNonRejected.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusTab("verified")}
+              className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
+                statusTab === "verified"
+                  ? "bg-white text-green-800 shadow-xs font-bold"
+                  : "text-slate-600 hover:text-gray-900"
+              }`}
+            >
+              Verified ({verifiedList.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusTab("pending")}
+              className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
+                statusTab === "pending"
+                  ? "bg-white text-amber-800 shadow-xs font-bold"
+                  : "text-slate-600 hover:text-gray-900"
+              }`}
+            >
+              Pending ({pendingList.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setStatusTab("rejected")}
+              className={`px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 whitespace-nowrap ${
+                statusTab === "rejected"
+                  ? "bg-red-600 text-white shadow-xs font-bold"
+                  : "text-red-700 hover:bg-red-50"
+              }`}
+            >
+              Rejected ({rejectedList.length})
+              {rejectedList.length > 0 && statusTab !== "rejected" && (
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              )}
+            </button>
+          </div>
         </div>
 
+        {/* Sort order + Search */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* FIFO / LIFO Order Toggle */}
           <button
             type="button"
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-2xs cursor-pointer"
-            title="Toggle FIFO (First In First Out) or LIFO (Newest First)"
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-2xs cursor-pointer whitespace-nowrap"
+            title="Toggle FIFO / LIFO"
           >
             <span className="text-gray-400">Order:</span>
             <span className={sortOrder === "asc" ? "text-emerald-700 font-bold" : "text-blue-700 font-bold"}>
-              {sortOrder === "asc" ? "FIFO (Oldest First)" : "LIFO (Newest First)"}
+              {sortOrder === "asc" ? "FIFO" : "LIFO"}
             </span>
           </button>
 
-          <div className="relative">
+          <div className="relative flex-1 min-w-[180px]">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search name, email, phone..."
-              className="rounded-xl border border-gray-200 bg-white pl-8 pr-3.5 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600/30 w-56"
+              placeholder="Search name, email, phone…"
+              className="w-full rounded-xl border border-gray-200 bg-white pl-8 pr-3.5 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600/30"
             />
           </div>
         </div>
       </div>
 
-      {/* USERS TABLE */}
-      <div className="bg-paper text-ink rounded-2xl overflow-hidden shadow-sm border border-ink/10">
-        <table className="w-full text-sm">
+      {/* Scroll hint for small screens */}
+      <p className="text-[10px] text-slate-400 mb-1.5 sm:hidden">← Scroll right to see all columns</p>
+
+      {/* USERS TABLE — horizontally scrollable on small screens */}
+      <div className="w-full overflow-x-auto rounded-2xl shadow-sm border border-ink/10">
+        <table className="min-w-[980px] w-full text-sm bg-paper text-ink">
           <thead className="bg-paper-dim font-data text-xs uppercase text-ink-soft">
             <tr>
-              <th className="text-left p-3">#</th>
-              <th className="text-left p-3">Name</th>
-              <th className="text-left p-3">Contact</th>
-              <th className="text-left p-3">Joined</th>
-              <th className="text-left p-3">Role</th>
-              <th className="text-left p-3">Admin area</th>
-              <th className="text-left p-3">Documents</th>
-              <th className="text-left p-3">Status / Verified</th>
-              <th className="text-right p-3">Actions</th>
+              <th className="text-left px-3 py-3 w-10">#</th>
+              <th className="text-left px-3 py-3 w-44">Name</th>
+              <th className="text-left px-3 py-3 w-52">Contact</th>
+              <th className="text-left px-3 py-3 w-28">Joined</th>
+              <th className="text-left px-3 py-3 w-36">Role</th>
+              <th className="text-left px-3 py-3 w-28">Admin Area</th>
+              <th className="text-left px-3 py-3 w-32">Documents</th>
+              <th className="text-left px-3 py-3 w-28">Status</th>
+              <th className="text-right px-3 py-3 w-36">Actions</th>
             </tr>
           </thead>
           <tbody>
             {displayedUsers.length === 0 ? (
               <tr>
-                <td colSpan={9} className="p-8 text-center text-sm text-slate-400">
+                <td colSpan={9} className="px-6 py-10 text-center text-sm text-slate-400">
                   {statusTab === "rejected"
                     ? "No rejected accounts."
                     : statusTab === "verified"
@@ -317,30 +389,88 @@ export default function ManageUsers() {
                   const isRejected = u.verificationStatus === "REJECTED";
 
                   return (
-                    <tr key={u.id} className="border-t border-ink/10 hover:bg-slate-50/50 transition">
-                      <td className="p-3 font-data text-xs text-slate-400 font-bold">
+                    <tr key={u.id} className="border-t border-ink/10 hover:bg-slate-50/60 transition align-top">
+
+                      {/* # */}
+                      <td className="px-3 py-3 font-data text-xs text-slate-400 font-bold whitespace-nowrap">
                         #{index + 1}
                       </td>
-                      <td className="p-3">
+
+                      {/* NAME */}
+                      <td className="px-3 py-3 max-w-[176px]">
                         <Link
                           href={`/admin/users/${u.id}`}
-                          className="font-semibold text-gray-900 hover:text-green-800 hover:underline"
+                          className="font-semibold text-gray-900 hover:text-green-800 hover:underline text-sm leading-tight block"
                         >
                           {u.name}
                         </Link>
-                        <p className="mt-0.5 text-[10px] text-slate-400">{u.id}</p>
+                        <p className="mt-0.5 text-[10px] text-slate-400 break-all leading-tight">{u.id}</p>
                         {isRejected && u.rejectionReason && (
-                          <p className="mt-1 text-[11px] text-red-600 bg-red-50 p-1 rounded border border-red-100 max-w-xs">
-                            Reason: {u.rejectionReason}
+                          <p className="mt-1 text-[10px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 leading-snug">
+                            {u.rejectionReason}
                           </p>
                         )}
                       </td>
-                      <td className="p-3 font-data text-xs">
-                        {u.email}
-                        <br />
-                        <span className="text-slate-500">{u.phone}</span>
+
+                      {/* CONTACT */}
+                      <td className="px-3 py-3 font-data text-xs max-w-[208px]">
+                        <div className="space-y-0.5">
+                          <div className="text-slate-800 break-all">{u.email}</div>
+                          <div className="text-slate-500">{u.phone}</div>
+                          {/* Original password row with eye toggle */}
+                          <div className="flex items-center gap-1 mt-1 min-w-0">
+                            <span
+                              className={`font-mono text-[10px] select-none truncate max-w-[130px] ${
+                                showPasswordId === u.id ? "text-slate-800 font-semibold" : "text-slate-400"
+                              }`}
+                              title={
+                                showPasswordId === u.id
+                                  ? (u.plainPassword || u.passwordHash || "—")
+                                  : "Original password (click eye to reveal)"
+                              }
+                            >
+                              {showPasswordId === u.id
+                                ? (u.plainPassword || u.passwordHash || "—")
+                                : "••••••••••••"}
+                            </span>
+                            <button
+                              type="button"
+                              title={showPasswordId === u.id ? "Hide password" : "Show original password"}
+                              onClick={() =>
+                                setShowPasswordId((prev) => (prev === u.id ? null : u.id))
+                              }
+                              className="shrink-0 rounded p-0.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                            >
+                              {showPasswordId === u.id ? <EyeOff size={11} /> : <Eye size={11} />}
+                            </button>
+                            {showPasswordId === u.id && (u.plainPassword || u.passwordHash) && (
+                              <button
+                                type="button"
+                                title="Copy password"
+                                onClick={() => copyPassword(u.plainPassword || u.passwordHash, u.id)}
+                                className="shrink-0 rounded p-0.5 text-slate-400 hover:text-emerald-600 hover:bg-slate-100 transition"
+                              >
+                                {copiedPasswordId === u.id ? (
+                                  <Check size={11} className="text-emerald-600" />
+                                ) : (
+                                  <Copy size={11} />
+                                )}
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              title="Set or update password"
+                              onClick={() => setPasswordPrompt(u)}
+                              className="shrink-0 rounded p-0.5 text-slate-300 hover:text-blue-600 hover:bg-slate-100 transition"
+                            >
+                              <Pencil size={10} />
+                            </button>
+                          </div>
+                        </div>
                       </td>
-                      <td className="p-3 font-data text-xs text-slate-600 whitespace-nowrap">
+
+                      {/* JOINED */}
+                      <td className="px-3 py-3 font-data text-xs text-slate-600 whitespace-nowrap">
                         {u.createdAt
                           ? new Date(u.createdAt).toLocaleDateString("en-IN", {
                               day: "2-digit",
@@ -358,148 +488,157 @@ export default function ManageUsers() {
                             : ""}
                         </span>
                       </td>
-                    <td className="p-3">
-                      <select
-                        value={u.role}
-                        onChange={(e) => {
-                          const role = e.target.value;
-                          if (role === "AREA_ADMIN") {
-                            const adminArea = window.prompt("City this admin can moderate:", u.adminArea || "");
-                            if (!adminArea?.trim()) return;
-                            update(u.id, { role, adminArea });
-                            return;
-                          }
-                          update(u.id, { role, adminArea: null });
-                        }}
-                        className="rounded-lg px-2 py-1 border border-ink/10 font-data text-xs bg-white"
-                      >
-                        {ROLES.map((r) => (
-                          <option key={r} value={r}>
-                            {r.replaceAll("_", " ")}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="p-3">
-                      <input
-                        defaultValue={u.adminArea || ""}
-                        placeholder="e.g. Moradabad"
-                        onBlur={(e) => update(u.id, { adminArea: e.target.value })}
-                        disabled={u.role !== "AREA_ADMIN"}
-                        className="rounded-lg px-2 py-1 border border-ink/10 text-xs w-28 disabled:opacity-40 bg-white"
-                      />
-                    </td>
 
-                    {/* DOCUMENTS COLUMN */}
-                    <td className="p-3">
-                      {docs.length === 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedUser(u)}
-                          className="inline-flex rounded-md bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-200 transition"
+                      {/* ROLE */}
+                      <td className="px-3 py-3">
+                        <select
+                          value={u.role}
+                          onChange={(e) => {
+                            const role = e.target.value;
+                            if (role === "AREA_ADMIN") {
+                              const adminArea = window.prompt("City this admin can moderate:", u.adminArea || "");
+                              if (!adminArea?.trim()) return;
+                              update(u.id, { role, adminArea });
+                              return;
+                            }
+                            update(u.id, { role, adminArea: null });
+                          }}
+                          className="rounded-lg px-2 py-1 border border-ink/10 font-data text-xs bg-white w-full max-w-[130px]"
                         >
-                          No docs
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedUser(u)}
-                          className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold shadow-xs transition ${
-                            allDocsVerified
-                              ? "bg-green-50 text-green-800 border border-green-200 hover:bg-green-100"
-                              : pendingDocs.length > 0
-                              ? "bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100"
-                              : "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
-                          }`}
-                          title="Click to view and verify documents"
-                        >
-                          <span>
+                          {ROLES.map((r) => (
+                            <option key={r} value={r}>
+                              {r.replaceAll("_", " ")}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+
+                      {/* ADMIN AREA */}
+                      <td className="px-3 py-3">
+                        <input
+                          defaultValue={u.adminArea || ""}
+                          placeholder="e.g. Moradabad"
+                          onBlur={(e) => update(u.id, { adminArea: e.target.value })}
+                          disabled={u.role !== "AREA_ADMIN"}
+                          className="rounded-lg px-2 py-1 border border-ink/10 text-xs w-full max-w-[112px] disabled:opacity-40 bg-white"
+                        />
+                      </td>
+
+                      {/* DOCUMENTS */}
+                      <td className="px-3 py-3">
+                        {docs.length === 0 ? (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedUser(u)}
+                            className="inline-flex rounded-md bg-gray-100 px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-200 transition whitespace-nowrap"
+                          >
+                            No docs
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedUser(u)}
+                            className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold shadow-xs transition whitespace-nowrap ${
+                              allDocsVerified
+                                ? "bg-green-50 text-green-800 border border-green-200 hover:bg-green-100"
+                                : pendingDocs.length > 0
+                                ? "bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100"
+                                : "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                            }`}
+                            title="Click to view and verify documents"
+                          >
                             {allDocsVerified
                               ? `✓ ${docs.length} Verified`
                               : pendingDocs.length > 0
                               ? `⚠ ${pendingDocs.length} Pending`
                               : `✗ ${rejectedDocs.length} Rejected`}
-                          </span>
-                          <span className="text-[10px] opacity-75">({docs.length})</span>
-                        </button>
-                      )}
-                    </td>
+                            <span className="text-[10px] opacity-70">({docs.length})</span>
+                          </button>
+                        )}
+                      </td>
 
-                    {/* STATUS / VERIFIED COLUMN */}
-                    <td className="p-3">
-                      {isRejected ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
+                      {/* STATUS / VERIFIED */}
+                      <td className="px-3 py-3">
+                        {isRejected ? (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700 whitespace-nowrap">
                             <Ban size={12} /> Rejected
                           </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={u.verified}
-                            onChange={(e) => {
-                              const nextVerified = e.target.checked;
-                              if (nextVerified && !allDocsVerified) {
-                                alert(
-                                  docs.length === 0
-                                    ? "Bina documents verify kiye user account verify nahi ho sakta. User ne abhi tak koi documents upload nahi kiye hain."
-                                    : "Bina documents verify kiye user account verify nahi ho sakta. Kripya pehle user ke sabhi documents verify karein."
-                                );
-                                setSelectedUser(u);
-                                return;
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="checkbox"
+                              checked={u.verified}
+                              onChange={(e) => {
+                                const nextVerified = e.target.checked;
+                                if (nextVerified && !allDocsVerified) {
+                                  alert(
+                                    docs.length === 0
+                                      ? "Bina documents verify kiye user account verify nahi ho sakta."
+                                      : "Sabhi documents pehle verify karein."
+                                  );
+                                  setSelectedUser(u);
+                                  return;
+                                }
+                                update(u.id, { verified: nextVerified });
+                              }}
+                              className={`h-4 w-4 rounded border-gray-300 accent-green-700 ${
+                                !u.verified && !allDocsVerified ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                              }`}
+                              title={
+                                u.verified
+                                  ? "User account is verified"
+                                  : allDocsVerified
+                                  ? "Ready to verify"
+                                  : "Documents must be verified first"
                               }
-                              update(u.id, { verified: nextVerified });
-                            }}
-                            className={`h-4 w-4 rounded border-gray-300 accent-green-700 ${
-                              !u.verified && !allDocsVerified ? "cursor-not-allowed opacity-60" : "cursor-pointer"
-                            }`}
-                            title={
-                              u.verified
-                                ? "User account is verified"
-                                : allDocsVerified
-                                ? "Ready to verify"
-                                : "Documents must be verified first"
-                            }
-                          />
-                          <span
-                            className={`text-xs font-semibold ${
-                              u.verified ? "text-green-700" : allDocsVerified ? "text-amber-700" : "text-slate-400"
-                            }`}
-                          >
-                            {u.verified ? "Verified" : allDocsVerified ? "Ready" : "Locked"}
-                          </span>
-                        </div>
-                      )}
-                    </td>
+                            />
+                            <span
+                              className={`text-xs font-semibold whitespace-nowrap ${
+                                u.verified ? "text-green-700" : allDocsVerified ? "text-amber-700" : "text-slate-400"
+                              }`}
+                            >
+                              {u.verified ? "Verified" : allDocsVerified ? "Ready" : "Locked"}
+                            </span>
+                          </div>
+                        )}
+                      </td>
 
-                    {/* ACTIONS COLUMN */}
-                    <td className="p-3 text-right">
-                      {isRejected ? (
-                        <div className="flex items-center justify-end gap-1.5">
+                      {/* ACTIONS */}
+                      <td className="px-3 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap min-w-[112px]">
+                          {isRejected ? (
+                            <button
+                              type="button"
+                              onClick={() => restoreAccount(u.id)}
+                              className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-2 py-1 text-[11px] font-bold text-gray-700 hover:bg-slate-100 transition whitespace-nowrap"
+                              title="Restore to Pending"
+                            >
+                              <RotateCcw size={11} /> Restore
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => rejectAccount(u.id, u.name)}
+                              className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2 py-1 text-[11px] font-bold text-red-600 hover:bg-red-50 transition whitespace-nowrap"
+                              title="Reject account"
+                            >
+                              <Ban size={11} /> Reject
+                            </button>
+                          )}
                           <button
                             type="button"
-                            onClick={() => restoreAccount(u.id)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-2.5 py-1 text-[11px] font-bold text-gray-700 hover:bg-slate-100 transition"
-                            title="Restore account to Pending status"
+                            onClick={() => deleteUser(u.id, u.name)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-rose-300 bg-rose-50 px-2 py-1 text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition whitespace-nowrap"
+                            title="Delete account (data archived)"
                           >
-                            <RotateCcw size={12} /> Restore
+                            <Trash2 size={11} /> Delete
                           </button>
                         </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => rejectAccount(u.id, u.name)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2 py-1 text-[11px] font-bold text-red-600 hover:bg-red-50 transition"
-                          title="Reject this user account"
-                        >
-                          <Ban size={12} /> Reject
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
+                      </td>
+
+                    </tr>
+                  );
+                })
             )}
           </tbody>
         </table>

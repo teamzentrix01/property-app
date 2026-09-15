@@ -53,10 +53,9 @@ const benefits = [
       "Our team is available to assist you throughout your property search journey.",
   },
 ];
-
-export default function WhyChoose100Acress() {
+export default function WhyChooseBhoomi() {
   return (
-    <section className="w-full bg-white py-16 sm:py-20 lg:py-12">
+    <section className="w-full py-16 sm:py-20 lg:py-12">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -70,7 +69,6 @@ export default function WhyChoose100Acress() {
               Your Trusted Property Partner
             </span>
           </div>
-
           {/* Heading */}
           <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
             Why Choose{" "}

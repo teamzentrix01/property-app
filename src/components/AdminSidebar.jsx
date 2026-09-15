@@ -12,11 +12,13 @@ import {
   LogOut,
   FileBarChart,
   Settings,
+  UserX,
 } from "lucide-react";
 
 const links = [
   ["/admin/dashboard", "Dashboard", BarChart3],
   ["/admin/users", "Users", Users],
+  ["/admin/deleted-users", "Deleted Accounts", UserX],
   ["/admin/properties", "Properties", Building2],
   ["/admin/reports", "Reports", FileBarChart],
   ["/admin/settings", "Settings", Settings],
@@ -87,7 +89,11 @@ export default function AdminSidebar() {
         <nav className="space-y-2">
           {links.map(([href, label, Icon]) => {
             const count =
-              label === "Properties" ? counts.pendingListings : null;
+              label === "Properties"
+                ? counts.pendingListings
+                : label === "Deleted Accounts"
+                ? counts.deletedUsers
+                : null;
 
             return (
               <Link

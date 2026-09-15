@@ -25,6 +25,26 @@ export default function Dashboard() {
   const [listingCategories, setListingCategories] = useState({});
   const [statusSaving, setStatusSaving] = useState({});
   const [statusErrors, setStatusErrors] = useState({});
+  const [copiedListingId, setCopiedListingId] = useState(null);
+
+  const copyListingId = (id) => {
+    navigator.clipboard.writeText(id).then(() => {
+      setCopiedListingId(id);
+      setTimeout(() => setCopiedListingId(null), 2000);
+    });
+  };
+
+  const addListingToBlock = (id) => {
+    setRecommendationForm((prev) => {
+      const existing = prev.listingIds
+        .split(/[\n,]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (existing.includes(id)) return prev;
+      const newIds = existing.length ? `${prev.listingIds}, ${id}` : id;
+      return { ...prev, listingIds: newIds };
+    });
+  };
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -497,20 +517,57 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {homepageListings.length > 0 && (
-            <div className="mt-6">
-              <h3 className="mb-3 font-display text-xl">Approved listings</h3>
-              <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 border-t border-ink/10 pt-6">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <h3 className="font-display text-xl">Approved listings (Available IDs)</h3>
+                <p className="text-xs text-ink-soft">Click &quot;+ Add to block&quot; or copy the ID to paste into the section above.</p>
+              </div>
+              <Link href="/admin/properties?status=ACTIVE" className="text-xs font-semibold text-moss hover:underline">
+                Manage all properties →
+              </Link>
+            </div>
+            {homepageListings.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-ink/20 p-4 text-xs text-ink-soft text-center">
+                No approved listings found yet. You can approve listings in <Link href="/admin/properties" className="text-moss font-semibold underline">Admin Properties</Link>.
+              </p>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {homepageListings.map((listing) => (
-                  <div key={listing.id} className="rounded-xl border border-ink/10 bg-white p-3 text-sm">
-                    <p className="font-semibold">{listing.title}</p>
-                    <p className="mt-1 text-ink-soft">{listing.area}, {listing.city}</p>
-                    <p className="mt-2 font-data text-[11px] uppercase tracking-wide text-moss">ID: {listing.id}</p>
+                  <div key={listing.id} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-semibold text-sm leading-tight text-gray-900">{listing.title}</p>
+                        <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                          Approved
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-ink-soft">{listing.area}, {listing.city}</p>
+                      <p className="mt-2 font-mono text-[11px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 break-all select-all font-semibold">
+                        ID: {listing.id}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2 pt-2 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={() => addListingToBlock(listing.id)}
+                        className="flex-1 rounded-lg bg-moss/10 px-2.5 py-1.5 text-xs font-semibold text-moss hover:bg-moss hover:text-white transition text-center cursor-pointer"
+                      >
+                        + Add to block
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => copyListingId(listing.id)}
+                        className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                      >
+                        {copiedListingId === listing.id ? "✓ Copied" : "Copy ID"}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </section>
       )}
 

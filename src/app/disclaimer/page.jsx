@@ -34,7 +34,7 @@ export default function DisclaimerPage() {
           <div>
             <h2 className="text-xl font-bold text-[#180e0f] mb-3">1. General Information Only</h2>
             <p>
-              The information provided on Bhoomi Real Estate (100acress.com) is for informational and guidance purposes only. While we endeavor to keep project details, floor plans, pricing, and availability accurate, the information does not constitute legal advice or an irrevocable financial offer.
+              The information provided on Bhoomi Real Estate (bhoomi.com) is for informational and guidance purposes only. While we endeavor to keep project details, floor plans, pricing, and availability accurate, the information does not constitute legal advice or an irrevocable financial offer.
             </p>
           </div>
 

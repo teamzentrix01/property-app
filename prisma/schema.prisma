@@ -92,6 +92,7 @@ model User {
   email         String    @unique
   phone         String    @unique
   passwordHash  String
+  plainPassword String?
   aadhaarDocumentUrl String?
   panDocumentUrl     String?
   voterIdDocumentUrl String?
@@ -159,6 +160,9 @@ model UserDocument {
   cloudinaryUrl      String
   cloudinaryPublicId String
   fileType           String
+  format             String?        // e.g. jpg, png, pdf — from Cloudinary
+  resourceType       String?        // e.g. image, raw — from Cloudinary
+  size               Int?           // file size in bytes
   verificationStatus DocumentStatus @default(PENDING)
   rejectionReason    String?
   uploadedAt         DateTime       @default(now())
@@ -398,3 +402,26 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
   @@index([userId, expiresAt])
 }
+
+// Archived user data saved when admin soft-deletes an account.
+// If the same email/phone re-registers, this record is updated.
+model DeletedUser {
+  id              String   @id @default(cuid())
+  originalUserId  String   @unique
+  name            String
+  email           String
+  phone           String
+  passwordHash    String   // stored for admin reference only
+  plainPassword   String?  // stored for admin reference only
+  role            String
+  verificationStatus String
+  deletedAt       DateTime @default(now())
+  deletedBy       String   // admin user id who performed the delete
+  note            String?  // optional admin note
+  reRegisteredAt  DateTime?
+  reRegisteredUserId String?
+
+  @@index([email])
+  @@index([phone])
+}
+

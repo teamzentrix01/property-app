@@ -12,26 +12,29 @@ import PopularBuilders from "@/components/PopularBuilders";
 import BHKLifestyle from "@/components/BHKLifestyle";
 import WhyChooseBhoomi from "@/components/WhyChooseBhoomi";
 import CustomerTestimonials from "@/components/CustomerTestimonials";
-import { getApprovedListings } from "@/lib/getListings";
+import { getApprovedListings, getRecommendedListings } from "@/lib/getListings";
 
 export default async function Page() {
   let listings = [];
   let commercialListings = [];
   let luxuryListings = [];
   let brandedListings = [];
+  let recommendedListings = [];
   let listingsError = false;
 
   try {
-    const [latest, commercial, luxury, branded] = await Promise.all([
+    const [latest, commercial, luxury, branded, recommended] = await Promise.all([
       getApprovedListings(),
       getApprovedListings({ propertyType: { in: ["SHOP", "SHOWROOM", "GODOWN", "OFFICE"] } }),
       getApprovedListings({ categories: { some: { category: "LUXURY" } } }),
       getApprovedListings({ categories: { some: { category: "BRANDED" } } }),
+      getRecommendedListings(),
     ]);
     listings = latest.listings;
     commercialListings = commercial.listings;
     luxuryListings = luxury.listings;
     brandedListings = branded.listings;
+    recommendedListings = recommended.listings;
   } catch (error) {
     listingsError = true;
     console.error("Homepage listings failed to load:", error);
@@ -40,7 +43,7 @@ export default async function Page() {
   return (
     <main className="w-full max-w-full overflow-x-hidden">
       <Herosection />
-      <RecommendedProperties listings={listings} error={listingsError} />
+      <RecommendedProperties listings={recommendedListings} error={listingsError} />
       <TrendingProjects />
       <NewLaunchProjects listings={listings} />
       <FestivalOffer />

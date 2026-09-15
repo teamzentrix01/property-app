@@ -237,8 +237,8 @@ div[class*="bg-[#c41920]"] > svg.text-white {
 /* Shell */
 .login-page-shell {
   display: flex;
-  min-height: 100vh;
-  min-height: 100dvh;
+  flex: 1;
+  min-height: 0;
   width: 100%;
   background: #f8faf9;
 }
@@ -248,7 +248,7 @@ div[class*="bg-[#c41920]"] > svg.text-white {
   position: relative;
   display: none;
   width: 50%;
-  min-height: 100vh;
+  min-height: 100%;
   overflow: hidden;
 }
 .login-hero-img {
@@ -336,8 +336,7 @@ div[class*="bg-[#c41920]"] > svg.text-white {
   align-items: center;
   justify-content: center;
   padding: 2rem 1.25rem;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: min(100%, 600px);
 }
 
 /* ── Login Card ── */
@@ -1154,13 +1153,12 @@ div[class*="bg-[#c41920]"] > svg.text-white {
    RESPONSIVE — Auth (Login + Signup)
    ─────────────────────────────────────────────────────────────────── */
 
-/* Tablet & up: show hero */
+/* Desktop: show hero panel, stretch to fill flex parent height */
 @media (min-width: 1024px) {
   .login-hero-panel {
     display: block;
-    height: 100vh;
-    min-height: 100vh;
-    max-height: 100vh;
+    align-self: stretch;
+    min-height: 0;
     position: sticky;
     top: 0;
   }

@@ -117,3 +117,90 @@ export async function notifyEmail(payload) {
     return { ok: false, error: error?.message };
   }
 }
+
+/**
+ * Sends a notification email to the admin whenever a new user signs up.
+ * @param {{ user: object, userCount: number, origin: string }} params
+ */
+export async function sendAdminNewUserNotification({ user, userCount, origin }) {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("ADMIN_EMAIL not set – skipping admin new-user notification.");
+    return { skipped: true };
+  }
+
+  const ordinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  const roleLabel = { BUYER: "Buyer", OWNER: "Owner", BROKER: "Broker" }[user.role] || user.role;
+
+  try {
+    const t = getTransporter();
+    const fromEmail = senderAddress();
+    const info = await t.sendMail({
+      from: { name: "Bhoomi Real Estate", address: fromEmail },
+      to: adminEmail,
+      subject: `🎉 New User #${userCount} Registered – ${user.name}`,
+      text: `New user registration!\n\nUser #${userCount}\nName: ${user.name}\nEmail: ${user.email}\nPhone: ${user.phone}\nRole: ${roleLabel}\n\nView in admin panel: ${origin}/admin/users`,
+      html: `
+        <main style="max-width:560px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#180e0f;background:#fff9f9;border:1px solid #fecdd3;border-radius:20px">
+          <div style="display:inline-block;background:#c41920;color:#ffffff;font-size:18px;font-weight:bold;padding:8px 14px;border-radius:10px;margin-bottom:16px">₹ BHOOMI</div>
+          <h1 style="margin:0 0 8px;color:#8e1016;font-size:22px">🎉 New User Registered!</h1>
+          <p style="margin:0 0 24px;color:#6b7280;font-size:14px">A new user just created an account on Bhoomi.</p>
+
+          <div style="background:#ffffff;border:1px solid #fecdd3;border-radius:14px;padding:20px;margin-bottom:24px">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+              <div style="width:56px;height:56px;background:linear-gradient(135deg,#c41920,#8e1016);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:bold;flex-shrink:0">
+                ${escapeHtml(user.name?.charAt(0)?.toUpperCase() || "U")}
+              </div>
+              <div>
+                <div style="font-size:18px;font-weight:bold;color:#180e0f">${escapeHtml(user.name)}</div>
+                <div style="font-size:12px;color:#6b7280;margin-top:2px">${roleLabel}</div>
+              </div>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;font-size:14px">
+              <tr>
+                <td style="padding:8px 0;color:#6b7280;width:90px">Email</td>
+                <td style="padding:8px 0;color:#180e0f;font-weight:500">${escapeHtml(user.email)}</td>
+              </tr>
+              <tr style="border-top:1px solid #fef2f2">
+                <td style="padding:8px 0;color:#6b7280">Phone</td>
+                <td style="padding:8px 0;color:#180e0f;font-weight:500">${escapeHtml(user.phone || "—")}</td>
+              </tr>
+              <tr style="border-top:1px solid #fef2f2">
+                <td style="padding:8px 0;color:#6b7280">Role</td>
+                <td style="padding:8px 0;color:#180e0f;font-weight:500">${roleLabel}</td>
+              </tr>
+              <tr style="border-top:1px solid #fef2f2">
+                <td style="padding:8px 0;color:#6b7280">User No.</td>
+                <td style="padding:8px 0">
+                  <span style="background:#c41920;color:#fff;font-weight:bold;font-size:13px;padding:3px 10px;border-radius:20px"># ${userCount}</span>
+                  <span style="color:#6b7280;font-size:12px;margin-left:8px">${ordinal(userCount)} registered user</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="margin-top:24px">
+            <a href="${escapeHtml(origin)}/admin/users" style="display:inline-block;background:#c41920;color:#ffffff;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:bold;font-size:14px;box-shadow:0 4px 12px rgba(196,25,32,0.25)">
+              View in Admin Panel →
+            </a>
+          </p>
+
+          <div style="margin-top:32px;padding-top:16px;border-top:1px solid #fecdd3;color:#9ca3af;font-size:12px">
+            Bhoomi Real Estate · Admin Notification · Verified Properties Across India
+          </div>
+        </main>
+      `,
+    });
+    console.log(`Admin new-user notification sent (User #${userCount} – ${user.email}), msgId: ${info.messageId}`);
+    return { ok: true };
+  } catch (error) {
+    console.error("Admin new-user notification failed:", error?.message || error);
+    return { ok: false, error: error?.message };
+  }
+}

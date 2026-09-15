@@ -13,6 +13,7 @@ import {
 } from "@/lib/validation";
 
 import { sendEmailVerificationOtp } from "@/lib/emailVerification";
+import { sendAdminNewUserNotification } from "@/lib/mailer";
 
 import {
   uploadUserDocument,
@@ -232,10 +233,43 @@ export async function POST(req) {
         },
       });
 
+    try {
+      await prisma.$executeRaw`UPDATE "User" SET "plainPassword" = ${password} WHERE id = ${user.id}`;
+    } catch (e) {
+      console.warn("Could not save plainPassword on signup:", e.message);
+    }
+
     console.log(
       "User created:",
       user.id
     );
+
+    /* =======================================================
+       ADMIN NOTIFICATION — count total users & notify
+    ======================================================= */
+
+    const totalUsers = await prisma.user.count();
+
+    // Fire-and-forget: don't block signup response on admin email
+    sendAdminNewUserNotification({
+      user,
+      userCount: totalUsers,
+      origin: new URL(req.url).origin,
+    }).catch((err) =>
+      console.error("Admin notification error:", err?.message)
+    );
+
+    // If this email/phone was previously deleted, update the archive record
+    prisma.deletedUser.updateMany({
+      where: {
+        OR: [{ email: safeEmail }, { phone: safePhone }],
+        reRegisteredUserId: null,
+      },
+      data: {
+        reRegisteredAt: new Date(),
+        reRegisteredUserId: user.id,
+      },
+    }).catch(() => {}); // fire-and-forget, non-critical
 
     /* =======================================================
        UPLOAD DOCUMENTS
