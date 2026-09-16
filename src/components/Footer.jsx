@@ -127,11 +127,11 @@ export default function Footer() {
                 </Link>
 
                 <a
-                  href="tel:+918500900100"
+                  href="tel:+919999999999"
                   className="flex items-center justify-center gap-2 rounded-lg border border-white/15 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-[#c41920] hover:text-[#c41920]"
                 >
                   <Phone className="h-4 w-4" />
-                  Call Now
+                  Call Now: +91 99999 99999
                 </a>
 
               </div>
@@ -179,36 +179,36 @@ export default function Footer() {
             </p>
 
             {/* Contact */}
-            <div className="mt-7 space-y-4">
+            <div className="mt-7 space-y-3">
 
               <a
-                href="tel:+918500900100"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[#c41920]"
+                href="tel:+919999999999"
+                className="footer-contact-item group flex items-center gap-3 p-2 text-sm text-white/70 transition"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
-                  <Phone className="h-4 w-4 text-[#c41920]" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 transition-colors duration-200">
+                  <Phone className="h-4 w-4 text-[#c41920] transition-colors duration-200 group-hover:text-white" />
                 </span>
 
-                <span>+91 8500 900 100</span>
+                <span className="transition-colors duration-200 group-hover:text-white">+91 99999 99999</span>
               </a>
 
               <a
                 href="mailto:support@100acress.com"
-                className="group flex items-center gap-3 text-sm text-white/60 transition hover:text-[#c41920]"
+                className="footer-contact-item group flex items-center gap-3 p-2 text-sm text-white/70 transition"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
-                  <Mail className="h-4 w-4 text-[#c41920]" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 transition-colors duration-200">
+                  <Mail className="h-4 w-4 text-[#c41920] transition-colors duration-200 group-hover:text-white" />
                 </span>
 
-                <span>support@100acress.com</span>
+                <span className="transition-colors duration-200 group-hover:text-white">support@100acress.com</span>
               </a>
 
-              <div className="flex items-start gap-3 text-sm text-white/60">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5">
-                  <MapPin className="h-4 w-4 text-[#c41920]" />
+              <div className="footer-contact-item group flex items-start gap-3 p-2 text-sm text-white/70 transition cursor-default">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 transition-colors duration-200">
+                  <MapPin className="h-4 w-4 text-[#c41920] transition-colors duration-200 group-hover:text-white" />
                 </span>
 
-                <span className="leading-6">
+                <span className="leading-6 transition-colors duration-200 group-hover:text-white">
                   Gurugram, Haryana
                   <br />
                   India & Dubai, UAE

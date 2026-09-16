@@ -454,12 +454,12 @@ export default function Navbar() {
 
               {/* CONTACT NUMBER */}
               <a
-                href="9999999999"
+                href="tel:+919999999999"
                 className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs font-medium text-[#180e0f] transition hover:text-[#c41920]"
                 aria-label="Call Bhoomi Real Estate"
               >
                 <Phone size={16} className="text-[#c41920]" />
-                <span>+91 9999999999</span>
+                <span>+91 99999 99999</span>
               </a>
 
               {user && (
@@ -793,11 +793,11 @@ export default function Navbar() {
                 )}
 
                 <a
-                  href="9999999999"
+                  href="tel:+919999999999"
                   className="flex items-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-4 py-2.5 text-xs font-semibold text-[#180e0f] transition hover:bg-[#ffe4e6]"
                 >
                   <Phone size={17} className="text-[#c41920]" />
-                  <span>+91 63970 36898</span>
+                  <span>+91 99999 99999</span>
                 </a>
 
                 {user && (

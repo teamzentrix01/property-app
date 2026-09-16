@@ -105,7 +105,12 @@ export default function NewListingPage() {
   if (access !== true) {
     return <main className="flex flex-1 items-center justify-center px-6 py-16 text-sm text-ink-soft">Checking your account…</main>;
   }
-  const update = (k, v) => setForm((o) => ({ ...o, [k]: v }));
+  const update = (k, v) => {
+    if (k === "contactNumber") {
+      v = String(v).replace(/\D/g, "").slice(0, 10);
+    }
+    setForm((o) => ({ ...o, [k]: v }));
+  };
   const isPlot = form.propertyType === "PLOT";
   const isHome = ["FLAT", "HOUSE", "PG"].includes(form.propertyType);
   const isCommercial = ["SHOP", "SHOWROOM", "GODOWN", "OFFICE"].includes(
@@ -153,7 +158,13 @@ export default function NewListingPage() {
     }
     if (step === 3) {
       if (!Number.isFinite(Number(form.price)) || Number(form.price) < 1) return setError("Enter a valid price");
-      if (!/^[6-9]\d{9}$/.test(String(form.contactNumber).replace(/\D/g, "").replace(/^91(?=\d{10}$)/, ""))) return setError("Enter a valid 10-digit Indian mobile number");
+      const phoneDigits = String(form.contactNumber || "").replace(/\D/g, "");
+      if (phoneDigits.length !== 10) {
+        return setError("Mobile number must be exactly 10 digits");
+      }
+      if (!/^[6-9]\d{9}$/.test(phoneDigits)) {
+        return setError("Enter a valid 10-digit Indian mobile number (starting with 6-9)");
+      }
       if (!categories.length) return setError("Select at least one section for this property.");
     }
     setStep((s) => Math.min(4, s + 1));
@@ -519,14 +530,36 @@ export default function NewListingPage() {
                       />
                     </Field>
                     <Field label="Your mobile number *">
-                      <input
-                        inputMode="tel"
-                        value={form.contactNumber}
-                        onChange={(e) =>
-                          update("contactNumber", e.target.value)
-                        }
-                        placeholder="10-digit number"
-                      />
+                      <div className="relative flex items-center">
+                        <span className="absolute left-3.5 text-xs font-semibold text-gray-500 select-none">
+                          +91
+                        </span>
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          pattern="[6-9][0-9]{9}"
+                          maxLength={10}
+                          value={form.contactNumber}
+                          onChange={(e) =>
+                            update("contactNumber", e.target.value)
+                          }
+                          placeholder="98765 43210"
+                          className="pl-12 pr-14"
+                        />
+                        <span className="absolute right-3 text-[11px] font-medium text-gray-400">
+                          {form.contactNumber?.length || 0}/10
+                        </span>
+                      </div>
+                      {form.contactNumber && form.contactNumber.length > 0 && form.contactNumber.length < 10 && (
+                        <p className="mt-1 text-[11px] text-amber-600 font-medium">
+                          Must be exactly 10 digits ({10 - form.contactNumber.length} remaining)
+                        </p>
+                      )}
+                      {form.contactNumber && form.contactNumber.length === 10 && !/^[6-9]/.test(form.contactNumber) && (
+                        <p className="mt-1 text-[11px] text-red-600 font-medium">
+                          Mobile number should start with 6, 7, 8, or 9
+                        </p>
+                      )}
                     </Field>
                     <Field label="Ownership type">
                       <select

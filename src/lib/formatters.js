@@ -11,3 +11,18 @@ export function formatPrice(price, purpose) {
 export function serializeForClient(value) {
   return JSON.parse(JSON.stringify(value));
 }
+
+export function formatPhoneNumber(phone) {
+  if (!phone) return "";
+  const cleaned = String(phone).trim();
+  const digits = cleaned.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  }
+  if (digits.length === 12 && digits.startsWith("91")) {
+    const last10 = digits.slice(2);
+    return `+91 ${last10.slice(0, 5)} ${last10.slice(5)}`;
+  }
+  return cleaned;
+}
+
