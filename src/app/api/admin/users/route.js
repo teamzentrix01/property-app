@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/serverAuth";
 import { ROLES, text } from "@/lib/validation";
-import { notifyEmail } from "@/lib/mailer";
+import { notifyEmail, sendAccountVerifiedEmail, sendAccountRejectedEmail } from "@/lib/mailer";
 import { hashPassword } from "@/lib/auth";
 
 const safeUser = {
@@ -175,20 +175,22 @@ export async function PATCH(req) {
 
   await prisma.adminAudit.create({ data: { adminId: auth.user.id, action: data.verificationStatus === "REJECTED" ? "USER_REJECTED" : "USER_UPDATED", targetType: "USER", targetId: target.id, metadata: { changedFields: Object.keys(data), previousRole: target.role, nextRole: user.role, verified: user.verified, verificationStatus: user.verificationStatus, rejectionReason: data.rejectionReason || null } } });
 
-  // Send email to the user's Gmail/email when account is verified by admin
+  // Send email to user's Gmail on Account Verification or Rejection
   let emailSent = false;
+  const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
   if (data.verificationStatus === "ACTIVE" || body.verified === true) {
-    const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
-    const emailResult = await notifyEmail({
-      to: target.email,
-      subject: "🎉 Your Bhoomi Account is Verified by Admin - Start Posting Properties!",
-      heading: "Account Verified Successfully!",
-      message: `Hello ${target.name || "User"},\n\nGreat news! Your account and identity documents have been reviewed and approved by the administrator. Your Bhoomi account is now ACTIVE and verified.\n\nYou are now fully eligible to post and manage property listings on Bhoomi for FREE.\n\nClick the button below to start posting your properties:`,
-      action: {
-        label: "Post Property Now",
-        url: `${origin}/post-property`,
-      },
-    });
+    const emailResult = await sendAccountVerifiedEmail({
+      user: { ...target, ...data },
+      origin,
+    }).catch((err) => ({ ok: false, error: err?.message }));
+    emailSent = Boolean(emailResult?.ok);
+  } else if (data.verificationStatus === "REJECTED") {
+    const emailResult = await sendAccountRejectedEmail({
+      user: { ...target, ...data },
+      reason: data.rejectionReason,
+      origin,
+    }).catch((err) => ({ ok: false, error: err?.message }));
     emailSent = Boolean(emailResult?.ok);
   }
 

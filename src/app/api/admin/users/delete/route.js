@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/serverAuth";
+import { sendAccountDeletedEmail } from "@/lib/mailer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -177,6 +178,16 @@ export async function DELETE(req) {
       // Finally delete the user account
       await tx.user.delete({ where: { id: userId } });
     });
+
+    // Notify user on their Gmail/email that account was removed
+    if (target.email) {
+      const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      await sendAccountDeletedEmail({
+        user: target,
+        note,
+        origin,
+      }).catch((err) => console.error("Account deleted email failed:", err));
+    }
 
     return NextResponse.json({
       ok: true,
