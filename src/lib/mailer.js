@@ -39,22 +39,32 @@ export function getTransporter() {
 
   const isGmail = cleanHost.includes("gmail") || cleanUser.includes("gmail.com");
 
-  transporter = nodemailer.createTransport({
-    service: isGmail ? "gmail" : undefined,
-    host: isGmail ? undefined : cleanHost,
-    port: isGmail ? undefined : portNum,
-    secure: portNum === 465,
-    auth: {
-      user: cleanUser,
-      pass: cleanPass,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
-  });
+  if (isGmail) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: cleanUser,
+        pass: cleanPass,
+      },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+    });
+  } else {
+    transporter = nodemailer.createTransport({
+      host: cleanHost,
+      port: portNum,
+      secure: portNum === 465,
+      auth: {
+        user: cleanUser,
+        pass: cleanPass,
+      },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+    });
+  }
 
   return transporter;
 }

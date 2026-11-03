@@ -66,7 +66,7 @@ function VerifyEmailContent() {
 
   return (
     <main className="login-page-shell">
-      <section className="mx-auto my-10 w-full max-w-md rounded-3xl bg-white p-7 shadow-xl sm:p-9">
+      <section suppressHydrationWarning className="mx-auto my-10 w-full max-w-md rounded-3xl bg-white p-7 shadow-xl sm:p-9">
         <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-[#c41920]">
           <Mail size={24} />
         </div>
