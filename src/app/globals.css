@@ -177,7 +177,7 @@ div[class*="bg-[#c41920]"] > svg.text-white {
    ================================================================= */
 .card-property-standard {
   background-color: #ffffff;
-  border: 1px solid #c41920;
+  border: 1px solid #e5e7eb;
   border-radius: 1.25rem;
   overflow: hidden;
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -188,20 +188,20 @@ div[class*="bg-[#c41920]"] > svg.text-white {
 
 .card-property-standard:hover {
   background-color: #c41920 !important;
-  border-color: #ffffff !important;
+  border-color: #c41920 !important;
   transform: translateY(-4px);
   box-shadow: 0 14px 35px rgba(196, 25, 32, 0.15) !important;
 }
 
 /* === Red hover color scheme for all property cards on homepage === */
 .card-red-hover {
-  border-color: #c41920 !important;
+  border-color: #e5e7eb !important;
   background-color: #ffffff;
   transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 .card-red-hover:hover {
   background-color: #c41920 !important;
-  border-color: #ffffff !important;
+  border-color: #c41920 !important;
 }
 
 /* Content text turns white on card hover */

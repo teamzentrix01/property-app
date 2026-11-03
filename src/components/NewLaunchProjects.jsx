@@ -107,7 +107,7 @@ export default function NewLaunchProjects({ listings = [] }) {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="card-red-hover group overflow-hidden rounded-xl border border-[#c41920] bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 hover:bg-[#c41920] hover:border-white hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(0,0,0,0.11)]"
+              className="card-red-hover group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 hover:bg-[#c41920] hover:border-[#c41920] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(0,0,0,0.11)]"
             >
 
               {/* ================= IMAGE ================= */}

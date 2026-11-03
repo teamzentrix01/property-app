@@ -60,7 +60,6 @@ export default function WhyChooseBhoomi() {
 
         {/* ================= HEADER ================= */}
         <div className="mx-auto max-w-3xl text-center">
-
           {/* Label */}
           <div className="mb-4 flex items-center justify-center gap-2">
             <Sparkles className="h-4 w-4 text-[#c41920]" />

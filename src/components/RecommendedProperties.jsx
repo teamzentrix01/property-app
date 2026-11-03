@@ -102,7 +102,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
             (Strictly Database Properties Only)
         ========================================== */}
         {properties.length > 0 ? (
-          <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden py-3">
+          <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden py-6">
             {/* Subtle gradient edges for luxury fade effect */}
             <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-8 sm:w-16 bg-gradient-to-r from-[#f8f9fa] to-transparent" />
             <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-8 sm:w-16 bg-gradient-to-l from-[#f8f9fa] to-transparent" />
@@ -110,13 +110,13 @@ export default function RecommendedProperties({ listings = [], error = false }) 
             {/* Marquee Track (Smooth right-to-left slide, pauses on hover) */}
             <div
               ref={sliderRef}
-              className="animate-slide-left flex gap-5 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-none"
+              className="animate-slide-left flex gap-5 px-4 sm:px-6 lg:px-8 py-3 overflow-x-auto scrollbar-none items-stretch"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {carouselItems.map((property, idx) => (
                 <div
                   key={`${property.id}-${idx}`}
-                  className="card-property-standard group relative flex flex-col w-[275px] sm:w-[290px] shrink-0 border border-[#c41920] shadow-sm transition-all duration-300 hover:bg-[#c41920] hover:border-white hover:-translate-y-1 hover:shadow-lg"
+                  className="card-property-standard group relative flex flex-col w-[275px] sm:w-[290px] shrink-0 border border-gray-200 shadow-sm transition-all duration-300 hover:bg-[#c41920] hover:border-[#c41920] hover:-translate-y-1.5 hover:shadow-xl"
                 >
                   {/* TOP IMAGE */}
                   <div className="relative h-[175px] w-full overflow-hidden bg-slate-100">
