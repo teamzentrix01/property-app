@@ -204,3 +204,153 @@ export async function sendAdminNewUserNotification({ user, userCount, origin }) 
     return { ok: false, error: error?.message };
   }
 }
+
+const DOC_NAMES = {
+  AADHAAR: "Aadhaar Card",
+  PAN: "PAN Card",
+  ADDRESS_PROOF: "Address Proof",
+  ID_PROOF: "Identity Proof",
+  aadhaar: "Aadhaar Card",
+  pan: "PAN Card",
+  voterId: "Voter ID Card",
+};
+
+/**
+ * 1. User Account Verified by Admin
+ */
+export async function sendAccountVerifiedEmail({ user, origin }) {
+  if (!user?.email) return { skipped: true };
+  const appOrigin = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  return notifyEmail({
+    to: user.email,
+    subject: "🎉 Congratulations! Your Bhoomi Account is Verified by Admin",
+    heading: "Account Verified Successfully!",
+    message: `Hello ${user.name || "User"},\n\nGreat news! Your account and identity documents have been reviewed and approved by the Bhoomi administration team. Your account is now ACTIVE and verified.\n\nYou are now fully eligible to post, manage, and showcase property listings on Bhoomi.\n\nClick the button below to get started:`,
+    action: {
+      label: "Post Property Now →",
+      url: `${appOrigin}/post-property`,
+    },
+  });
+}
+
+/**
+ * 2. User Account Rejected by Admin
+ */
+export async function sendAccountRejectedEmail({ user, reason, origin }) {
+  if (!user?.email) return { skipped: true };
+  const appOrigin = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const formattedReason = reason ? `\n\nReason given by admin:\n"${reason}"` : "";
+  return notifyEmail({
+    to: user.email,
+    subject: "⚠️ Bhoomi Account Verification Status: Rejected",
+    heading: "Account Verification Update",
+    message: `Hello ${user.name || "User"},\n\nYour identity verification for your Bhoomi account has been reviewed and rejected by the administration team.${formattedReason}\n\nPlease log in to your account to review your profile and submit updated, valid documents for re-verification.`,
+    action: {
+      label: "Review Your Profile →",
+      url: `${appOrigin}/login`,
+    },
+  });
+}
+
+/**
+ * 3. Document Verified by Admin
+ */
+export async function sendDocumentVerifiedEmail({ user, documentType, allVerified, origin }) {
+  if (!user?.email) return { skipped: true };
+  const appOrigin = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const docName = DOC_NAMES[documentType] || documentType || "Identity Document";
+  const allActiveNote = allVerified
+    ? "\n\n🎉 All required verification documents have now been approved! Your Bhoomi account is now ACTIVE and fully verified."
+    : "\n\nOur team is reviewing any remaining documents. You will receive an update once all documents are processed.";
+
+  return notifyEmail({
+    to: user.email,
+    subject: `✅ Your ${docName} Has Been Verified - Bhoomi`,
+    heading: "Document Verified Successfully",
+    message: `Hello ${user.name || "User"},\n\nYour uploaded ${docName} has been reviewed and successfully VERIFIED by the Bhoomi admin team.${allActiveNote}`,
+    action: {
+      label: allVerified ? "Post Property Now →" : "View Dashboard →",
+      url: allVerified ? `${appOrigin}/post-property` : `${appOrigin}/dashboard`,
+    },
+  });
+}
+
+/**
+ * 4. Document Rejected by Admin
+ */
+export async function sendDocumentRejectedEmail({ user, documentType, reason, origin }) {
+  if (!user?.email) return { skipped: true };
+  const appOrigin = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const docName = DOC_NAMES[documentType] || documentType || "Identity Document";
+  const formattedReason = reason ? `\n\nReason for rejection:\n"${reason}"` : "";
+
+  return notifyEmail({
+    to: user.email,
+    subject: `⚠️ Action Required: Your ${docName} Was Rejected - Bhoomi`,
+    heading: "Document Verification Update",
+    message: `Hello ${user.name || "User"},\n\nYour uploaded ${docName} could not be verified by the admin team.${formattedReason}\n\nPlease log in to your Bhoomi dashboard and re-upload a clear, valid copy of this document to complete your account verification.`,
+    action: {
+      label: "Re-Upload Document →",
+      url: `${appOrigin}/dashboard`,
+    },
+  });
+}
+
+/**
+ * 5. Property Status Update (Approved, Active, or Rejected)
+ */
+export async function sendPropertyStatusEmail({ owner, listing, status, reason, origin }) {
+  if (!owner?.email) return { skipped: true };
+  const appOrigin = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const title = listing?.title || "Your Property Listing";
+  const location = [listing?.area, listing?.city].filter(Boolean).join(", ");
+
+  if (status === "APPROVED" || status === "ACTIVE") {
+    return notifyEmail({
+      to: owner.email,
+      subject: `🎉 Property Listing Approved: ${title} - Bhoomi`,
+      heading: "Property Listing Approved!",
+      message: `Hello ${owner.name || "Property Owner"},\n\nGreat news! Your property listing "${title}"${location ? ` located in ${location}` : ""} has been reviewed and APPROVED by the Bhoomi administration team.\n\nIt is now live on our platform and visible to verified buyers and tenants across India.`,
+      action: {
+        label: "View Your Listing →",
+        url: `${appOrigin}/properties/${listing.id}`,
+      },
+    });
+  }
+
+  if (status === "REJECTED") {
+    const formattedReason = reason ? `\n\nReason for rejection:\n"${reason}"` : "";
+    return notifyEmail({
+      to: owner.email,
+      subject: `⚠️ Property Listing Review: ${title} - Bhoomi`,
+      heading: "Property Listing Needs Attention",
+      message: `Hello ${owner.name || "Property Owner"},\n\nYour property listing "${title}"${location ? ` located in ${location}` : ""} was reviewed by the administration team and could not be approved at this time.${formattedReason}\n\nPlease check your property details, description, pricing, or photos to ensure they comply with our platform guidelines.`,
+      action: {
+        label: "Manage Listings →",
+        url: `${appOrigin}/dashboard`,
+      },
+    });
+  }
+
+  return { skipped: true };
+}
+
+/**
+ * 6. User Account Deleted by Admin
+ */
+export async function sendAccountDeletedEmail({ user, note, origin }) {
+  if (!user?.email) return { skipped: true };
+  const appOrigin = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const formattedNote = note ? `\n\nAdmin note: "${note}"` : "";
+  return notifyEmail({
+    to: user.email,
+    subject: "⚠️ Notice: Your Bhoomi Account Has Been Removed",
+    heading: "Account Removed",
+    message: `Hello ${user.name || "User"},\n\nThis is an automated notice that your Bhoomi account (${user.email}) has been removed by the platform administration.${formattedNote}\n\nIf you believe this was done in error or if you have questions, please contact our support team.`,
+    action: {
+      label: "Contact Support →",
+      url: `${appOrigin}/contact`,
+    },
+  });
+}
+

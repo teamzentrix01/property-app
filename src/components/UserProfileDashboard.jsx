@@ -339,7 +339,11 @@ function DashboardSidebar({ menu, profile, accountType, section, selectSection, 
 function EmptyState({ children, href, action }) { return <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500 shadow-sm"><p>{children}</p><Link href={href} className="mt-4 inline-block rounded-xl bg-green-700 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-green-800">{action}</Link></div>; }
 function Details({ values }) { return <dl className="mt-6 grid gap-4 sm:grid-cols-2">{values.map(([label, value]) => <div key={label} className="rounded-xl border border-gray-100 bg-slate-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-gray-400">{label}</dt><dd className="mt-1 text-sm font-semibold text-gray-900">{value || "Not specified"}</dd></div>)}</dl>; }
 function ProfileForm({ form, setForm, onSubmit, onCancel }) {
-  const update = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const update = (e) => {
+    const { name, value } = e.target;
+    const val = name === "phone" ? value.replace(/\D/g, "").slice(0, 10) : value;
+    setForm((f) => ({ ...f, [name]: val }));
+  };
   const fields = [["name","Full Name"],["phone","Mobile Number"],["preferredCity","Preferred City"],["preferredLocation","Preferred Locality"],["preferredPropertyType","Property Type"],["budgetRange","Budget Range"],["preferredBhk","BHK"]];
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -348,7 +352,15 @@ function ProfileForm({ form, setForm, onSubmit, onCancel }) {
         {fields.map(([name,label]) => (
           <label key={name} className="block text-xs font-bold uppercase tracking-wider text-gray-600">
             {label}
-            <input name={name} value={form[name] || ""} onChange={update} className="mt-1.5 w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-medium text-gray-800 outline-none focus:border-green-700 focus:ring-2 focus:ring-green-100" />
+            <input
+              name={name}
+              value={form[name] || ""}
+              onChange={update}
+              maxLength={name === "phone" ? 10 : undefined}
+              inputMode={name === "phone" ? "numeric" : undefined}
+              placeholder={name === "phone" ? "10-digit mobile number" : undefined}
+              className="mt-1.5 w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm font-medium text-gray-800 outline-none focus:border-green-700 focus:ring-2 focus:ring-green-100"
+            />
           </label>
         ))}
         <label className="block text-xs font-bold uppercase tracking-wider text-gray-600">

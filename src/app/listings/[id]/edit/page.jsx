@@ -42,6 +42,10 @@ export default function EditListingPage() {
     event.preventDefault();
     const categories = (listing.categories || []).map((item) => item.category);
     if (!categories.length) return setError("Select at least one section for this property.");
+    const cleanPhone = String(listing.contactNumber || "").replace(/\D/g, "");
+    if (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      return setError("Enter a valid 10-digit Indian mobile number (starting with 6-9)");
+    }
     setBusy(true);
     setError("");
     const payload = { action: "UPDATE", purpose: listing.purpose, propertyType: listing.propertyType, photos: listing.photos.map((photo) => photo.url), categories };
@@ -70,7 +74,22 @@ export default function EditListingPage() {
               <Field label="City"><input required value={listing.city || ""} onChange={(event) => update("city", event.target.value)} /></Field>
               <Field label="Locality"><input required value={listing.area || ""} onChange={(event) => update("area", event.target.value)} /></Field>
               <Field label={listing.purpose === "RENT" ? "Monthly rent" : "Expected price"}><input required type="number" value={listing.price || ""} onChange={(event) => update("price", event.target.value)} /></Field>
-              <Field label="Contact number"><input required value={listing.contactNumber || ""} onChange={(event) => update("contactNumber", event.target.value)} /></Field>
+              <Field label="Contact number">
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-xs font-semibold text-gray-500 select-none">+91</span>
+                  <input
+                    required
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[6-9][0-9]{9}"
+                    maxLength={10}
+                    value={listing.contactNumber || ""}
+                    onChange={(event) => update("contactNumber", event.target.value.replace(/\D/g, "").slice(0, 10))}
+                    placeholder="98765 43210"
+                    className="pl-11"
+                  />
+                </div>
+              </Field>
               <Field label="Area"><input type="number" value={listing.sizeValue || ""} onChange={(event) => update("sizeValue", event.target.value)} /></Field>
               <Field label="Area unit"><select value={listing.sizeUnit || "sqft"} onChange={(event) => update("sizeUnit", event.target.value)}>{["sqft", "sqyard", "gaj", "acre"].map((unit) => <option key={unit}>{unit}</option>)}</select></Field>
               {listing.propertyType === "PLOT" && <>

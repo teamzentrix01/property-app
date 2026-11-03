@@ -17,6 +17,11 @@ export default function ContactUsPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const phoneDigits = String(form.phone || "").replace(/\D/g, "");
+    if (phoneDigits.length !== 10 || !/^[6-9]\d{9}$/.test(phoneDigits)) {
+      alert("Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9)");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -28,7 +33,7 @@ export default function ContactUsPage() {
     {
       city: "Gurugram (Corporate Office)",
       address: "Golf Course Extension Road, Sector 65, Gurugram, Haryana - 122018",
-      phone: "+91 8500 900 100",
+      phone: "+91 99999 99999",
       email: "support@100acress.com",
     },
     {
@@ -40,7 +45,7 @@ export default function ContactUsPage() {
     {
       city: "Moradabad (Regional Office)",
       address: "Civil Lines, Delhi Road, Moradabad, Uttar Pradesh - 244001",
-      phone: "+91 9999 999 999",
+      phone: "+91 99999 99999",
       email: "moradabad@100acress.com",
     },
   ];
@@ -109,14 +114,30 @@ export default function ContactUsPage() {
                     <label className="block text-xs font-bold uppercase tracking-wider text-ink-soft mb-2">
                       Phone Number *
                     </label>
-                    <input
-                      required
-                      type="tel"
-                      placeholder="e.g. 9876543210"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#c41920] focus:ring-1 focus:ring-[#c41920]"
-                    />
+                    <div className="relative flex items-center">
+                      <span className="absolute left-4 text-sm font-semibold text-gray-500 select-none">
+                        +91
+                      </span>
+                      <input
+                        required
+                        type="tel"
+                        inputMode="numeric"
+                        pattern="[6-9][0-9]{9}"
+                        maxLength={10}
+                        placeholder="98765 43210"
+                        value={form.phone}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            phone: e.target.value.replace(/\D/g, "").slice(0, 10),
+                          })
+                        }
+                        className="w-full rounded-xl border border-ink/15 bg-white pl-13 pr-14 py-3 text-sm outline-none transition focus:border-[#c41920] focus:ring-1 focus:ring-[#c41920]"
+                      />
+                      <span className="absolute right-3.5 text-xs text-gray-400">
+                        {form.phone?.length || 0}/10
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -184,7 +205,7 @@ export default function ContactUsPage() {
               <h3 className="text-lg font-bold text-[#180e0f]">Quick Contact</h3>
               <div className="mt-5 space-y-4">
                 <a
-                  href="tel:+918500900100"
+                  href="tel:+919999999999"
                   className="flex items-center gap-3.5 rounded-xl border border-ink/8 p-3.5 transition hover:bg-[#fff1f2] hover:border-[#fecdd3]"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#fff1f2] text-[#c41920]">
@@ -192,7 +213,7 @@ export default function ContactUsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-ink-soft">Toll-Free Helpline</p>
-                    <p className="text-sm font-bold text-[#180e0f]">+91 8500 900 100</p>
+                    <p className="text-sm font-bold text-[#180e0f]">+91 99999 99999</p>
                   </div>
                 </a>
 

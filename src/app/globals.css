@@ -103,6 +103,17 @@ input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(196, 25, 
 .site-footer [class*="text-white/"] { color: #fff !important; }
 .site-footer a { border-radius: .5rem; transition: background-color .2s ease, color .2s ease; }
 .site-footer a:hover { background-color: #c41920 !important; color: #fff !important; }
+.site-footer .footer-contact-item { border-radius: .75rem; transition: background-color .2s ease, color .2s ease; }
+.site-footer .footer-contact-item:hover { background-color: #c41920 !important; color: #fff !important; }
+.site-footer .footer-contact-item:hover span:first-child { background-color: rgba(255, 255, 255, 0.2) !important; }
+.site-footer a:hover svg,
+.site-footer .footer-contact-item:hover svg,
+.site-footer a:hover [class*="text-[#c41920]"],
+.site-footer .footer-contact-item:hover [class*="text-[#c41920]"],
+.site-footer [class*="group"]:hover svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
 
 /* Crimson buttons and badge icons have pure white high-contrast icons */
 button[class*="bg-[#c41920]"] svg,

@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <p className="mt-2 font-semibold text-[#180e0f]">
               Data Protection Officer · Bhoomi Real Estate<br />
-              Email: support@100acress.com · Phone: +91 8500 900 100
+              Email: support@100acress.com · Phone: +91 99999 99999
             </p>
           </div>
         </div>

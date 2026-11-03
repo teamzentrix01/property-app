@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import PropertyCard from "@/components/PropertyCard";
 import { notFound } from "next/navigation";
-import { serializeForClient } from "@/lib/formatters";
+import { serializeForClient, formatPhoneNumber } from "@/lib/formatters";
 
 // Public page a broker shares — shows only the properties they picked
 export default async function CatalogPage({ params }) {
@@ -30,7 +30,7 @@ export default async function CatalogPage({ params }) {
         ))}
       </div>
       <a href={`tel:${link.broker.phone}`} className="inline-block mt-10 bg-green-700 text-white px-6 py-3 rounded-full font-medium">
-        Call {link.broker.name} — {link.broker.phone}
+        Call {link.broker.name} — {formatPhoneNumber(link.broker.phone)}
       </a>
     </main>
   );
