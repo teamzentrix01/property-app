@@ -1,4 +1,3 @@
-import { Fraunces, Work_Sans, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -7,25 +6,6 @@ import RegisterSW from "@/components/RegisterSW";
 import Footer from "@/components/Footer";
 import LoginPopupModal from "@/components/LoginPopupModal";
 import AccountVerifiedModal from "@/components/AccountVerifiedModal";
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  style: ["normal", "italic"],
-});
-
-const workSans = Work_Sans({
-  variable: "--font-work-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const jbMono = JetBrains_Mono({
-  variable: "--font-jbmono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
 
 export const metadata = {
   title: "Bhoomi | Verified Properties Across India",
@@ -50,7 +30,12 @@ export default async function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${workSans.variable} ${jbMono.variable} h-full`}
+      className="h-full font-body"
+      style={{
+        "--font-fraunces": "Fraunces, Georgia, serif",
+        "--font-work-sans": "'Work Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "--font-jbmono": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+      }}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink antialiased pb-16 md:pb-0">
         <RegisterSW />
