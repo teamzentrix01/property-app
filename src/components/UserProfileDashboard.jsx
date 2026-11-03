@@ -63,7 +63,7 @@ export default function UserProfileDashboard() {
                 <div className="rounded-2xl border border-green-200 bg-white p-6 text-gray-900 shadow-sm sm:p-8">
                   <p className="text-xs font-bold uppercase tracking-[.18em] text-green-700">Your Bhoomi Account</p>
                   <h1 className="mt-2 font-display text-3xl font-extrabold text-gray-950 sm:text-4xl">Welcome back, {profile.name.split(" ")[0]}</h1>
-                  <p className="mt-2 text-sm text-gray-500">Saved properties, documents, and listings from your personal dashboard.</p>
+                  <p className="mt-2 text-sm text-gray-500">Manage your Saved properties, documents, and listings from your personal dashboard.</p>
                 </div>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -316,8 +316,8 @@ function DashboardSidebar({ menu, profile, accountType, section, selectSection, 
             key={key}
             onClick={() => selectSection(key)}
             className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-xs font-bold transition duration-150 ${section === key
-                ? "bg-white text-[#14532D] shadow-sm"
-                : "text-green-100 hover:bg-white/10 hover:text-white"
+              ? "bg-white text-[#14532D] shadow-sm"
+              : "text-green-100 hover:bg-white/10 hover:text-white"
               }`}
           >
             <Icon size={16} className={section === key ? "text-[#14532D]" : "text-green-300"} />
