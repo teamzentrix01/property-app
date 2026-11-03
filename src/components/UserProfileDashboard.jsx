@@ -48,12 +48,12 @@ export default function UserProfileDashboard() {
             onClick={() => setMenu(!menu)}
             className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-gray-800 shadow-sm"
           >
-            {menu ? <X size={17}/> : <Menu size={17}/>} Account Menu
+            {menu ? <X size={17} /> : <Menu size={17} />} Account Menu
           </button>
           <span className="rounded-full bg-green-50 border border-green-200 px-3 py-1 text-xs font-bold text-green-800">{accountType}</span>
         </div>
         <div className="flex flex-col gap-6 lg:flex-row">
-          <DashboardSidebar menu={menu} profile={profile} accountType={accountType} section={section} selectSection={selectSection} logout={logout}/>
+          <DashboardSidebar menu={menu} profile={profile} accountType={accountType} section={section} selectSection={selectSection} logout={logout} />
           <section className="min-w-0 flex-1">
             {notice && <p className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">{notice}</p>}
             {error && <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
@@ -63,7 +63,7 @@ export default function UserProfileDashboard() {
                 <div className="rounded-2xl border border-green-200 bg-white p-6 text-gray-900 shadow-sm sm:p-8">
                   <p className="text-xs font-bold uppercase tracking-[.18em] text-green-700">Your Bhoomi Account</p>
                   <h1 className="mt-2 font-display text-3xl font-extrabold text-gray-950 sm:text-4xl">Welcome back, {profile.name.split(" ")[0]}</h1>
-                  <p className="mt-2 text-sm text-gray-500">Manage your saved properties, documents, and listings from your personal dashboard.</p>
+                  <p className="mt-2 text-sm text-gray-500">Saved properties, documents, and listings from your personal dashboard.</p>
                 </div>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -107,11 +107,11 @@ export default function UserProfileDashboard() {
               <>
                 <Header title="My Profile" action={!editing && (
                   <button onClick={() => setEditing(true)} className="inline-flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-green-800">
-                    <Pencil size={15}/>Edit Profile
+                    <Pencil size={15} />Edit Profile
                   </button>
-                )}/>
+                )} />
                 {editing ? (
-                  <ProfileForm form={form} setForm={setForm} onSubmit={saveProfile} onCancel={() => setEditing(false)}/>
+                  <ProfileForm form={form} setForm={setForm} onSubmit={saveProfile} onCancel={() => setEditing(false)} />
                 ) : (
                   <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                     <div className="flex items-center gap-4">
@@ -123,7 +123,7 @@ export default function UserProfileDashboard() {
                         <p className="text-sm text-gray-500">{profile.email}</p>
                       </div>
                     </div>
-                    <Details values={[["Mobile Number", profile.phone], ["Account Type", accountType], ["Registration Date", date(profile.createdAt)], ["Account Status", profile.verificationStatus]]}/>
+                    <Details values={[["Mobile Number", profile.phone], ["Account Type", accountType], ["Registration Date", date(profile.createdAt)], ["Account Status", profile.verificationStatus]]} />
                   </div>
                 )}
               </>
@@ -135,7 +135,7 @@ export default function UserProfileDashboard() {
                   <button onClick={() => { setEditing(true); setSection("profile"); }} className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:border-green-600 hover:text-green-700">
                     Edit Preferences
                   </button>
-                }/>
+                } />
                 <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                   <p className="text-sm text-gray-500">Your property preferences help tailor our recommendations.</p>
                   <Details values={[
@@ -145,14 +145,14 @@ export default function UserProfileDashboard() {
                     ["Property Type", profile.preferredPropertyType || "Not specified"],
                     ["Budget Range", profile.budgetRange || "Not specified"],
                     ["BHK", profile.preferredBhk || "Not specified"]
-                  ]}/>
+                  ]} />
                 </div>
               </>
             )}
 
             {section === "saved" && (
               <>
-                <Header title={`Saved Properties (${saved.length})`}/>
+                <Header title={`Saved Properties (${saved.length})`} />
                 {saved.length ? (
                   <div className="flex flex-wrap gap-5">
                     {saved.map((l) => (
@@ -165,7 +165,7 @@ export default function UserProfileDashboard() {
                             Remove
                           </button>
                         </>
-                      }/>
+                      } />
                     ))}
                   </div>
                 ) : (
@@ -176,7 +176,7 @@ export default function UserProfileDashboard() {
 
             {section === "documents" && (
               <>
-                <Header title={`My Documents (${docs.length})`}/>
+                <Header title={`My Documents (${docs.length})`} />
                 <UserDocuments />
               </>
             )}
@@ -200,7 +200,7 @@ export default function UserProfileDashboard() {
                       <span className="rounded-md bg-amber-200/90 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-900">Locked</span>
                     </button>
                   )
-                }/>
+                } />
                 {posted.length ? (
                   <div className="flex flex-wrap gap-5">
                     {posted.map((l) => (
@@ -216,7 +216,7 @@ export default function UserProfileDashboard() {
                             Delete
                           </button>
                         </>
-                      }/>
+                      } />
                     ))}
                   </div>
                 ) : isVerified ? (
@@ -315,11 +315,10 @@ function DashboardSidebar({ menu, profile, accountType, section, selectSection, 
           <button
             key={key}
             onClick={() => selectSection(key)}
-            className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-xs font-bold transition duration-150 ${
-              section === key
+            className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-xs font-bold transition duration-150 ${section === key
                 ? "bg-white text-[#14532D] shadow-sm"
                 : "text-green-100 hover:bg-white/10 hover:text-white"
-            }`}
+              }`}
           >
             <Icon size={16} className={section === key ? "text-[#14532D]" : "text-green-300"} />
             <span>{label}</span>
@@ -344,12 +343,12 @@ function ProfileForm({ form, setForm, onSubmit, onCancel }) {
     const val = name === "phone" ? value.replace(/\D/g, "").slice(0, 10) : value;
     setForm((f) => ({ ...f, [name]: val }));
   };
-  const fields = [["name","Full Name"],["phone","Mobile Number"],["preferredCity","Preferred City"],["preferredLocation","Preferred Locality"],["preferredPropertyType","Property Type"],["budgetRange","Budget Range"],["preferredBhk","BHK"]];
+  const fields = [["name", "Full Name"], ["phone", "Mobile Number"], ["preferredCity", "Preferred City"], ["preferredLocation", "Preferred Locality"], ["preferredPropertyType", "Property Type"], ["budgetRange", "Budget Range"], ["preferredBhk", "BHK"]];
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       <p className="mb-5 text-xs text-gray-400">Email and account type are managed securely and cannot be changed here.</p>
       <div className="grid gap-4 sm:grid-cols-2">
-        {fields.map(([name,label]) => (
+        {fields.map(([name, label]) => (
           <label key={name} className="block text-xs font-bold uppercase tracking-wider text-gray-600">
             {label}
             <input
