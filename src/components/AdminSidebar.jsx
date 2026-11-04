@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import {
   BarChart3,
   Users,
@@ -13,6 +13,7 @@ import {
   FileBarChart,
   Settings,
   UserX,
+  MessageSquare,
 } from "lucide-react";
 
 const links = [
@@ -20,6 +21,7 @@ const links = [
   ["/admin/users", "Users", Users],
   ["/admin/deleted-users", "Deleted Accounts", UserX],
   ["/admin/properties", "Properties", Building2],
+  ["/admin/inquiries", "Inquiries", MessageSquare],
   ["/admin/reports", "Reports", FileBarChart],
   ["/admin/settings", "Settings", Settings],
 ];
@@ -28,13 +30,50 @@ export default function AdminSidebar() {
   const [open, setOpen] = useState(false);
   const [counts, setCounts] = useState({});
   const router = useRouter();
+  const pathname = usePathname();
 
-  useEffect(() => {
-    fetch("/api/admin/dashboard", { credentials: "include" })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => data && setCounts(data.stats))
-      .catch(() => { });
+  // Fetch live counts with seen timestamps from localStorage
+  const refreshCounts = useCallback(() => {
+    const seenUsersAt = typeof window !== "undefined" ? localStorage.getItem("bhoomi_admin_seen_users_at") : null;
+    const seenInquiriesAt = typeof window !== "undefined" ? localStorage.getItem("bhoomi_admin_seen_inquiries_at") : null;
+
+    const params = new URLSearchParams();
+    if (seenUsersAt) params.set("seenUsersAt", seenUsersAt);
+    if (seenInquiriesAt) params.set("seenInquiriesAt", seenInquiriesAt);
+
+    fetch(`/api/admin/dashboard?${params.toString()}`, { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.stats) {
+          setCounts(data.stats);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  // When admin navigates to /admin/users or /admin/inquiries, mark as seen
+  useEffect(() => {
+    if (!pathname) return;
+
+    if (pathname.startsWith("/admin/users") && !pathname.startsWith("/admin/users/delete")) {
+      const now = new Date().toISOString();
+      localStorage.setItem("bhoomi_admin_seen_users_at", now);
+      setCounts((prev) => ({ ...prev, newUsers: 0 }));
+    }
+
+    if (pathname.startsWith("/admin/inquiries")) {
+      const now = new Date().toISOString();
+      localStorage.setItem("bhoomi_admin_seen_inquiries_at", now);
+      setCounts((prev) => ({ ...prev, newInquiries: 0 }));
+    }
+  }, [pathname]);
+
+  // Initial fetch and 15s auto-polling for real-time live notification updates
+  useEffect(() => {
+    refreshCounts();
+    const interval = setInterval(refreshCounts, 15000);
+    return () => clearInterval(interval);
+  }, [refreshCounts]);
 
   async function logout() {
     await fetch("/api/admin/auth/logout", {
@@ -89,10 +128,14 @@ export default function AdminSidebar() {
         <nav className="space-y-2">
           {links.map(([href, label, Icon]) => {
             const count =
-              label === "Properties"
+              label === "Users"
+                ? counts.newUsers
+                : label === "Properties"
                 ? counts.pendingListings
                 : label === "Deleted Accounts"
                 ? counts.deletedUsers
+                : label === "Inquiries"
+                ? counts.newInquiries
                 : null;
 
             return (
@@ -106,7 +149,7 @@ export default function AdminSidebar() {
                 <span className="flex-1">{label}</span>
 
                 {count > 0 && (
-                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] text-red-700">
+                  <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1.5 text-[11px] font-bold text-[#c41920] shadow-sm">
                     {count}
                   </span>
                 )}

@@ -564,6 +564,9 @@ export default async function ListingDetail({ params }) {
               price={priceNum}
               purpose={listing.purpose}
               formattedPrice={formatPrice(listing.price, listing.purpose)}
+              listingId={listing.id}
+              propertyTitle={listing.title}
+              propertyLocation={[listing.area, listing.city].filter(Boolean).join(", ")}
             />
 
             {/* 3. Schedule a Free Site Visit Card */}

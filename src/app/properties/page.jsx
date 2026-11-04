@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
-import { getAllApprovedListings } from "@/lib/getListings";
+import { getAllApprovedListings, getApprovedCities } from "@/lib/getListings";
 import { PURPOSES, PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
 import { listingFilters } from "@/lib/listingFilters";
 
@@ -18,8 +18,11 @@ export const dynamic = "force-dynamic";
 export default async function PropertiesPage({ searchParams }) {
   const sp = await searchParams;
   const { where, error } = listingFilters(sp);
-  // Fetch every approved property from the backend, without a city restriction.
-  const { listings } = error ? { listings: [] } : await getAllApprovedListings(where);
+  // Fetch every approved property and all approved cities in parallel
+  const [{ listings }, cities] = await Promise.all([
+    error ? Promise.resolve({ listings: [] }) : getAllApprovedListings(where),
+    getApprovedCities(),
+  ]);
 
   return (
     <main className="min-h-screen flex-1 bg-slate-50 pb-24 md:pb-16">
@@ -102,11 +105,14 @@ export default async function PropertiesPage({ searchParams }) {
               </select>
             </Filter>
             <Filter label="City">
-              <input
-                name="city"
-                defaultValue={sp.city || ""}
-                placeholder="e.g. Gurugram, Moradabad, Meerut"
-              />
+              <select name="city" defaultValue={sp.city || ""}>
+                <option value="">All cities</option>
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
             </Filter>
             <Filter label="Locality">
               <input

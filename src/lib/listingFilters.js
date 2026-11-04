@@ -43,7 +43,8 @@ export function listingFilters(params) {
   if (furnishing && !["UNFURNISHED", "SEMI_FURNISHED", "FULLY_FURNISHED"].includes(furnishing)) return { error: "Invalid furnishing filter." };
   if (postedBy && !["BUYER", "OWNER", "BROKER"].includes(postedBy)) return { error: "Invalid posted-by filter." };
 
-  if (city) where.city = { contains: city, mode: "insensitive" };
+  // Use insensitive equals so dropdown city selection matches exactly (trims whitespace variants)
+  if (city) where.city = { equals: city.trim(), mode: "insensitive" };
   if (area) where.area = { contains: area, mode: "insensitive" };
   if (purpose) where.purpose = purpose;
   if (propertyTypes.length) where.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : { in: propertyTypes };
@@ -54,12 +55,21 @@ export function listingFilters(params) {
   if (minPrice !== undefined || maxPrice !== undefined) where.price = { ...(minPrice !== undefined ? { gte: minPrice } : {}), ...(maxPrice !== undefined ? { lte: maxPrice } : {}) };
   if (minArea !== undefined || maxArea !== undefined) where.sizeValue = { ...(minArea !== undefined ? { gte: minArea } : {}), ...(maxArea !== undefined ? { lte: maxArea } : {}) };
   if (search) {
-    const clauses = ["title", "city", "area", "nearbyLandmark", "description"].map((field) => ({ [field]: { contains: search, mode: "insensitive" } }));
+    // Build OR clauses for full-text search across relevant fields
+    const clauses = ["title", "area", "nearbyLandmark", "description"].map((field) => ({ [field]: { contains: search, mode: "insensitive" } }));
+    // Only search city field if no city dropdown filter is already applied (avoid conflict)
+    if (!city) clauses.push({ city: { contains: search, mode: "insensitive" } });
     const bhk = search.match(/^(\d+)\s*bhk$/i);
     if (bhk) clauses.push({ bedrooms: Number(bhk[1]) });
     const searchTypes = PROPERTY_TYPE_ALIASES[search.toUpperCase()] || (PROPERTY_TYPES.includes(search.toUpperCase()) ? [search.toUpperCase()] : []);
     if (searchTypes.length) clauses.push({ propertyType: searchTypes.length === 1 ? searchTypes[0] : { in: searchTypes } });
-    where.OR = clauses;
+    // Wrap OR inside AND with existing city/area filters using Prisma AND
+    if (city) {
+      // city is already set as top-level filter; wrap search as a nested AND condition
+      where.AND = [{ OR: clauses }];
+    } else {
+      where.OR = clauses;
+    }
   }
   return { where, error: null };
 }

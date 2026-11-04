@@ -15,7 +15,7 @@ export default function ContactUsPage() {
     message: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const phoneDigits = String(form.phone || "").replace(/\D/g, "");
     if (phoneDigits.length !== 10 || !/^[6-9]\d{9}$/.test(phoneDigits)) {
@@ -23,10 +23,29 @@ export default function ContactUsPage() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "CONTACT",
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit inquiry");
+      }
       setSubmitted(true);
-    }, 600);
+    } catch (err) {
+      alert(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const offices = [

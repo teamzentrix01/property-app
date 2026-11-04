@@ -84,6 +84,40 @@ export async function getRecommendedListings() {
   return { listings: serializeForClient(combined), demo: false };
 }
 
+export async function getApprovedCities() {
+  if (!process.env.DATABASE_URL) return [];
+  try {
+    // Fetch all distinct cities from APPROVED or ACTIVE properties
+    const rows = await prisma.listing.findMany({
+      where: {
+        status: { in: ["APPROVED", "ACTIVE"] },
+        city: { not: null },
+      },
+      select: { city: true },
+    });
+
+    // Normalize: trim whitespace, deduplicate case-insensitively
+    // Keep the first seen casing as the canonical display form
+    const seen = new Map(); // lowercase -> canonical
+    for (const row of rows) {
+      const raw = row.city;
+      if (!raw) continue;
+      const trimmed = raw.trim();
+      if (!trimmed) continue;
+      const key = trimmed.toLowerCase();
+      if (!seen.has(key)) seen.set(key, trimmed);
+    }
+
+    // Sort alphabetically (locale-aware for Hindi city names)
+    return [...seen.values()].sort((a, b) =>
+      a.localeCompare(b, ["hi", "en"], { sensitivity: "base" })
+    );
+  } catch (err) {
+    console.warn("getApprovedCities error:", err?.message);
+    return [];
+  }
+}
+
 export async function getAllApprovedListings(where = {}) {
   if (!process.env.DATABASE_URL) {
     return { listings: [], demo: true };

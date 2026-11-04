@@ -59,6 +59,14 @@ const projects = [
 export default function NewLaunchProjects({ listings = [] }) {
   const projects = listings.slice(0, 4).map((listing) => ({ id: listing.id, name: listing.title, location: `${listing.area}, ${listing.city}`, price: formatPrice(listing.price, listing.purpose), type: listing.propertyType, image: listing.photos?.[0]?.url || "/file.svg", tag: "New Launch" }));
 
+  // Dynamic city label from actual listings — no hardcoded city
+  const uniqueCities = [...new Set(projects.map((p) => p.location?.split(',').pop()?.trim()).filter(Boolean))];
+  const cityLabel =
+    uniqueCities.length === 0 ? 'India' :
+    uniqueCities.length === 1 ? uniqueCities[0] :
+    uniqueCities.length === 2 ? uniqueCities.join(' and ') :
+    uniqueCities[0] + ', ' + uniqueCities[1] + ' and More';
+
   return (
     <section className="w-full bg-[#f8f8f8] py-16 sm:py-16 lg:py-12">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
@@ -71,7 +79,7 @@ export default function NewLaunchProjects({ listings = [] }) {
             <div className="mb-3 flex items-center gap-2">
               <span className="h-[2px] w-8 bg-[#b58a3a]" />
 
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#b58a3a]">
                 Latest Launches
               </span>
             </div>
@@ -79,20 +87,17 @@ export default function NewLaunchProjects({ listings = [] }) {
             {/* Main Heading */}
             <h2 className="text-3xl font-bold tracking-tight text-[#171717] sm:text-4xl lg:text-[42px]">
               New Launch Projects in{" "}
-              <span className="text-[Explore Gurugram]">
-                Gurugram
-              </span>
+              <span className="text-[#c41920]">{cityLabel}</span>
             </h2>
 
             {/* Description */}
             <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500 sm:text-base">
-              Explore the latest residential launches from trusted
-              developers across Gurugram's prime locations.
+              Explore the latest verified property launches across your city.
             </p>
           </div>
 
           {/* View All */}
-          <Link href="/properties" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[Explore Gurugram]">
+          <Link href="/properties" className="group flex w-fit items-center gap-2 text-sm font-semibold text-[#222] transition hover:text-[#b58a3a]">
             View All Projects
 
             <ArrowRight
@@ -152,13 +157,13 @@ export default function NewLaunchProjects({ listings = [] }) {
               <div className="p-4">
 
                 {/* Name */}
-                <h3 className="text-lg font-bold text-[#171717] transition group-hover:text-[Explore Gurugram]">
+                <h3 className="text-lg font-bold text-[#171717] transition group-hover:text-[#b58a3a]">
                   {project.name}
                 </h3>
 
                 {/* Location */}
                 <div className="mt-2 flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[Explore Gurugram]" />
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#b58a3a]" />
 
                   <p className="line-clamp-2 text-xs leading-5 text-gray-500">
                     {project.location}
@@ -212,7 +217,7 @@ export default function NewLaunchProjects({ listings = [] }) {
                 <span className="h-2 w-2 rounded-full bg-[#c49a4a]" />
 
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#c49a4a]">
-                  Gurugram Real Estate
+                  Latest New Launches
                 </span>
               </div>
 

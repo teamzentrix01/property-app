@@ -76,7 +76,7 @@ export default function EditListingPage() {
               <Field label={listing.purpose === "RENT" ? "Monthly rent" : "Expected price"}><input required type="number" value={listing.price || ""} onChange={(event) => update("price", event.target.value)} /></Field>
               <Field label="Contact number">
                 <div className="relative flex items-center">
-                  <span className="absolute left-3 text-xs font-semibold text-gray-500 select-none">+91</span>
+                  <span className="pointer-events-none absolute left-3.5 z-10 text-xs font-semibold text-gray-500 select-none">+91</span>
                   <input
                     required
                     type="tel"
@@ -86,7 +86,7 @@ export default function EditListingPage() {
                     value={listing.contactNumber || ""}
                     onChange={(event) => update("contactNumber", event.target.value.replace(/\D/g, "").slice(0, 10))}
                     placeholder="98765 43210"
-                    className="pl-11"
+                    style={{ paddingLeft: "3.25rem", paddingRight: "1rem" }}
                   />
                 </div>
               </Field>

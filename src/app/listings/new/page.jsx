@@ -531,7 +531,7 @@ export default function NewListingPage() {
                     </Field>
                     <Field label="Your mobile number *">
                       <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-xs font-semibold text-gray-500 select-none">
+                        <span className="pointer-events-none absolute left-3.5 z-10 flex items-center text-xs font-semibold text-gray-500 select-none">
                           +91
                         </span>
                         <input
@@ -544,9 +544,9 @@ export default function NewListingPage() {
                             update("contactNumber", e.target.value)
                           }
                           placeholder="98765 43210"
-                          className="pl-12 pr-14"
+                          style={{ paddingLeft: "3.25rem", paddingRight: "3.5rem" }}
                         />
-                        <span className="absolute right-3 text-[11px] font-medium text-gray-400">
+                        <span className="pointer-events-none absolute right-3 z-10 flex items-center text-[11px] font-medium text-gray-400 select-none">
                           {form.contactNumber?.length || 0}/10
                         </span>
                       </div>
