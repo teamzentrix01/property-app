@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, ArrowRight, BadgeCheck } from "lucide-react";
 import SaveListingButton from "@/components/SaveListingButton";
@@ -14,9 +16,20 @@ const TYPES = {
   OFFICE: "Office Space",
   PG: "PG / Co-living",
 };
-export default function PropertyCard({ listing, variant, actions, children }) {
+export default function PropertyCard({ listing, variant, badge, actions, children }) {
+  const router = useRouter();
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) setUserLoggedIn(true);
+      })
+      .catch(() => {});
+  }, []);
   if (variant === "trending") return <TrendingCard listing={listing} />;
-  if (variant === "dashboard") return <DashboardCard listing={listing} actions={actions || children} />;
+  if (variant === "dashboard") return <DashboardCard listing={listing} badge={badge} actions={actions || children} />;
   const photo = listing.photos?.[0]?.url;
   const facts =
     listing.propertyType === "PLOT"
@@ -66,27 +79,41 @@ export default function PropertyCard({ listing, variant, actions, children }) {
         </span>
       </div>
       <div className="p-4">
-        <div className="mb-2 flex items-start justify-between gap-3">
-          <div>
-            <p className="font-display text-xl font-semibold">
-              {formatPrice(listing.price, listing.purpose)}
-            </p>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-moss-deep">
-              {TYPES[listing.propertyType]}
-            </p>
+        {(listing.locationBadge || badge) && (
+          <div className="mb-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200/80 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 shadow-2xs">
+              <MapPin className="h-2.5 w-2.5 text-blue-600" />
+              {listing.locationBadge || badge}
+            </span>
           </div>
-          <span className="rounded-full bg-paper-dim px-2.5 py-1 text-[10px] font-semibold">
+        )}
+        {/* 1. Location */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 min-w-0">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920]" />
+            <span className="truncate">{listing.area}, {listing.city}</span>
+          </div>
+          <span className="shrink-0 rounded-full bg-paper-dim px-2.5 py-0.5 text-[10px] font-semibold">
             {listing.postedBy === "BROKER" ? "Agent" : "Owner"}
           </span>
         </div>
-        <Link href={`/listings/${listing.id}`}>
-          <h3 className="line-clamp-1 font-semibold text-ink group-hover:text-moss-deep">
+
+        {/* 2. Price in Bold Red */}
+        <div className="mt-1.5 flex items-baseline gap-2">
+          <p className="text-xl font-bold text-[#c41920]">
+            {formatPrice(listing.price, listing.purpose)}
+          </p>
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+            {TYPES[listing.propertyType]}
+          </span>
+        </div>
+
+        {/* 3. Title */}
+        <Link href={`/listings/${listing.id}`} className="mt-1 block">
+          <h3 className="line-clamp-1 font-semibold text-ink group-hover:text-[#c41920]">
             {listing.title}
           </h3>
         </Link>
-        <p className="mt-1 line-clamp-1 text-sm text-ink-soft">
-          {listing.area}, {listing.city}
-        </p>
         {facts.filter(Boolean).length > 0 && (
           <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-y border-ink/8 py-2 text-xs text-ink-soft">
             {facts.filter(Boolean).map((f) => (
@@ -95,20 +122,46 @@ export default function PropertyCard({ listing, variant, actions, children }) {
           </div>
         )}
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <a
-            href={`tel:${listing.contactNumber || ""}`}
-            className="rounded-xl border border-moss/25 py-2 text-center text-xs font-semibold text-moss-deep"
-          >
-            Call
-          </a>
-          <a
-            href={`https://wa.me/91${String(listing.contactNumber || "")
-              .replace(/\D/g, "")
-              .slice(-10)}`}
-            className="rounded-xl bg-moss py-2 text-center text-xs font-semibold text-white"
-          >
-            WhatsApp
-          </a>
+          {!userLoggedIn ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push(`/login?next=/listings/${listing.id}`);
+              }}
+              className="rounded-xl border border-moss/25 py-2 text-center text-xs font-semibold text-moss-deep"
+            >
+              Call
+            </button>
+          ) : (
+            <a
+              href={`tel:${listing.contactNumber || ""}`}
+              className="rounded-xl border border-moss/25 py-2 text-center text-xs font-semibold text-moss-deep"
+            >
+              Call
+            </a>
+          )}
+          {!userLoggedIn ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push(`/login?next=/listings/${listing.id}`);
+              }}
+              className="rounded-xl bg-moss py-2 text-center text-xs font-semibold text-white"
+            >
+              WhatsApp
+            </button>
+          ) : (
+            <a
+              href={`https://wa.me/91${String(listing.contactNumber || "")
+                .replace(/\D/g, "")
+                .slice(-10)}`}
+              className="rounded-xl bg-moss py-2 text-center text-xs font-semibold text-white"
+            >
+              WhatsApp
+            </a>
+          )}
         </div>
       </div>
     </article>
@@ -176,20 +229,26 @@ function TrendingCard({ listing }) {
 
       {/* CONTENT */}
       <div className="p-4">
-        <Link href={`/listings/${project.id}`}>
-          <h3 className="line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[#b2873a]">
-            {project.name}
-          </h3>
-        </Link>
-
-        {/* Location */}
-        <div className="mt-2 flex items-center gap-2">
-          <MapPin className="h-4 w-4 shrink-0 text-[#b2873a]" />
+        {/* 1. Location */}
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 shrink-0 text-[#c41920]" />
 
           <p className="line-clamp-1 text-xs text-gray-500">
             {project.location}
           </p>
         </div>
+
+        {/* 2. Price */}
+        <p className="mt-1 text-lg font-bold text-[#c41920]">
+          {project.price}
+        </p>
+
+        {/* 3. Title */}
+        <Link href={`/listings/${project.id}`} className="mt-1 block">
+          <h3 className="line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[#c41920]">
+            {project.name}
+          </h3>
+        </Link>
 
         {/* Divider */}
         <div className="my-4 h-px bg-gray-100" />
@@ -229,7 +288,7 @@ function TrendingCard({ listing }) {
   );
 }
 
-function DashboardCard({ listing, actions }) {
+function DashboardCard({ listing, badge, actions }) {
   const photo = listing.photos?.[0]?.url;
   const location = [listing.area, listing.city].filter(Boolean).join(", ") || "Location on request";
   const price = formatPrice(listing.price, listing.purpose);
@@ -276,23 +335,31 @@ function DashboardCard({ listing, actions }) {
 
       {/* CARD CONTENT */}
       <div className="flex flex-1 flex-col p-4">
-        {/* Property Name */}
-        <Link href={`/listings/${listing.id}`}>
-          <h3 className="line-clamp-1 text-[15px] sm:text-base font-bold text-[#171717] transition-colors hover:text-[#c41920]">
-            {listing.title}
-          </h3>
-        </Link>
+        {(listing.locationBadge || badge) && (
+          <div className="mb-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200/80 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 shadow-2xs">
+              <MapPin className="h-2.5 w-2.5 text-blue-600" />
+              {listing.locationBadge || badge}
+            </span>
+          </div>
+        )}
+        {/* 1. Location */}
+        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920]" />
+          <span className="truncate">{location}</span>
+        </div>
 
-        {/* Price in Bold Red */}
+        {/* 2. Price in Bold Red */}
         <p className="mt-1 text-base font-bold text-[#c41920] sm:text-lg">
           {price}
         </p>
 
-        {/* Location */}
-        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-500">
-          <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920]" />
-          <span className="truncate">{location}</span>
-        </div>
+        {/* 3. Property Name */}
+        <Link href={`/listings/${listing.id}`} className="mt-1">
+          <h3 className="line-clamp-1 text-[15px] sm:text-base font-bold text-[#171717] transition-colors hover:text-[#c41920]">
+            {listing.title}
+          </h3>
+        </Link>
 
         {/* Property Type / Area */}
         <div className="mt-2 flex items-center justify-between text-[11px] text-gray-500 font-medium">

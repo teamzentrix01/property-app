@@ -500,7 +500,14 @@ function LoginForm() {
               {/* Register CTA */}
               <p className="login-register-cta">
                 Don&apos;t have an account?{" "}
-                <Link href="/signup" className="login-register-link">
+                <Link
+                  href={
+                    searchParams.get("next") || searchParams.get("redirect")
+                      ? `/signup?next=${encodeURIComponent(searchParams.get("next") || searchParams.get("redirect"))}`
+                      : "/signup"
+                  }
+                  className="login-register-link"
+                >
                   Register
                 </Link>
               </p>

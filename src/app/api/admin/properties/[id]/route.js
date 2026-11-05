@@ -18,6 +18,24 @@ export async function PATCH(req, { params }) {
   if (!auth.user) return NextResponse.json({ error: auth.error }, { status: auth.status });
   const { id } = await params;
   const body = await req.json().catch(() => null);
+  // Allow Admin to toggle DMA Approved / Authority Approved status independently or alongside status
+  if (body && typeof body.authorityApproved === "boolean" && !body.status) {
+    const updated = await prisma.listing.update({
+      where: { id },
+      data: { authorityApproved: body.authorityApproved },
+    });
+    await prisma.adminAudit.create({
+      data: {
+        adminId: auth.user.id,
+        action: body.authorityApproved ? "ADMIN_PROPERTY_DMA_APPROVED" : "ADMIN_PROPERTY_DMA_REVOKED",
+        targetType: "LISTING",
+        targetId: id,
+        metadata: { authorityApproved: body.authorityApproved },
+      },
+    });
+    return NextResponse.json({ listing: updated });
+  }
+
   if (!statuses.includes(body?.status)) return NextResponse.json({ error: "Invalid property status" }, { status: 400 });
   if (body.status === "ACTIVE") {
     const current = await prisma.listing.findUnique({ where: { id }, select: { status: true } });
@@ -25,7 +43,7 @@ export async function PATCH(req, { params }) {
     if (current.status !== "APPROVED" && current.status !== "ACTIVE") return NextResponse.json({ error: "Only approved properties can be activated" }, { status: 400 });
   }
   const now = new Date();
-  const data = { status: body.status, rejectionReason: body.status === "REJECTED" ? String(body.reason || "Property was rejected during review.").slice(0, 500) : null, ...(body.status === "APPROVED" ? { approvedAt: now, approvedBy: auth.user.id } : {}), ...(body.status === "ACTIVE" ? { activatedAt: now, activatedBy: auth.user.id } : {}), ...(body.status === "REJECTED" ? { rejectedAt: now, rejectedBy: auth.user.id } : {}) };
+  const data = { status: body.status, ...(typeof body.authorityApproved === "boolean" ? { authorityApproved: body.authorityApproved } : {}), rejectionReason: body.status === "REJECTED" ? String(body.reason || "Property was rejected during review.").slice(0, 500) : null, ...(body.status === "APPROVED" ? { approvedAt: now, approvedBy: auth.user.id } : {}), ...(body.status === "ACTIVE" ? { activatedAt: now, activatedBy: auth.user.id } : {}), ...(body.status === "REJECTED" ? { rejectedAt: now, rejectedBy: auth.user.id } : {}) };
   const listing = await prisma.listing.update({
     where: { id },
     data,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, ChevronLeft, ChevronRight, Landmark, Mail, Building, Eye } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Landmark, Mail, Building, Eye, Sparkles } from "lucide-react";
 
 export default function AdminInquiriesPage() {
   const [data, setData] = useState(null);
@@ -39,6 +39,13 @@ export default function AdminInquiriesPage() {
       return (
         <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 border border-emerald-200/60">
           <Landmark size={11} /> Home Loan
+        </span>
+      );
+    }
+    if (message?.startsWith("[NIA CHATBOT INQUIRY]")) {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-800 border border-rose-200/60">
+          <Sparkles size={11} /> Nia AI Assistant
         </span>
       );
     }

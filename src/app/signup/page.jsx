@@ -22,6 +22,7 @@ import {
   Check,
 } from "lucide-react";
 import BhoomiMark from "@/components/BhoomiMark";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 /* ── Password strength helper (cosmetic only — does NOT change backend rules) ── */
 function getPasswordStrength(password) {
@@ -45,6 +46,8 @@ export default function SignupPage() {
     name: "",
     email: "",
     phone: "",
+    preferredLocation: "",
+    preferredCity: "",
     password: "",
     role: "BUYER",
   });
@@ -92,6 +95,11 @@ export default function SignupPage() {
     } else if (!phoneRegex.test(form.phone.trim())) {
       newErrors.phone =
         "Please enter a valid 10-digit Indian mobile number.";
+    }
+
+    // Preferred Property Location
+    if (!form.preferredLocation || !form.preferredLocation.trim()) {
+      newErrors.preferredLocation = "Please choose or enter your preferred property location.";
     }
 
     // Password
@@ -445,6 +453,50 @@ export default function SignupPage() {
                       <AlertCircle size={14} /> {errors.phone}
                     </p>
                   )}
+                </div>
+
+                {/* Preferred Property Location */}
+                <div className="login-field-group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="preferred-location-input" className="login-label mb-0">
+                      Preferred Property Location
+                    </label>
+                    <span className="text-[11px] font-semibold text-[#c41920]">Required</span>
+                  </div>
+                  <LocationAutocomplete
+                    id="preferred-location-input"
+                    name="preferredLocation"
+                    value={form.preferredLocation}
+                    placeholder="Enter city, locality, sector, or PIN code..."
+                    onChange={(text, item) => {
+                      setForm((prev) => ({
+                        ...prev,
+                        preferredLocation: text,
+                        preferredCity: item?.city || prev.preferredCity || text,
+                      }));
+                      if (errors.preferredLocation) {
+                        setErrors((prev) => ({ ...prev, preferredLocation: "" }));
+                      }
+                    }}
+                    onSelect={(item) => {
+                      setForm((prev) => ({
+                        ...prev,
+                        preferredLocation: item.fullAddress || item.label,
+                        preferredCity: item.city || "",
+                      }));
+                      if (errors.preferredLocation) {
+                        setErrors((prev) => ({ ...prev, preferredLocation: "" }));
+                      }
+                    }}
+                  />
+                  {errors.preferredLocation && (
+                    <p id="signup-loc-err" className="login-field-error" role="alert">
+                      <AlertCircle size={14} /> {errors.preferredLocation}
+                    </p>
+                  )}
+                  <p className="mt-1 text-[11px] text-gray-400">
+                    Bhoomi personalizes your homepage and recommendations based on this location.
+                  </p>
                 </div>
 
                 {/* Password */}

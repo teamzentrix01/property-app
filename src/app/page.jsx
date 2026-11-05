@@ -12,29 +12,51 @@ import PopularBuilders from "@/components/PopularBuilders";
 import BHKLifestyle from "@/components/BHKLifestyle";
 import WhyChooseBhoomi from "@/components/WhyChooseBhoomi";
 import CustomerTestimonials from "@/components/CustomerTestimonials";
-import { getApprovedListings, getRecommendedListings } from "@/lib/getListings";
+import PersonalizedPropertiesSection from "@/components/PersonalizedPropertiesSection";
+import { getApprovedListings, getRecommendedListings, getRotatingSectionsData } from "@/lib/getListings";
+import { currentUser } from "@/lib/serverAuth";
+import { getUserLocationRecommendations } from "@/lib/locationIntelligence";
 
 export default async function Page() {
+  const user = await currentUser();
+
   let listings = [];
   let commercialListings = [];
   let luxuryListings = [];
   let brandedListings = [];
   let recommendedListings = [];
   let listingsError = false;
+  let personalizedLocationData = null;
+  let rotatingData = { trending: {}, newLaunch: {}, branded: {}, luxury: {} };
 
   try {
-    const [latest, commercial, luxury, branded, recommended] = await Promise.all([
+    const promises = [
       getApprovedListings(),
       getApprovedListings({ propertyType: { in: ["SHOP", "SHOWROOM", "GODOWN", "OFFICE"] } }),
       getApprovedListings({ categories: { some: { category: "LUXURY" } } }),
       getApprovedListings({ categories: { some: { category: "BRANDED" } } }),
       getRecommendedListings(),
-    ]);
+      getRotatingSectionsData().catch(() => ({ trending: {}, newLaunch: {}, branded: {}, luxury: {} })),
+    ];
+
+    if (user && (user.preferredLocation || user.preferredCity)) {
+      promises.push(
+        getUserLocationRecommendations(
+          user.preferredLocation || user.preferredCity,
+          { limit: 12 }
+        ).catch(() => null)
+      );
+    }
+
+    const [latest, commercial, luxury, branded, recommended, rotating, personalized] = await Promise.all(promises);
+
     listings = latest.listings;
     commercialListings = commercial.listings;
     luxuryListings = luxury.listings;
     brandedListings = branded.listings;
     recommendedListings = recommended.listings;
+    rotatingData = rotating || { trending: {}, newLaunch: {}, branded: {}, luxury: {} };
+    personalizedLocationData = personalized || null;
   } catch (error) {
     listingsError = true;
     console.error("Homepage listings failed to load:", error);
@@ -43,18 +65,28 @@ export default async function Page() {
   return (
     <main className="w-full max-w-full overflow-x-hidden">
       <Herosection />
+
+
+
+      {personalizedLocationData && (
+        <PersonalizedPropertiesSection
+          userLocationData={personalizedLocationData}
+          user={user}
+        />
+      )}
+
       <RecommendedProperties listings={recommendedListings} error={listingsError} />
-      <TrendingProjects />
-      <NewLaunchProjects listings={listings} />
       <FestivalOffer />
-      <BrandedResidences listings={brandedListings}/>
-      <TopLuxuryProjects listings={luxuryListings}/>
-      <CommercialProjects listings={commercialListings}/>
-      <SCOProjects listings={commercialListings}/>
-      <PopularBuilders/>
-      <BHKLifestyle/>
-      <WhyChooseBhoomi/>
-      <CustomerTestimonials/>
+      <TrendingProjects groupedData={rotatingData.trending} />
+      <NewLaunchProjects groupedData={rotatingData.newLaunch} listings={listings} />
+      <BrandedResidences groupedData={rotatingData.branded} listings={brandedListings} />
+      <TopLuxuryProjects groupedData={rotatingData.luxury} listings={luxuryListings} />
+      <CommercialProjects listings={commercialListings} />
+      <SCOProjects listings={commercialListings} />
+      <PopularBuilders />
+      <BHKLifestyle />
+      <WhyChooseBhoomi />
+      <CustomerTestimonials />
     </main>
   );
 }

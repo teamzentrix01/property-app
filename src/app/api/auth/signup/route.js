@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import { parseLocationString } from "@/lib/indianLocations";
 
 import {
   hashPassword,
@@ -64,6 +65,17 @@ export async function POST(req) {
 
     const role =
       value("role");
+
+    const preferredLocationValue =
+      value("preferredLocation").trim();
+
+    let preferredCityValue =
+      value("preferredCity").trim();
+
+    if (!preferredCityValue && preferredLocationValue) {
+      const parsedLoc = parseLocationString(preferredLocationValue);
+      preferredCityValue = parsedLoc.city || preferredLocationValue;
+    }
 
     const name =
       personName(nameValue);
@@ -230,6 +242,12 @@ export async function POST(req) {
 
           verificationDeadline:
             verificationDeadline,
+
+          preferredLocation:
+            preferredLocationValue || null,
+
+          preferredCity:
+            preferredCityValue || null,
         },
       });
 

@@ -6,6 +6,7 @@ import RegisterSW from "@/components/RegisterSW";
 import Footer from "@/components/Footer";
 import LoginPopupModal from "@/components/LoginPopupModal";
 import AccountVerifiedModal from "@/components/AccountVerifiedModal";
+import NiaChatbot from "@/components/NiaChatbot";
 
 export const metadata = {
   title: "Bhoomi | Verified Properties Across India",
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }) {
           {!isAdminRoute && <Footer />}
           {!isAdminRoute && <LoginPopupModal />}
           {!isAdminRoute && <AccountVerifiedModal />}
+          {!isAdminRoute && <NiaChatbot />}
         </SmoothScroll>
       </body>
     </html>

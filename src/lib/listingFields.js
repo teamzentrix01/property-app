@@ -48,7 +48,7 @@ export const OPTIONAL_FIELD_GROUPS = [
         name: "sizeUnit",
         label: "Unit",
         type: "select",
-        options: ["sqft", "sqyard", "gaj", "acre"],
+        options: ["sqft", "sqyard", "gaj", "sqmeter", "acre", "hectare", "bigha", "marla", "kanal", "ground", "cent"],
       },
       { name: "plotLength", label: "Plot length (ft)", type: "number" },
       { name: "plotWidth", label: "Plot width (ft)", type: "number" },

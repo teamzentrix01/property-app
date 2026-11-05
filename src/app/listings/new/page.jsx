@@ -370,10 +370,11 @@ export default function NewListingPage() {
                         value={form.sizeUnit}
                         onChange={(e) => update("sizeUnit", e.target.value)}
                       >
-                        <option value="sqft">sq ft</option>
-                        <option value="sqyard">sq yard</option>
-                        <option value="gaj">gaj</option>
-                        <option value="acre">acre</option>
+                        {MEASUREMENT_UNITS.map((unit) => (
+                          <option key={unit.value} value={unit.value}>
+                            {unit.label}
+                          </option>
+                        ))}
                       </select>
                     </Field>
                     {isPlot && (
@@ -528,6 +529,24 @@ export default function NewListingPage() {
                         onChange={(e) => update("price", e.target.value)}
                         placeholder="Amount in ₹"
                       />
+                      {form.price > 0 && form.sizeValue > 0 && (
+                        <div className="mt-2.5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50/70 p-2.5">
+                          <div>
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                              Estimated Unit Rate
+                            </span>
+                            <span className="text-xs font-bold text-emerald-950">
+                              ₹{Math.round(calculateEstimatedUnitRate({ price: form.price, sizeValue: form.sizeValue, sizeUnit: form.sizeUnit, targetUnit: form.sizeUnit }).rate || 0).toLocaleString("en-IN")}{" "}
+                              <span className="text-[11px] font-normal text-emerald-700">
+                                {MEASUREMENT_UNITS.find((u) => u.value === form.sizeUnit)?.suffix || "/ " + form.sizeUnit}
+                              </span>
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-semibold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200">
+                            Auto-calculated
+                          </span>
+                        </div>
+                      )}
                     </Field>
                     <Field label="Your mobile number *">
                       <div className="relative flex items-center">

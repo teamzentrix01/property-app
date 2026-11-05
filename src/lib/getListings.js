@@ -182,3 +182,74 @@ export async function getHomepageSections() {
     fallbackListings: serializeForClient(fallbackListings),
   };
 }
+
+
+export async function getRotatingSectionsData() {
+  if (!process.env.DATABASE_URL) {
+    return {
+      trending: {},
+      newLaunch: {},
+      branded: {},
+      luxury: {},
+    };
+  }
+
+  try {
+    const listings = await prisma.listing.findMany({
+      where: { status: { in: ["APPROVED", "ACTIVE"] } },
+      include: {
+        photos: true,
+        categories: true,
+        owner: { select: { verified: true, name: true, role: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const serialized = serializeForClient(listings);
+
+    const trending = {};
+    const newLaunch = {};
+    const branded = {};
+    const luxury = {};
+
+    for (const item of serialized) {
+      const city = item.city?.trim();
+      if (!city) continue;
+
+      // Group for trending
+      if (!trending[city]) trending[city] = [];
+      trending[city].push(item);
+
+      // Group for newLaunch
+      if (!newLaunch[city]) newLaunch[city] = [];
+      newLaunch[city].push(item);
+
+      // Group for branded
+      const hasBranded = item.categories?.some((c) => c.category === "BRANDED");
+      if (hasBranded) {
+        if (!branded[city]) branded[city] = [];
+        branded[city].push(item);
+      }
+
+      // Group for luxury
+      const hasLuxury = item.categories?.some((c) => c.category === "LUXURY");
+      if (hasLuxury) {
+        if (!luxury[city]) luxury[city] = [];
+        luxury[city].push(item);
+      }
+    }
+
+    // If no city has branded/luxury tag yet, use cities with properties as fallback
+    if (Object.keys(branded).length === 0) {
+      Object.assign(branded, trending);
+    }
+    if (Object.keys(luxury).length === 0) {
+      Object.assign(luxury, trending);
+    }
+
+    return { trending, newLaunch, branded, luxury };
+  } catch (e) {
+    console.warn("Could not query rotating sections data:", e.message);
+    return { trending: {}, newLaunch: {}, branded: {}, luxury: {} };
+  }
+}

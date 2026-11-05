@@ -161,24 +161,24 @@ export default function CommercialProjects({ listings = [] }) {
               {/* ================= CONTENT ================= */}
               <div className="p-4">
 
-                {/* Developer */}
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[Explore Gurugram]">
-                  {project.developer}
-                </p>
-
-                {/* Name */}
-                <h3 className="mt-1 line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[Explore Gurugram]">
-                  {project.name}
-                </h3>
-
-                {/* Location */}
-                <div className="mt-2 flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[Explore Gurugram]" />
+                {/* 1. Location */}
+                <div className="flex items-start gap-2">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#c41920]" />
 
                   <p className="line-clamp-2 text-xs leading-5 text-gray-500">
                     {project.location}, {project.city}
                   </p>
                 </div>
+
+                {/* 2. Price */}
+                <p className="mt-1 text-lg font-bold text-[#c41920]">
+                  {project.price}
+                </p>
+
+                {/* 3. Name */}
+                <h3 className="mt-1 line-clamp-1 text-lg font-bold text-[#171717] transition group-hover:text-[#c41920]">
+                  {project.name}
+                </h3>
 
                 {/* Divider */}
                 <div className="my-4 h-px bg-gray-100" />

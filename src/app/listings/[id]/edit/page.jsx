@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import PropertyCategorySelector from "@/components/PropertyCategorySelector";
+import { MEASUREMENT_UNITS, calculateEstimatedUnitRate } from "@/lib/unitConversions";
 
-const fields = ["title", "city", "area", "price", "contactNumber", "sizeValue", "sizeUnit", "plotLength", "plotWidth", "roadWidthFt", "facing", "bedrooms", "bathrooms", "nearbyLandmark", "description", "negotiable", "isCornerPlot"];
+const fields = ["title", "city", "area", "price", "contactNumber", "sizeValue", "sizeUnit", "plotLength", "plotWidth", "roadWidthFt", "facing", "bedrooms", "bathrooms", "nearbyLandmark", "description", "negotiable", "isCornerPlot", "authorityApproved"];
 
 export default function EditListingPage() {
   const { id } = useParams();
@@ -73,7 +74,27 @@ export default function EditListingPage() {
               <Field label="Listing title" wide><input required value={listing.title || ""} onChange={(event) => update("title", event.target.value)} /></Field>
               <Field label="City"><input required value={listing.city || ""} onChange={(event) => update("city", event.target.value)} /></Field>
               <Field label="Locality"><input required value={listing.area || ""} onChange={(event) => update("area", event.target.value)} /></Field>
-              <Field label={listing.purpose === "RENT" ? "Monthly rent" : "Expected price"}><input required type="number" value={listing.price || ""} onChange={(event) => update("price", event.target.value)} /></Field>
+              <Field label={listing.purpose === "RENT" ? "Monthly rent" : "Expected price"}>
+                <input required type="number" value={listing.price || ""} onChange={(event) => update("price", event.target.value)} />
+                {Number(listing.price) > 0 && Number(listing.sizeValue) > 0 && (
+                  <div className="mt-2.5 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50/70 p-2.5">
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                        Estimated Unit Rate
+                      </span>
+                      <span className="text-xs font-bold text-emerald-950">
+                        ₹{Math.round(calculateEstimatedUnitRate({ price: listing.price, sizeValue: listing.sizeValue, sizeUnit: listing.sizeUnit, targetUnit: listing.sizeUnit }).rate || 0).toLocaleString("en-IN")}{" "}
+                        <span className="text-[11px] font-normal text-emerald-700">
+                          {MEASUREMENT_UNITS.find((u) => u.value === listing.sizeUnit)?.suffix || "/ " + (listing.sizeUnit || "sqft")}
+                        </span>
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200">
+                      Auto-calculated
+                    </span>
+                  </div>
+                )}
+              </Field>
               <Field label="Contact number">
                 <div className="relative flex items-center">
                   <span className="pointer-events-none absolute left-3.5 z-10 text-xs font-semibold text-gray-500 select-none">+91</span>
@@ -91,13 +112,14 @@ export default function EditListingPage() {
                 </div>
               </Field>
               <Field label="Area"><input type="number" value={listing.sizeValue || ""} onChange={(event) => update("sizeValue", event.target.value)} /></Field>
-              <Field label="Area unit"><select value={listing.sizeUnit || "sqft"} onChange={(event) => update("sizeUnit", event.target.value)}>{["sqft", "sqyard", "gaj", "acre"].map((unit) => <option key={unit}>{unit}</option>)}</select></Field>
+              <Field label="Area unit"><select value={listing.sizeUnit || "sqft"} onChange={(event) => update("sizeUnit", event.target.value)}>{MEASUREMENT_UNITS.map((unit) => <option key={unit.value} value={unit.value}>{unit.label}</option>)}</select></Field>
               {listing.propertyType === "PLOT" && <>
                 <Field label="Plot length (ft)"><input type="number" value={listing.plotLength || ""} onChange={(event) => update("plotLength", event.target.value)} /></Field>
                 <Field label="Plot width (ft)"><input type="number" value={listing.plotWidth || ""} onChange={(event) => update("plotWidth", event.target.value)} /></Field>
                 <Field label="Road width (ft)"><input type="number" value={listing.roadWidthFt || ""} onChange={(event) => update("roadWidthFt", event.target.value)} /></Field>
                 <Field label="Facing"><select value={listing.facing || ""} onChange={(event) => update("facing", event.target.value)}><option value="">Select</option>{["North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"].map((direction) => <option key={direction}>{direction}</option>)}</select></Field>
                 <Check label="Corner plot" value={listing.isCornerPlot} set={(value) => update("isCornerPlot", value)} />
+                <Check label="MDA / Development Authority Approved" value={listing.authorityApproved} set={(value) => update("authorityApproved", value)} />
               </>}
               {["HOUSE", "FLAT", "PG"].includes(listing.propertyType) && <>
                 <Field label="Bedrooms / BHK"><input type="number" value={listing.bedrooms || ""} onChange={(event) => update("bedrooms", event.target.value)} /></Field>

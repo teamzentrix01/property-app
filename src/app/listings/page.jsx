@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Compass, Sparkles } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
 import { getApprovedListings } from "@/lib/getListings";
 import { PURPOSES, PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
 import { listingFilters } from "@/lib/listingFilters";
+import { getUserLocationRecommendations } from "@/lib/locationIntelligence";
 const allTypes = [
   ...new Map(
     Object.values(PROPERTY_TYPES_BY_PURPOSE)
@@ -15,6 +16,16 @@ export default async function ListingsPage({ searchParams }) {
   const sp = await searchParams;
   const { where, error } = listingFilters(sp);
   const { listings } = error ? { listings: [] } : await getApprovedListings(where);
+
+  let fallbackLocationData = null;
+  const searchedLoc = sp.city || sp.area || sp.search;
+  if (!listings.length && searchedLoc) {
+    try {
+      fallbackLocationData = await getUserLocationRecommendations(searchedLoc, { limit: 12 });
+    } catch (e) {
+      console.warn("Fallback location error:", e.message);
+    }
+  }
   return (
     <main className="min-h-screen flex-1 bg-slate-50 pb-24 md:pb-16">
       <section className="border-b border-gray-200 bg-white">
@@ -153,6 +164,36 @@ export default async function ListingsPage({ searchParams }) {
               {listings.map((l) => (
                 <PropertyCard key={l.id} listing={l} />
               ))}
+            </div>
+          ) : fallbackLocationData && fallbackLocationData.allRecommendations.length > 0 ? (
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-5 shadow-2xs">
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
+                    <Compass className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-gray-950">
+                      No properties found in {fallbackLocationData.searchedLocation}
+                    </h2>
+                    <p className="mt-1 text-xs sm:text-sm font-medium text-blue-900">
+                      But don&apos;t worry! Explore properties available nearby.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-display text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#c41920]" />
+                  Recommended Properties Near {fallbackLocationData.searchedLocation}
+                </h3>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {fallbackLocationData.allRecommendations.map((l) => (
+                    <PropertyCard key={l.id} listing={l} badge={l.locationBadge} />
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="rounded-3xl border border-dashed border-gray-200 bg-white py-20 text-center">

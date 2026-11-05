@@ -154,25 +154,25 @@ export default function RecommendedProperties({ listings = [], error = false }) 
 
                   {/* CARD CONTENT */}
                   <div className="flex flex-1 flex-col p-4">
-                    {/* Property Name */}
-                    <Link href={`/listings/${property.id}`}>
-                      <h3 className="line-clamp-1 text-[15px] sm:text-base font-bold text-[#171717] transition-colors group-hover:text-[#c41920]">
-                        {property.name}
-                      </h3>
-                    </Link>
-
-                    {/* Price in Bold Red */}
-                    <p className="mt-1 text-base font-bold text-[#c41920] sm:text-lg">
-                      {property.price}
-                    </p>
-
-                    {/* Location */}
-                    <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-500">
+                    {/* 1. Location */}
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
                       <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920]" />
                       <span className="truncate">
                         {property.location}{property.city ? `, ${property.city}` : ""}
                       </span>
                     </div>
+
+                    {/* 2. Price in Bold Red */}
+                    <p className="mt-1 text-base font-bold text-[#c41920] sm:text-lg">
+                      {property.price}
+                    </p>
+
+                    {/* 3. Property Name */}
+                    <Link href={`/listings/${property.id}`} className="mt-1">
+                      <h3 className="line-clamp-1 text-[15px] sm:text-base font-bold text-[#171717] transition-colors group-hover:text-[#c41920]">
+                        {property.name}
+                      </h3>
+                    </Link>
 
                     {/* View Property Button */}
                     <Link

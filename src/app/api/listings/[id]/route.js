@@ -62,6 +62,7 @@ export async function PATCH(req, { params }) {
       nearbyLandmark: text(body.nearbyLandmark, { max: 160 }), description: text(body.description, { max: 5000 }),
       negotiable: typeof body.negotiable === "boolean" ? body.negotiable : undefined,
       isCornerPlot: typeof body.isCornerPlot === "boolean" ? body.isCornerPlot : undefined,
+      authorityApproved: typeof body.authorityApproved === "boolean" ? body.authorityApproved : undefined,
       status: "PENDING", rejectionReason: null,
       categories: { deleteMany: {}, create: categories.map((category) => ({ category })) },
     };

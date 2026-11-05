@@ -1,5 +1,6 @@
 "use client";
 import PropertyCard from "@/components/PropertyCard";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -33,7 +34,7 @@ export default function UserProfileDashboard() {
   // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => { load().catch(() => setError("We could not load your dashboard. Please refresh and try again.")); }, []);
   const selectSection = (key) => { setSection(key); setMenu(false); setNotice(""); };
-  const saveProfile = async (event) => { event.preventDefault(); setError(""); const r = await fetch("/api/profile", { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }); const data = await r.json(); if (!r.ok) return setError(data.error || "Could not save your profile"); setProfile(data.user); setForm({ ...blank, ...data.user }); setEditing(false); setNotice("Profile updated successfully."); };
+  const saveProfile = async (event) => { event.preventDefault(); setError(""); const r = await fetch("/api/profile", { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }); const data = await r.json(); if (!r.ok) return setError(data.error || "Could not save your profile"); setProfile(data.user); setForm({ ...blank, ...data.user }); setEditing(false); setNotice("Profile updated successfully."); window.dispatchEvent(new Event("bhoomi-location-changed")); router.refresh(); };
   const removeSaved = async (id) => { const r = await fetch(`/api/profile/saved-properties?listingId=${encodeURIComponent(id)}`, { method: "DELETE", credentials: "include" }); if (r.ok) { setSaved((items) => items.filter((item) => item.id !== id)); setCounts((value) => ({ ...value, saved: Math.max(0, value.saved - 1) })); setNotice("Property removed from saved properties."); } };
   const deleteListing = async (id) => { if (!window.confirm("Delete this property listing?")) return; const r = await fetch(`/api/listings/${id}`, { method: "DELETE", credentials: "include" }); if (r.ok) { setPosted((items) => items.filter((item) => item.id !== id)); setCounts((value) => ({ ...value, posted: Math.max(0, value.posted - 1) })); } else setError("Could not delete the listing."); };
   const logout = async () => { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); router.push("/"); router.refresh(); };
@@ -207,7 +208,7 @@ export default function UserProfileDashboard() {
                       <ListingCard key={l.id} listing={l} actions={
                         <>
                           <Link href={`/listings/${l.id}`} className="flex-1 text-center rounded-xl bg-green-700 px-2.5 py-2 text-xs font-bold text-white transition hover:bg-green-800">
-                            View
+                            View Details
                           </Link>
                           <Link href={`/listings/${l.id}/edit`} className="flex-1 text-center rounded-xl border border-gray-200 px-2.5 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50">
                             Edit
