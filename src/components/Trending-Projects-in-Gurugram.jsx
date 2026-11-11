@@ -109,7 +109,6 @@ export default function TrendingProjects({ groupedData = {} }) {
             </span>
             {eligibleCities.map((cityName) => {
               const isActive = activeCity.toLowerCase() === cityName.toLowerCase();
-              const count = clientData[cityName]?.length || 0;
               return (
                 <button
                   key={cityName}
@@ -123,13 +122,6 @@ export default function TrendingProjects({ groupedData = {} }) {
                 >
                   <MapPin className={`h-3 w-3 ${isActive ? "text-white" : "text-[#c41920]"}`} />
                   <span>{cityName}</span>
-                  <span
-                    className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-                      isActive ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    {count}
-                  </span>
                 </button>
               );
             })}

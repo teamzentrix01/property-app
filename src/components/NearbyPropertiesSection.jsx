@@ -138,6 +138,11 @@ export default function NearbyPropertiesSection() {
 
               <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
                 Showing properties in <span className="text-white underline decoration-[#c41920] decoration-4 underline-offset-4">{city || "Your City"}</span>
+                {source === "profile" && (
+                  <span className="ml-2 text-xs font-normal text-emerald-300 bg-emerald-400/10 px-2.5 py-1 rounded-full border border-emerald-400/20 align-middle">
+                    (from your profile)
+                  </span>
+                )}
                 {source === "ip" && (
                   <span className="ml-2 text-xs font-normal text-amber-300 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/20 align-middle">
                     (approximate)
