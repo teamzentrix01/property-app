@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Phone, Calendar, Heart, Share2, MessageCircle } from "lucide-react";
+import { ADMIN_CONTACT } from "@/lib/adminContact";
 
 export default function PropertyActions({ listing, compact = false, isLoggedIn = false }) {
   const router = useRouter();
@@ -12,10 +13,9 @@ export default function PropertyActions({ listing, compact = false, isLoggedIn =
     `Hi, I am interested in ${listing.title} at ${listing.area}, ${listing.city}. Please share complete details and your best quote.`,
   );
   const [status, setStatus] = useState("");
-  const phone = String(listing.phone || listing.contactNumber || "")
-    .replace(/\D/g, "")
-    .slice(-10);
-  const whatsapp = `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
+  // Route all inquiries to Admin number 7417499974
+  const phone = ADMIN_CONTACT.phone;
+  const whatsapp = `https://wa.me/${ADMIN_CONTACT.waNumber}?text=${encodeURIComponent(message)}`;
 
   useEffect(() => {
     const handleOpenInquiry = () => {

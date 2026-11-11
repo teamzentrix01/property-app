@@ -57,7 +57,11 @@ export async function POST(req) {
         where: { id: body.listingId },
         include: { owner: { select: { id: true, email: true, name: true } } },
       });
-      if (listing?.ownerId) {
+      // Route inquiry recipient to Super Admin so Admin manages all leads
+      if (superAdmin?.id) {
+        recipientId = superAdmin.id;
+        recipientEmail = superAdmin.email;
+      } else if (listing?.ownerId) {
         recipientId = listing.ownerId;
         recipientEmail = listing.owner.email;
       }

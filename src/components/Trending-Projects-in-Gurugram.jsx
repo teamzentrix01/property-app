@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  Building2,
 } from "lucide-react";
 import PropertyCard from "@/components/PropertyCard";
 import { useRotatingCitySection } from "@/hooks/useRotatingCitySection";
@@ -29,9 +30,11 @@ export default function TrendingProjects({ groupedData = {} }) {
   const {
     activeCity,
     activeProperties,
+    eligibleCities,
     isTransitioning,
     nextCity,
     prevCity,
+    setCityByName,
     hasMultipleCities,
   } = useRotatingCitySection({
     initialGroupedData: clientData,
@@ -39,14 +42,14 @@ export default function TrendingProjects({ groupedData = {} }) {
   });
 
   return (
-    <section className="w-full bg-white py-10 sm:py-6">
+    <section className="w-full bg-white py-12 sm:py-16 border-b border-gray-100">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
+        
         {/* ================= HEADER ================= */}
-        <div className="mb-8 flex items-end justify-between">
+        <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-2 flex items-center gap-2">
               <span className="h-[2px] w-8 bg-[#c41920]" />
-
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#c41920]">
                 EXPLORE {activeCity.toUpperCase()}
               </span>
@@ -59,35 +62,79 @@ export default function TrendingProjects({ groupedData = {} }) {
               </span>
             </h2>
 
-            <p className="mt-3 max-w-2xl text-sm text-gray-500 sm:text-base">
-              Discover the most sought-after residential projects
-              and premium properties in {activeCity}.
+            <p className="mt-2 max-w-2xl text-sm text-gray-500 sm:text-base">
+              Discover the most sought-after residential projects and premium properties in {activeCity}.
             </p>
           </div>
 
-          {/* Desktop arrows */}
-          {hasMultipleCities && (
-            <div className="hidden gap-2 md:flex">
-              <button
-                type="button"
-                onClick={prevCity}
-                aria-label="Previous city"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-[#c41920] text-white transition hover:bg-[#a3141a]"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
+          {/* Desktop Right: Controls & View All */}
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/properties?city=${encodeURIComponent(activeCity)}`}
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#c41920] hover:text-[#8e1016] transition"
+            >
+              <span>View all in {activeCity}</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
 
-              <button
-                type="button"
-                onClick={nextCity}
-                aria-label="Next city"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-[#c41920] text-white transition hover:bg-[#a3141a]"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          )}
+            {hasMultipleCities && (
+              <div className="hidden gap-2 md:flex ml-2">
+                <button
+                  type="button"
+                  onClick={prevCity}
+                  aria-label="Previous city"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-[#c41920] text-white transition hover:bg-[#a3141a] cursor-pointer"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={nextCity}
+                  aria-label="Next city"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-[#c41920] text-white transition hover:bg-[#a3141a] cursor-pointer"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* ================= CITY PILLS / TABS (CLICKABLE TO SEARCH/FILTER) ================= */}
+        {eligibleCities.length > 0 && (
+          <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mr-1 shrink-0 flex items-center gap-1">
+              <Building2 className="h-3.5 w-3.5 text-gray-400" /> Cities:
+            </span>
+            {eligibleCities.map((cityName) => {
+              const isActive = activeCity.toLowerCase() === cityName.toLowerCase();
+              const count = clientData[cityName]?.length || 0;
+              return (
+                <button
+                  key={cityName}
+                  type="button"
+                  onClick={() => setCityByName(cityName)}
+                  className={`inline-flex items-center gap-1.5 shrink-0 rounded-full px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-[#c41920] text-white shadow-sm ring-2 ring-red-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900"
+                  }`}
+                >
+                  <MapPin className={`h-3 w-3 ${isActive ? "text-white" : "text-[#c41920]"}`} />
+                  <span>{cityName}</span>
+                  <span
+                    className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+                      isActive ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* ================= PROJECT CARDS ================= */}
         <div
@@ -98,67 +145,23 @@ export default function TrendingProjects({ groupedData = {} }) {
               ? "grid grid-flow-col auto-cols-[100%] gap-5 overflow-x-auto pb-2 sm:auto-cols-[calc((100%_-_20px)/2)] lg:auto-cols-[calc((100%_-_60px)/4)]"
               : "grid grid-cols-1 gap-5"
           }`}
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {activeProperties.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-[#fbf9f5] py-16 px-4 text-center">
-              <MapPin className="mb-3 h-10 w-10 text-[#c41920] opacity-50" />
-              <p className="text-base font-medium text-gray-700">
-                No properties available in {activeCity} right now.
-              </p>
-              <p className="mt-1 text-xs text-gray-400">
-                Please check back later or explore other cities.
-              </p>
-            </div>
-          ) : (
-            activeProperties.map((project) => (
-              <PropertyCard key={project.id} listing={project} variant="trending" />
+          {activeProperties.length ? (
+            activeProperties.map((listing) => (
+              <PropertyCard
+                key={listing.id}
+                listing={listing}
+                variant="trending"
+              />
             ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-500">
+              No trending projects available in {activeCity} at the moment.
+            </div>
           )}
         </div>
 
-        {/* ================= MOBILE ARROWS ================= */}
-        {hasMultipleCities && (
-          <div className="mt-6 flex justify-center gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={prevCity}
-              aria-label="Previous city"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-[#c41920] text-white shadow-sm transition hover:bg-[#a3141a]"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={nextCity}
-              aria-label="Next city"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-[#c41920] text-white shadow-sm transition hover:bg-[#a3141a]"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-        )}
-
-        {/* ================= BOTTOM CTA ================= */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-xl bg-[#f8f6f1] px-6 py-6 sm:flex-row sm:px-8">
-          <div>
-            <h3 className="text-lg font-bold text-[#1c1c1c]">
-              Looking for a property in {activeCity}?
-            </h3>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Explore verified properties across {activeCity}.
-            </p>
-          </div>
-
-          <Link
-            href={`/listings?city=${encodeURIComponent(activeCity)}`}
-            className="flex items-center gap-2 rounded-lg bg-[#c41920] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#a3141a]"
-          >
-            Explore {activeCity}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
       </div>
     </section>
   );

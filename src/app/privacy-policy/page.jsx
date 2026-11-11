@@ -61,14 +61,21 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-[#180e0f] mb-3">5. Data Security</h2>
+            <h2 className="text-xl font-bold text-[#180e0f] mb-3">5. Location Data & Privacy</h2>
+            <p>
+              When you browse our platform, we may request access to your device location (via browser GPS or approximate IP address) solely to recommend verified properties and plots nearest to you. Your exact coordinates are never permanently stored in our database or shared with third parties; they are used in real-time only to calculate distances and sort relevant listings.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-[#180e0f] mb-3">6. Data Security</h2>
             <p>
               We implement industry-standard encryption protocols (HTTPS/TLS) and secure database storage to prevent unauthorized access, disclosure, or alteration of your personal data.
             </p>
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-[#180e0f] mb-3">6. Contact Information</h2>
+            <h2 className="text-xl font-bold text-[#180e0f] mb-3">7. Contact Information</h2>
             <p>
               For privacy-related inquiries, data modification requests, or questions regarding this policy, please reach out to:
             </p>

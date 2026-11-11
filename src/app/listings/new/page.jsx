@@ -6,6 +6,7 @@ import { Lock } from "lucide-react";
 import { PROPERTY_TYPES_BY_PURPOSE } from "@/lib/listingFields";
 import { PURPOSES, PROPERTY_TYPES, validateListingRequiredFields } from "@/lib/validation";
 import PropertyCategorySelector from "@/components/PropertyCategorySelector";
+import { MEASUREMENT_UNITS, calculateEstimatedUnitRate } from "@/lib/unitConversions";
 const initial = {
   title: "",
   propertyType: "",

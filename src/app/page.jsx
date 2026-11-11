@@ -1,5 +1,6 @@
 import React from "react";
 import Herosection from "@/components/Herosection";
+import NearbyPropertiesSection from "@/components/NearbyPropertiesSection";
 import RecommendedProperties from "@/components/RecommendedProperties";
 import TrendingProjects from "@/components/Trending-Projects-in-Gurugram";
 import NewLaunchProjects from "@/components/NewLaunchProjects";
@@ -66,14 +67,15 @@ export default async function Page() {
     <main className="w-full max-w-full overflow-x-hidden">
       <Herosection />
 
-
-
       {personalizedLocationData && (
         <PersonalizedPropertiesSection
           userLocationData={personalizedLocationData}
           user={user}
         />
       )}
+
+      {/* On-Demand Nearby Properties (Location captured only on button click) */}
+      <NearbyPropertiesSection />
 
       <RecommendedProperties listings={recommendedListings} error={listingsError} />
       <FestivalOffer />
