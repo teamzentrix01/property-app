@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { currentUser, isScopedAreaAdmin } from "@/lib/serverAuth";
 import { formatPrice } from "@/lib/formatters";
 import PropertyActions from "@/components/PropertyActions";
+import { ADMIN_CONTACT } from "@/lib/adminContact";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyCard from "@/components/PropertyCard";
 import EstimatedUnitRateSelector from "@/components/EstimatedUnitRateSelector";
@@ -131,7 +132,8 @@ export default async function ListingDetail({ params }) {
     ([k]) =>
       listing[k] !== null && listing[k] !== undefined && listing[k] !== "",
   );
-  const phone = listing.owner?.phone || listing.contactNumber;
+  // Admin contact 7417499974 so owner number is private
+  const phone = ADMIN_CONTACT.phone;
   const isOwner = viewer?.id === listing.ownerId;
   const unitPrice = listing.sizeValue ? Number(listing.price) / listing.sizeValue : null;
 
@@ -684,11 +686,11 @@ export default async function ListingDetail({ params }) {
                       <span>Book Visit via WhatsApp</span>
                     </a>
                     <a
-                      href="tel:+919999999999"
+                      href="tel:+917417499974"
                       className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-2.5 text-center text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
                     >
                       <Phone className="h-3.5 w-3.5 text-[#c41920]" />
-                      <span>Call Helpline: +91 99999 99999</span>
+                      <span>Call Helpline: +91 74174 99974</span>
                     </a>
                   </>
                 ) : (
@@ -705,7 +707,7 @@ export default async function ListingDetail({ params }) {
                       className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-2.5 text-center text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
                     >
                       <Phone className="h-3.5 w-3.5 text-[#c41920]" />
-                      <span>Call Helpline: +91 99999 99999</span>
+                      <span>Call Helpline: +91 74174 99974</span>
                     </Link>
                   </>
                 )}

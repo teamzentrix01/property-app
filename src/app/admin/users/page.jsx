@@ -573,8 +573,8 @@ export default function ManageUsers() {
                                 if (nextVerified && !allDocsVerified) {
                                   alert(
                                     docs.length === 0
-                                      ? "Bina documents verify kiye user account verify nahi ho sakta."
-                                      : "Sabhi documents pehle verify karein."
+                                      ? "User account cannot be verified without verifying required documents."
+                                      : "Please verify all uploaded documents first."
                                   );
                                   setSelectedUser(u);
                                   return;

@@ -1,4 +1,5 @@
 "use client";
+import { ADMIN_CONTACT } from "@/lib/adminContact";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -135,7 +136,7 @@ export default function PropertyCard({ listing, variant, badge, actions, childre
             </button>
           ) : (
             <a
-              href={`tel:${listing.contactNumber || ""}`}
+              href={ADMIN_CONTACT.tel}
               className="rounded-xl border border-moss/25 py-2 text-center text-xs font-semibold text-moss-deep"
             >
               Call
@@ -154,9 +155,7 @@ export default function PropertyCard({ listing, variant, badge, actions, childre
             </button>
           ) : (
             <a
-              href={`https://wa.me/91${String(listing.contactNumber || "")
-                .replace(/\D/g, "")
-                .slice(-10)}`}
+              href={`https://wa.me/${ADMIN_CONTACT.waNumber}`}
               className="rounded-xl bg-moss py-2 text-center text-xs font-semibold text-white"
             >
               WhatsApp

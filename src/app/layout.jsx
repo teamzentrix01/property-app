@@ -47,7 +47,7 @@ export default async function RootLayout({ children }) {
           {!isAdminRoute && <LoginPopupModal />}
           {!isAdminRoute && <AccountVerifiedModal />}
           {!isAdminRoute && <NiaChatbot />}
-        </SmoothScroll>
+                  </SmoothScroll>
       </body>
     </html>
   );

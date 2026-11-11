@@ -11,9 +11,10 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
  * Provides:
  *  - activeCity: Currently displayed city name
  *  - activeProperties: Properties matching the active city and category
- *  - cities: List of all eligible cities with properties
+ *  - eligibleCities: List of all eligible cities with properties
  *  - isTransitioning: Boolean for smooth fade/swap animations
  *  - nextCity / prevCity: Manual controls that also restart the 60s timer
+ *  - setCityByName: Allows selecting a specific city directly from clickable pills/tabs
  */
 export function useRotatingCitySection({
   initialGroupedData = {},
@@ -45,6 +46,14 @@ export function useRotatingCitySection({
     }, 250);
   }, [totalCities]);
 
+  // Select city directly by name
+  const setCityByName = useCallback((cityName) => {
+    const idx = eligibleCities.findIndex((c) => c.toLowerCase() === cityName.toLowerCase());
+    if (idx !== -1) {
+      changeCityToIndex(idx);
+    }
+  }, [eligibleCities, changeCityToIndex]);
+
   // Next city
   const nextCity = useCallback(() => {
     if (totalCities <= 1) return;
@@ -63,7 +72,6 @@ export function useRotatingCitySection({
   useEffect(() => {
     if (totalCities <= 1) return;
 
-    // Reset previous timer
     if (timerRef.current) clearInterval(timerRef.current);
 
     timerRef.current = setInterval(() => {
@@ -88,8 +96,8 @@ export function useRotatingCitySection({
     isTransitioning,
     nextCity,
     prevCity,
+    setCityByName,
     cityIndex,
     hasMultipleCities: totalCities > 1,
   };
 }
-

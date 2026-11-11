@@ -8,6 +8,7 @@ import { CONTENT_CATEGORIES } from "@/lib/contentCategories";
 import StatusBadge, { statusLabel } from "@/components/StatusBadge";
 import UserDocuments from "@/components/UserDocuments";
 import UserProfileDashboard from "@/components/UserProfileDashboard";
+import SuperAdminView from "@/components/SuperAdminView";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -246,6 +247,30 @@ export default function Dashboard() {
   }
 
   if (!["AREA_ADMIN", "SUPER_ADMIN"].includes(user.role)) return <UserProfileDashboard />;
+
+  if (user.role === "SUPER_ADMIN") {
+    return (
+      <main className="flex-1 mx-auto px-4 sm:px-6 py-8 w-full max-w-7xl">
+        <SuperAdminView
+          user={user}
+          pending={pending}
+          inquiries={inquiries}
+          homepageListings={homepageListings}
+          recommendationSections={recommendationSections}
+          recommendationForm={recommendationForm}
+          setRecommendationForm={setRecommendationForm}
+          createRecommendationSection={createRecommendationSection}
+          removeRecommendationSection={removeRecommendationSection}
+          addListingToBlock={addListingToBlock}
+          copyListingId={copyListingId}
+          copiedListingId={copiedListingId}
+          approveListing={approve}
+          listingCategories={listingCategories}
+          toggleCategory={toggleCategory}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className={`flex-1 mx-auto px-4 sm:px-6 py-12 w-full ${user.role === "SUPER_ADMIN" ? "max-w-7xl" : "max-w-4xl"}`}>
