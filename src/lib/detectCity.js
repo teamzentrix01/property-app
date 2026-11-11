@@ -81,10 +81,12 @@ async function detectCityViaIp() {
 
 /**
  * Primary function: detectCity()
+ * @param {Object} [options]
+ * @param {boolean} [options.forceGps] - When true, bypasses localStorage to re-trigger live browser GPS
  */
-export async function detectCity() {
-  // 1. Check localStorage first
-  if (typeof window !== "undefined") {
+export async function detectCity(options = {}) {
+  // 1. Check localStorage first (unless user explicitly requested forceGps)
+  if (!options.forceGps && typeof window !== "undefined") {
     try {
       const savedCity = localStorage.getItem(STORAGE_KEY);
       if (savedCity && savedCity.trim()) {

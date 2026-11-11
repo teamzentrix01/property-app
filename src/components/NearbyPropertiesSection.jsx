@@ -72,6 +72,27 @@ export default function NearbyPropertiesSection() {
     };
   }, []);
 
+  // Force re-detect GPS live location (bypassing saved localStorage)
+  const handleDetectLiveGPS = async () => {
+    setLoading(true);
+    setDropdownOpen(false);
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("userCity");
+      }
+      const detected = await detectCity({ forceGps: true });
+      const currentCity = detected.city || "Moradabad";
+      setCity(currentCity);
+      setSource(detected.source);
+      setNearbySuggestions(getNearbyCitySuggestions(currentCity));
+      await fetchPropertiesForCity(currentCity);
+    } catch (err) {
+      console.warn("GPS live detection failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch properties from GET /api/properties?city=
   const fetchPropertiesForCity = async (cityName) => {
     setLoading(true);
@@ -148,6 +169,18 @@ export default function NearbyPropertiesSection() {
                     onClick={() => setDropdownOpen(false)} 
                   />
                   <div className="absolute right-0 top-full mt-2 z-50 w-72 max-h-80 overflow-y-auto rounded-2xl bg-white p-2 shadow-2xl border border-gray-200 animate-in fade-in zoom-in-95 duration-150">
+                    {/* Live GPS Re-detect Option */}
+                    <div className="p-1 border-b border-gray-100">
+                      <button
+                        type="button"
+                        onClick={handleDetectLiveGPS}
+                        className="w-full flex items-center gap-2 rounded-xl bg-red-50 p-2.5 text-xs font-bold text-[#c41920] hover:bg-[#c41920] hover:text-white transition cursor-pointer"
+                      >
+                        <Compass className="h-4 w-4 shrink-0 animate-spin-slow" />
+                        <span>Detect My Live GPS Location</span>
+                      </button>
+                    </div>
+
                     <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
                       <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
                         Select Your City
