@@ -91,7 +91,7 @@ export async function getApprovedCities() {
     const rows = await prisma.listing.findMany({
       where: {
         status: { in: ["APPROVED", "ACTIVE"] },
-        city: { not: null },
+        city: { not: "" },
       },
       select: { city: true },
     });

@@ -11,6 +11,8 @@ export async function GET() {
       email: user.email,
       role: user.role,
       adminArea: user.adminArea,
+      preferredCity: user.preferredCity,
+      preferredLocation: user.preferredLocation,
       verificationStatus: user.verificationStatus,
       verified: Boolean(user.verified),
     },

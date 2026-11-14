@@ -754,7 +754,7 @@ export default async function ListingDetail({ params }) {
 
             {/* Additional Rich Bhoomi Content to fully balance height */}
             <BhoomiPropertySidebarCards
-              price={listing.price}
+              price={priceNum}
               title={listing.title}
               city={listing.city}
               area={listing.area}

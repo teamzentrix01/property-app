@@ -85,8 +85,9 @@ async function detectCityViaIp() {
  * @param {boolean} [options.forceGps] - When true, bypasses localStorage to re-trigger live browser GPS
  */
 export async function detectCity(options = {}) {
-  // 1. Check localStorage first (unless user explicitly requested forceGps)
-  if (!options.forceGps && typeof window !== "undefined") {
+  // 1. Try Browser Geolocation FIRST (if forceGps or not yet explicitly saved, or always ask for live location)
+  // When options.checkSavedFirst is true, it checks localStorage first.
+  if (options.checkSavedFirst && !options.forceGps && typeof window !== "undefined") {
     try {
       const savedCity = localStorage.getItem(STORAGE_KEY);
       if (savedCity && savedCity.trim()) {
@@ -101,7 +102,7 @@ export async function detectCity(options = {}) {
     }
   }
 
-  // 2. Browser Geolocation (with enableHighAccuracy: false)
+  // 2. Trigger Browser GPS Geolocation (Prompts the browser for location permission)
   if (typeof window !== "undefined" && typeof navigator !== "undefined" && navigator.geolocation) {
     try {
       const gpsResult = await new Promise((resolve) => {
@@ -121,13 +122,13 @@ export async function detectCity(options = {}) {
             resolve(null);
           },
           (err) => {
-            // Geolocation denied, timed out, or unavailable
+            // Geolocation denied or timed out
             resolve(null);
           },
           {
-            enableHighAccuracy: false,
-            timeout: 6000,
-            maximumAge: 300000,
+            enableHighAccuracy: true,
+            timeout: 8000,
+            maximumAge: 0,
           }
         );
       });
@@ -140,7 +141,41 @@ export async function detectCity(options = {}) {
     }
   }
 
-  // 3. IP-based fallback via ipapi.co
+  // 3. If GPS denied/unavailable, check if logged-in user has preferred city/address in profile
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        const profileCity = data?.user?.preferredCity || data?.user?.preferredLocation;
+        if (profileCity && profileCity.trim()) {
+          const normalizedProfileCity = normalizeCityName(profileCity) || profileCity.trim();
+          return {
+            city: normalizedProfileCity,
+            source: "profile",
+          };
+        }
+      }
+    } catch (e) {
+      console.warn("Profile location check failed:", e);
+    }
+  }
+
+  // 4. Check localStorage if user previously selected a city
+  if (typeof window !== "undefined") {
+    try {
+      const savedCity = localStorage.getItem(STORAGE_KEY);
+      if (savedCity && savedCity.trim()) {
+        const normalizedSaved = normalizeCityName(savedCity) || savedCity.trim();
+        return {
+          city: normalizedSaved,
+          source: "saved",
+        };
+      }
+    } catch (e) {}
+  }
+
+  // 5. IP-based fallback via ipapi.co
   const ipCity = await detectCityViaIp();
   if (ipCity) {
     return {
@@ -149,7 +184,7 @@ export async function detectCity(options = {}) {
     };
   }
 
-  // 4. Default fallback when all fail
+  // 6. Default fallback when all fail
   return {
     city: DEFAULT_FALLBACK_CITY,
     source: "none",

@@ -31,6 +31,7 @@ export default async function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className="h-full font-body"
       style={{
         "--font-fraunces": "Fraunces, Georgia, serif",
