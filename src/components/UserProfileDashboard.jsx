@@ -5,12 +5,21 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, FileText, Heart, Home, Lock, LogOut, MapPin, Menu, Pencil, UserRound, X } from "lucide-react";
+import { Building2, Calculator, FileText, Heart, Home, Lock, LogOut, MapPin, Menu, Pencil, UserRound, X } from "lucide-react";
 import { formatPrice } from "@/lib/formatters";
 import UserDocuments from "@/components/UserDocuments";
+import HomeLoanEstimator from "@/components/HomeLoanEstimator";
 
 const roleLabel = { BUYER: "Buyer", OWNER: "Property Owner", BROKER: "Property Broker" };
-const nav = [["overview", "Overview", Home], ["profile", "My Profile", UserRound], ["saved", "Saved Properties", Heart], ["documents", "My Documents", FileText], ["posted", "My Posted Properties", Building2], ["preferences", "Buyer / Renter Details", MapPin]];
+const nav = [
+  ["overview", "Overview", Home],
+  ["profile", "My Profile", UserRound],
+  ["saved", "Saved Properties", Heart],
+  ["documents", "My Documents", FileText],
+  ["posted", "My Posted Properties", Building2],
+  ["preferences", "Buyer / Renter Details", MapPin],
+  ["emi_calculator", "EMI Calculator", Calculator, "BUYER_ONLY"],
+];
 const blank = { name: "", phone: "", preferredCity: "", preferredLocation: "", preferredPropertyType: "", budgetRange: "", preferredBhk: "", searchPurpose: "" };
 const date = (value) => value ? new Date(value).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
@@ -69,14 +78,16 @@ export default function UserProfileDashboard() {
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   {[
-                    [Heart, "Saved Properties", counts.saved, "text-red-600"],
-                    [Building2, "My Properties", counts.posted, "text-green-700"],
-                    [FileText, "Documents", counts.documents, "text-green-700"],
-                    [UserRound, "Account Type", accountType, "text-green-700"]
-                  ].map(([Icon, label, value, iconColor]) => (
+                    [Heart, "Saved Properties", counts.saved, "text-red-600", () => selectSection("saved")],
+                    [Building2, "My Properties", counts.posted, "text-green-700", () => selectSection("posted")],
+                    [FileText, "Documents", counts.documents, "text-green-700", () => selectSection("documents")],
+                    profile.role === "BUYER"
+                      ? [Calculator, "EMI Calculator", "Calculate", "text-emerald-700", () => selectSection("emi_calculator")]
+                      : [UserRound, "Account Type", accountType, "text-green-700", () => selectSection("profile")],
+                  ].map(([Icon, label, value, iconColor, onClickHandler]) => (
                     <button
                       key={label}
-                      onClick={() => label === "Saved Properties" ? selectSection("saved") : label === "My Properties" ? selectSection("posted") : label === "Documents" ? selectSection("documents") : selectSection("profile")}
+                      onClick={onClickHandler}
                       className="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-300 hover:shadow-md"
                     >
                       <Icon className={iconColor || "text-green-700"} size={22} />
@@ -237,6 +248,62 @@ export default function UserProfileDashboard() {
                 )}
               </>
             )}
+
+            {section === "emi_calculator" && profile.role === "BUYER" && (
+              <>
+                <Header title="EMI Calculator & Loan Estimator" />
+                <div className="grid gap-6 lg:grid-cols-12 items-start">
+                  {/* Left Column: Buyer Financial Overview & Tips */}
+                  <div className="space-y-5 lg:col-span-7">
+                    <div className="rounded-2xl bg-gradient-to-br from-emerald-800 via-green-800 to-green-700 p-6 text-white shadow-md">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-xs">
+                          <Calculator size={22} className="text-emerald-200" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg">Buyer Financial Planning</h3>
+                          <p className="text-xs text-emerald-100">
+                            Simulate your monthly EMI and interest for purchase budgets at current interest rates.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                      <h4 className="font-bold text-sm text-gray-900 mb-3">
+                        Home Loan Planning Tips for Buyers
+                      </h4>
+                      <ul className="space-y-2.5 text-xs text-gray-600">
+                        <li className="flex items-start gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
+                          <span><strong>Ideal Loan-to-Value (LTV):</strong> Most Indian banks finance 75% to 80% of the total property agreement value.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
+                          <span><strong>Tenure Selection:</strong> A longer tenure (e.g. 20–25 years) reduces monthly EMI, while a shorter tenure significantly cuts down total interest paid.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
+                          <span><strong>Pre-approval Advantage:</strong> Having a pre-approved loan letter helps negotiate better deals with property owners.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Compact EMI Calculator */}
+                  <div className="lg:col-span-5">
+                    <HomeLoanEstimator
+                      price={Number(profile.budgetRange?.replace(/\D/g, "")) || 5000000}
+                      purpose="SALE"
+                      formattedPrice="₹50.00 L"
+                      propertyTitle="Buyer General Loan Estimation"
+                      propertyLocation={profile.preferredCity || profile.preferredLocation || "India"}
+                      compact={true}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </section>
         </div>
       </div>
@@ -305,6 +372,13 @@ export default function UserProfileDashboard() {
 }
 function Header({ title, action }) { return <div className="mb-6 flex flex-wrap items-center justify-between gap-3"><h1 className="font-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{title}</h1>{action}</div>; }
 function DashboardSidebar({ menu, profile, accountType, section, selectSection, logout }) {
+  const visibleNav = nav.filter(([key, label, Icon, visibility]) => {
+    if (visibility === "BUYER_ONLY") {
+      return profile.role === "BUYER";
+    }
+    return true;
+  });
+
   return (
     <aside className={`${menu ? "block" : "hidden"} rounded-2xl bg-[#14532D] p-4 text-white shadow-xl shadow-green-950/15 lg:block lg:w-64 lg:shrink-0 lg:self-start`}>
       <div className="border-b border-white/15 px-2 pb-4">
@@ -312,7 +386,7 @@ function DashboardSidebar({ menu, profile, accountType, section, selectSection, 
         <p className="mt-0.5 text-xs font-semibold text-green-200">{accountType}</p>
       </div>
       <nav className="mt-4 space-y-1.5">
-        {nav.map(([key, label, Icon]) => (
+        {visibleNav.map(([key, label, Icon]) => (
           <button
             key={key}
             onClick={() => selectSection(key)}

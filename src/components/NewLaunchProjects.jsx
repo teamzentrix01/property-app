@@ -143,7 +143,7 @@ export default function NewLaunchProjects({ groupedData = {}, listings = [] }) {
             projects.map((project) => (
               <div
                 key={project.id}
-                className="card-red-hover group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 hover:bg-[#c41920] hover:border-[#c41920] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(0,0,0,0.11)]"
+                className="card-red-hover group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-250 hover:border-[#c41920]/40 hover:-translate-y-1 hover:shadow-lg"
               >
                 {/* ================= IMAGE ================= */}
                 <div className="relative h-[175px] overflow-hidden">
@@ -235,7 +235,7 @@ export default function NewLaunchProjects({ groupedData = {}, listings = [] }) {
                   {/* Button */}
                   <Link
                     href={`/listings/${project.id}`}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-[#c41920] py-2.5 text-sm font-semibold text-[#c41920] transition-all duration-300 hover:bg-[#c41920] hover:text-white"
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-[#fff1f2] border border-[#c41920]/20 py-2.5 text-sm font-semibold text-[#c41920] transition-colors duration-200 hover:bg-[#c41920] hover:text-white"
                   >
                     View Details
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

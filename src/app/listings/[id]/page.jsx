@@ -9,6 +9,7 @@ import PropertyCard from "@/components/PropertyCard";
 import EstimatedUnitRateSelector from "@/components/EstimatedUnitRateSelector";
 import PropertySpecifications from "@/components/PropertySpecifications";
 import BhoomiPropertySidebarCards from "@/components/BhoomiPropertySidebarCards";
+import HomeLoanEstimator from "@/components/HomeLoanEstimator";
 import RequestVisitButton from "@/components/RequestVisitButton";
 import Link from "next/link";
 import {
@@ -535,6 +536,17 @@ export default async function ListingDetail({ params }) {
                   listingId={listing.id}
                 />
               </div>
+
+              {/* ── BHOOMI VERIFIED TITLE & ADVANTAGE SECTION (LEFT SIDE TO FILL VACANT SPACE) ── */}
+              <div className="mt-8 border-t border-gray-100 pt-8">
+                <BhoomiPropertySidebarCards
+                  price={priceNum}
+                  title={listing.title}
+                  city={listing.city}
+                  area={listing.area}
+                  showOnlyAssurance={true}
+                />
+              </div>
             </div>
           </section>
 
@@ -652,6 +664,19 @@ export default async function ListingDetail({ params }) {
               )}
             </div>
 
+            {/* 2. COMPACT EMI CALCULATOR (BUYER ONLY) - Placed in right sidebar column */}
+            {viewer?.role === "BUYER" && listing.purpose === "SALE" && (
+              <HomeLoanEstimator
+                price={priceNum}
+                purpose={listing.purpose}
+                formattedPrice={formatPrice(listing.price, listing.purpose)}
+                listingId={listing.id}
+                propertyTitle={listing.title}
+                propertyLocation={`${listing.area ? `${listing.area}, ` : ""}${listing.city}`}
+                compact={true}
+              />
+            )}
+
 
             {/* 3. Schedule a Free Site Visit Card */}
             <div className="rounded-3xl border border-gray-200/80 bg-gradient-to-br from-white to-[#fff8f8] p-6 shadow-sm">
@@ -752,12 +777,13 @@ export default async function ListingDetail({ params }) {
               </div>
             </div>
 
-            {/* Additional Rich Bhoomi Content to fully balance height */}
+            {/* Additional Rich Bhoomi Content: Locality Trends */}
             <BhoomiPropertySidebarCards
               price={priceNum}
               title={listing.title}
               city={listing.city}
               area={listing.area}
+              showOnlyTrends={true}
             />
           </aside>
         </div>
@@ -767,13 +793,13 @@ export default async function ListingDetail({ params }) {
           <section className="mt-16 border-t border-gray-200/80 pt-12">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-[#c41920]">
+                <p className="text-sm font-bold uppercase tracking-widest text-[#c41920]">
                   Similar Options
                 </p>
-                <h2 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-[#180e0f]">
+                <h2 className="mt-1.5 font-display text-3xl sm:text-4xl font-bold text-[#180e0f] tracking-tight">
                   Recommended Properties in {listing.city}
                 </h2>
-                <p className="mt-1 text-sm text-gray-700 font-medium">
+                <p className="mt-2 text-base text-gray-700 font-medium">
                   Handpicked verified properties matching this property type and locality.
                 </p>
               </div>

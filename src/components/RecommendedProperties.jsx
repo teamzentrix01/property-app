@@ -175,7 +175,7 @@ export default function RecommendedProperties({ listings = [], error = false }) 
               {carouselItems.map((property, idx) => (
                 <div
                   key={`${property.id}-${idx}`}
-                  className="card-property-standard group relative flex flex-col w-[275px] sm:w-[290px] shrink-0 border border-gray-200 shadow-sm transition-all duration-300 hover:bg-[#c41920] hover:border-[#c41920] hover:-translate-y-1.5 hover:shadow-xl rounded-2xl overflow-hidden bg-white"
+                  className="card-property-standard group relative flex flex-col w-[275px] sm:w-[290px] shrink-0 border border-gray-200 shadow-sm transition-all duration-250 bg-white hover:-translate-y-1 hover:shadow-lg hover:border-[#c41920]/40 rounded-2xl overflow-hidden"
                 >
                   {/* TOP IMAGE */}
                   <div className="relative h-[175px] w-full overflow-hidden bg-slate-100">
@@ -212,34 +212,34 @@ export default function RecommendedProperties({ listings = [], error = false }) 
                   </div>
 
                   {/* CARD CONTENT */}
-                  <div className="flex flex-1 flex-col p-4">
+                  <div className="flex flex-1 flex-col p-4 bg-white">
                     {/* Location */}
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 group-hover:text-white/80 transition-colors">
-                      <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920] group-hover:text-white" />
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 transition-colors">
+                      <MapPin className="h-3.5 w-3.5 shrink-0 text-[#c41920]" />
                       <span className="truncate">
                         {property.location}{property.city ? `, ${property.city}` : ""}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="mt-1.5 text-sm font-bold text-gray-900 group-hover:text-white transition-colors line-clamp-1">
+                    <h3 className="mt-1.5 text-sm font-bold text-gray-900 transition-colors line-clamp-1">
                       {property.name}
                     </h3>
 
                     {/* Price */}
-                    <div className="mt-3 flex items-center justify-between pt-2 border-t border-gray-100 group-hover:border-white/20">
+                    <div className="mt-3 flex items-center justify-between pt-2 border-t border-gray-100">
                       <div>
-                        <span className="text-[10px] font-medium text-gray-400 group-hover:text-white/70 block uppercase">
+                        <span className="text-[10px] font-medium text-gray-400 block uppercase">
                           Starting From
                         </span>
-                        <span className="text-base font-extrabold text-[#c41920] group-hover:text-white transition-colors">
+                        <span className="text-base font-extrabold text-[#c41920]">
                           {property.price}
                         </span>
                       </div>
 
                       <Link
                         href={`/listings/${property.id}`}
-                        className="rounded-lg bg-red-50 group-hover:bg-white text-[#c41920] px-3 py-1.5 text-xs font-bold transition hover:shadow-xs"
+                        className="rounded-lg bg-[#fff1f2] text-[#c41920] hover:bg-[#c41920] hover:text-white px-3 py-1.5 text-xs font-bold transition-colors duration-200 shadow-xs"
                       >
                         Details
                       </Link>

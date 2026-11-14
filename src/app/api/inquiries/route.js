@@ -31,6 +31,16 @@ export async function POST(req) {
     const senderEmail = String(body.email || user?.email || "no-email@bhoomi.com").trim().toLowerCase();
     const senderPhone = String(body.phone || user?.phone || "").replace(/\D/g, "").slice(0, 10);
 
+    // Role-based protection: LOAN inquiry / EMI calculations can only be submitted by authenticated BUYERs
+    if (type === "LOAN") {
+      if (!user) {
+        return NextResponse.json({ error: "Login as Buyer required to submit Home Loan / EMI inquiries" }, { status: 401 });
+      }
+      if (user.role !== "BUYER") {
+        return NextResponse.json({ error: "Only accounts with Buyer role can access Home Loan / EMI services" }, { status: 403 });
+      }
+    }
+
     // 1. Find or pick an admin as fallback recipient
     const superAdmin = await prisma.user.findFirst({
       where: { role: { in: ["SUPER_ADMIN", "AREA_ADMIN"] } },

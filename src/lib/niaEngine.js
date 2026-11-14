@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { serializeForClient } from "@/lib/formatters";
-import { INDIAN_CITIES, parseLocationString } from "@/lib/indianLocations";
 
 /**
  * Knowledge Base for Bhoomi FAQs, Policies, and Site Navigation
  */
 export const BHOOMI_KNOWLEDGE = {
-  about: "Bhoomi is India's premium real estate platform providing 100% verified listings, direct-from-owner and broker options, DMA/MDA approval badges, and zero hidden fees across Moradabad, Meerut, Rampur, Noida, Gurugram, Delhi NCR and all major Indian cities.",
+  about:
+    "Bhoomi is India's premium real estate platform providing 100% verified listings, direct-from-owner and broker options, DMA/MDA approval badges, and zero hidden fees across Moradabad, Meerut, Rampur, Noida, Gurugram, Delhi NCR and all major Indian cities.",
   services: [
     "Residential properties: Plots, Independent Houses, Apartments, Villas, Builder Floors",
     "Commercial properties: Shops, Showrooms, Godowns, Offices, Commercial SCO Plots",
@@ -14,118 +14,241 @@ export const BHOOMI_KNOWLEDGE = {
     "Verified Listings: Properties inspected and verified with DMA/MDA/RERA approvals",
     "Dealer & Owner Inquiries: Direct connection with verified property dealers & owners",
   ],
-  postingGuide: "To post a property on Bhoomi, click on 'Post Property' in the navbar or visit /post-property. If you don't have an account, sign up or log in. Verified owners and brokers can list plots, flats, houses, shops, and offices with photos, pricing, and exact locations.",
-  verificationInfo: "Bhoomi displays 'Verified Listing' for admin-checked properties and '✓ MDA Approved' / '✓ DMA Approved' badges for government development authority approvals. RERA numbers are prominently displayed when registered.",
-  contactSupport: "You can reach Bhoomi Support via email at bhoomiproperty7@gmail.com, or submit an inquiry directly through Nia to connect with our regional property dealers.",
+  postingGuide:
+    "To post a property on Bhoomi, click on 'Post Property' in the navbar or visit /post-property. If you don't have an account, sign up or log in. Verified owners and brokers can list plots, flats, houses, shops, and offices with photos, pricing, and exact locations.",
+  verificationInfo:
+    "Bhoomi displays 'Verified Listing' for admin-checked properties and '✓ MDA Approved' / '✓ DMA Approved' badges for government development authority approvals. RERA numbers are prominently displayed when registered.",
+  contactSupport:
+    "You can reach Bhoomi Support via email at bhoomiproperty7@gmail.com, or submit an inquiry directly through Nia to connect with our regional property dealers.",
 };
 
+// Available Cities for quick suggestions
+export const RECOMMENDED_CITIES = [
+  "Moradabad",
+  "Meerut",
+  "Rampur",
+  "Delhi",
+  "Noida",
+  "Greater Noida",
+  "Ghaziabad",
+  "Lucknow",
+];
+
+// Budget options definitions
+export const BUY_BUDGET_OPTIONS = [
+  { label: "Under ₹20 Lakhs", min: 0, max: 2000000 },
+  { label: "₹20–40 Lakhs", min: 2000000, max: 4000000 },
+  { label: "₹40–60 Lakhs", min: 4000000, max: 6000000 },
+  { label: "₹60–80 Lakhs", min: 6000000, max: 8000000 },
+  { label: "₹80 Lakhs–1 Crore", min: 8000000, max: 10000000 },
+  { label: "₹1–2 Crore", min: 10000000, max: 20000000 },
+  { label: "Above ₹2 Crore", min: 20000000, max: 1000000000 },
+  { label: "Flexible / Not Decided", min: 0, max: 0 },
+];
+
+export const RENT_BUDGET_OPTIONS = [
+  { label: "Under ₹5,000", min: 0, max: 5000 },
+  { label: "₹5,000–₹10,000", min: 5000, max: 10000 },
+  { label: "₹10,000–₹20,000", min: 10000, max: 20000 },
+  { label: "₹20,000–₹30,000", min: 20000, max: 30000 },
+  { label: "₹30,000–₹50,000", min: 30000, max: 50000 },
+  { label: "Above ₹50,000", min: 50000, max: 500000 },
+  { label: "Flexible", min: 0, max: 0 },
+];
+
+export const PROPERTY_TYPE_OPTIONS = [
+  { label: "Flat / Apartment", value: "FLAT" },
+  { label: "Independent House", value: "HOUSE" },
+  { label: "Plot / Land", value: "PLOT" },
+  { label: "Office Space", value: "OFFICE" },
+  { label: "Shop / Commercial", value: "SHOP" },
+  { label: "PG / Co-living", value: "PG" },
+];
+
+export const BHK_OPTIONS = [
+  { label: "1 BHK", value: 1 },
+  { label: "2 BHK", value: 2 },
+  { label: "3 BHK", value: 3 },
+  { label: "4 BHK", value: 4 },
+  { label: "5+ BHK", value: 5 },
+  { label: "No Preference", value: 0 },
+];
+
+export const FURNISHING_OPTIONS = [
+  { label: "Furnished", value: "FULLY_FURNISHED" },
+  { label: "Semi-Furnished", value: "SEMI_FURNISHED" },
+  { label: "Unfurnished", value: "UNFURNISHED" },
+  { label: "No Specific Preference", value: "ANY" },
+];
+
+// Additional Dealer Flow Options
+export const RESIDENTIAL_PREF_OPTIONS = [
+  { label: "Ready to Move", value: "READY_TO_MOVE" },
+  { label: "Under Construction", value: "UNDER_CONSTRUCTION" },
+  { label: "Furnished", value: "FULLY_FURNISHED" },
+  { label: "Semi-Furnished", value: "SEMI_FURNISHED" },
+  { label: "Unfurnished", value: "UNFURNISHED" },
+  { label: "No Specific Preference", value: "NO_PREF" },
+];
+
+export const PLOT_SIZE_OPTIONS = [
+  { label: "100–200 sq. yard (Gaj)", value: "100-200 sq. yard" },
+  { label: "200–500 sq. yard (Gaj)", value: "200-500 sq. yard" },
+  { label: "500+ sq. yard (Gaj)", value: "500+ sq. yard" },
+  { label: "1–2 Bigha", value: "1-2 Bigha" },
+  { label: "2+ Bigha / Agricultural", value: "2+ Bigha" },
+  { label: "Flexible", value: "Flexible" },
+];
+
+export const COMMERCIAL_AREA_OPTIONS = [
+  { label: "Under 500 sq. ft.", value: "Under 500 sq.ft." },
+  { label: "500–1,000 sq. ft.", value: "500-1,000 sq.ft." },
+  { label: "1,000–3,000 sq. ft.", value: "1,000-3,000 sq.ft." },
+  { label: "3,000+ sq. ft.", value: "3,000+ sq.ft." },
+  { label: "Flexible", value: "Flexible" },
+];
+
+export const COMMERCIAL_USAGE_OPTIONS = [
+  { label: "Retail / Shop", value: "Retail / Shop" },
+  { label: "Corporate Office", value: "Corporate Office" },
+  { label: "Warehouse / Godown", value: "Warehouse / Godown" },
+  { label: "Restaurant / Cafe", value: "Restaurant / Cafe" },
+  { label: "General Commercial", value: "General Commercial" },
+];
+
+export const CONTACT_METHOD_OPTIONS = [
+  { label: "WhatsApp", value: "WhatsApp" },
+  { label: "Phone Call", value: "Call" },
+  { label: "Either Call or WhatsApp", value: "Either" },
+];
+
+export const HOW_TO_CONTACT_OPTIONS = [
+  { label: "I want to contact a dealer about a specific property", action: "contact_specific_property" },
+  { label: "I want to contact a property owner", action: "contact_property_owner" },
+  { label: "I want to find dealers in my preferred location", action: "find_dealers_by_location" },
+  { label: "I need help connecting with a dealer", action: "dealer_connection_help" },
+];
+
 /**
- * Extract search intent, filters, budget, property type from natural language input
+ * Natural language intent parser that extracts any property details mentioned in text
  */
-export function extractPropertySearchCriteria(text = "", conversationHistory = []) {
-  const combined = [
-    ...conversationHistory.map((m) => m.content || ""),
-    text,
-  ].join(" ").toLowerCase();
+export function parseNaturalLanguageIntent(text = "") {
+  const t = text.toLowerCase().trim();
+  const extracted = {};
 
-  const current = text.toLowerCase();
+  // 1. Purpose
+  if (/\b(rent|kiraya|lease|tenant|pg)\b/i.test(t)) {
+    extracted.purpose = "RENT";
+  } else if (/\b(buy|purchase|khareedna|kharidna|sale|invest)\b/i.test(t)) {
+    extracted.purpose = "SALE";
+  } else if (/\b(sell|bechna|post property|list property)\b/i.test(t)) {
+    extracted.intent = "SELL";
+  }
 
-  // 1. Property Type detection
-  let propertyType = null;
-  if (/(plot|land|zameen|bhoomi)/i.test(combined)) propertyType = "PLOT";
-  else if (/(flat|apartment|bhk|condo)/i.test(combined)) propertyType = "FLAT";
-  else if (/(house|villa|kothi|banglow|independent house|makan|ghar)/i.test(combined)) propertyType = "HOUSE";
-  else if (/(shop|dukaan)/i.test(combined)) propertyType = "SHOP";
-  else if (/(showroom)/i.test(combined)) propertyType = "SHOWROOM";
-  else if (/(office|workspace)/i.test(combined)) propertyType = "OFFICE";
-  else if (/(godown|warehouse)/i.test(combined)) propertyType = "GODOWN";
-  else if (/(pg|hostel|co-living)/i.test(combined)) propertyType = "PG";
+  // 2. Property Type
+  if (/\b(plot|plots|land|zameen|bhoomi)\b/i.test(t)) extracted.propertyType = "PLOT";
+  else if (/\b(flat|flats|apartment|apartments|condo)\b/i.test(t)) extracted.propertyType = "FLAT";
+  else if (/\b(house|houses|villa|villas|kothi|banglow|bungalow|independent house|makan|ghar)\b/i.test(t)) extracted.propertyType = "HOUSE";
+  else if (/\b(shop|shops|dukaan|commercial)\b/i.test(t)) extracted.propertyType = "SHOP";
+  else if (/\b(showroom|showrooms)\b/i.test(t)) extracted.propertyType = "SHOWROOM";
+  else if (/\b(office|offices|workspace)\b/i.test(t)) extracted.propertyType = "OFFICE";
+  else if (/\b(godown|warehouse)\b/i.test(t)) extracted.propertyType = "GODOWN";
+  else if (/\b(pg|hostel|co-living)\b/i.test(t)) extracted.propertyType = "PG";
 
-  // 2. Purpose (Buy / Rent)
-  let purpose = null;
-  if (/(rent|kiraya|lease|tenant|pg)/i.test(combined)) purpose = "RENT";
-  else if (/(buy|purchase|khareedna|sale|invest)/i.test(combined)) purpose = "SALE";
-
-  // 3. City & Location detection from Indian cities list & keywords
-  let detectedCity = null;
+  // 3. City
   const knownCities = [
     "moradabad", "meerut", "rampur", "noida", "greater noida",
     "ghaziabad", "gurugram", "gurgaon", "delhi", "lucknow",
     "bareilly", "bareily", "agra", "mathura", "aligarh", "dehradun",
     "haridwar", "jaipur", "chandigarh", "faridabad"
   ];
-
   for (const c of knownCities) {
-    if (combined.includes(c)) {
-      if (c === "gurgaon") detectedCity = "Gurugram";
-      else if (c === "bareily") detectedCity = "Bareilly";
-      else detectedCity = c.charAt(0).toUpperCase() + c.slice(1);
+    if (new RegExp(`\\b${c}\\b`, "i").test(t)) {
+      if (c === "gurgaon") extracted.city = "Gurugram";
+      else if (c === "bareily") extracted.city = "Bareilly";
+      else extracted.city = c.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
       break;
     }
   }
 
-  // 4. Locality / Sector detection (e.g. "sector 12", "golf course road", "durga chauk", "near kia showroom")
-  let detectedLocality = null;
-  const sectorMatch = combined.match(/(sector\s*\d+|sec\s*\d+)/i);
-  if (sectorMatch) {
-    detectedLocality = sectorMatch[1];
-  }
+  // 4. Locality / Sector
+  const sectorMatch = t.match(/\b(sector\s*\d+|sec\s*\d+)\b/i);
+  if (sectorMatch) extracted.locality = sectorMatch[1];
 
-  // 5. Budget extraction (e.g. "50 lakh", "50-70 lakhs", "1.5 cr", "30000 rent", "under 40 l")
-  let minPrice = null;
-  let maxPrice = null;
+  // 5. BHK
+  const bhkMatch = t.match(/(\d+)\s*(?:bhk|bedroom|bed)/i);
+  if (bhkMatch) extracted.bedrooms = parseInt(bhkMatch[1], 10);
 
-  // Lakh patterns
-  const croreMatch = combined.match(/(\d+(?:\.\d+)?)\s*(?:cr|crore|crores)/i);
+  // 6. Furnishing
+  if (/\b(fully furnished|full furnished)\b/i.test(t)) extracted.furnishing = "FULLY_FURNISHED";
+  else if (/\b(semi furnished|semi-furnished)\b/i.test(t)) extracted.furnishing = "SEMI_FURNISHED";
+  else if (/\b(unfurnished|without furniture)\b/i.test(t)) extracted.furnishing = "UNFURNISHED";
+
+  // 7. Budget (Lakhs, Crores, or Rent thousands)
+  const croreMatch = t.match(/(\d+(?:\.\d+)?)\s*(?:cr|crore|crores)\b/i);
   if (croreMatch) {
     const val = parseFloat(croreMatch[1]) * 10000000;
-    maxPrice = val;
+    extracted.maxPrice = val;
+    extracted.minPrice = 0;
+    extracted.budgetLabel = `Up to ₹${croreMatch[1]} Cr`;
   }
 
-  const lakhRangeMatch = combined.match(/(\d+)\s*(?:to|-)\s*(\d+)\s*(?:lakh|lakhs|lacs|lac|l\b)/i);
+  const lakhRangeMatch = t.match(/(\d+)\s*(?:to|-)\s*(\d+)\s*(?:lakh|lakhs|lacs|lac|l\b)/i);
   if (lakhRangeMatch) {
-    minPrice = parseInt(lakhRangeMatch[1], 10) * 100000;
-    maxPrice = parseInt(lakhRangeMatch[2], 10) * 100000;
+    extracted.minPrice = parseInt(lakhRangeMatch[1], 10) * 100000;
+    extracted.maxPrice = parseInt(lakhRangeMatch[2], 10) * 100000;
+    extracted.budgetLabel = `₹${lakhRangeMatch[1]}–${lakhRangeMatch[2]} Lakhs`;
   } else {
-    const singleLakhMatch = combined.match(/(?:under|below|upto|within|budget(?:\s*of)?)\s*(\d+)\s*(?:lakh|lakhs|lacs|lac|l\b)/i);
+    const singleLakhMatch = t.match(/(?:under|below|upto|within|budget(?:\s*of)?)\s*(\d+)\s*(?:lakh|lakhs|lacs|lac|l\b)/i);
     if (singleLakhMatch) {
-      maxPrice = parseInt(singleLakhMatch[1], 10) * 100000;
+      extracted.maxPrice = parseInt(singleLakhMatch[1], 10) * 100000;
+      extracted.minPrice = 0;
+      extracted.budgetLabel = `Under ₹${singleLakhMatch[1]} Lakhs`;
     } else {
-      const plainLakh = combined.match(/(\d+)\s*(?:lakh|lakhs|lacs|lac|l\b)/i);
-      if (plainLakh) {
-        maxPrice = parseInt(plainLakh[1], 10) * 100000 * 1.25; // 25% tolerance
-        minPrice = parseInt(plainLakh[1], 10) * 100000 * 0.75;
+      const plainLakh = t.match(/(\d+)\s*(?:lakh|lakhs|lacs|lac|l\b)/i);
+      if (plainLakh && !extracted.maxPrice) {
+        const amt = parseInt(plainLakh[1], 10) * 100000;
+        extracted.minPrice = Math.max(0, amt * 0.7);
+        extracted.maxPrice = amt * 1.3;
+        extracted.budgetLabel = `Around ₹${plainLakh[1]} Lakhs`;
       }
     }
   }
 
-  // 6. BHK detection
-  let bedrooms = null;
-  const bhkMatch = combined.match(/(\d+)\s*(?:bhk|bedroom|bed)/i);
-  if (bhkMatch) {
-    bedrooms = parseInt(bhkMatch[1], 10);
+  // Rent thousands (e.g. "15000 rent", "under 20k", "10k to 20k")
+  const rentKMatch = t.match(/(\d+)\s*(?:k|thousand)\s*(?:to|-)\s*(\d+)\s*(?:k|thousand)/i);
+  if (rentKMatch) {
+    extracted.minPrice = parseInt(rentKMatch[1], 10) * 1000;
+    extracted.maxPrice = parseInt(rentKMatch[2], 10) * 1000;
+    extracted.budgetLabel = `₹${rentKMatch[1]}k–₹${rentKMatch[2]}k`;
+  } else {
+    const singleRentMatch = t.match(/(?:rent|under|below|budget)\s*(?:of\s*)?(\d{4,6})\b/i);
+    if (singleRentMatch) {
+      extracted.maxPrice = parseInt(singleRentMatch[1], 10);
+      extracted.minPrice = 0;
+      extracted.budgetLabel = `Up to ₹${singleRentMatch[1]}`;
+    }
   }
 
-  return {
-    propertyType,
-    purpose,
-    city: detectedCity,
-    locality: detectedLocality,
-    minPrice,
-    maxPrice,
-    bedrooms,
-    wantsInquiry: /(dealer|broker|agent|contact|call me|visit|callback|phone number|schedule visit|talk to|inquiry|enquiry)/i.test(current),
-  };
+  // 8. General inquiry / dealer request / contact dealer
+  extracted.wantsSubmitDealer = /(submit dealer request|dealer request|find dealer for me|request dealer)/i.test(t);
+  extracted.wantsContactDealer = /(how to contact dealer|contact dealer|contact owner|talk to dealer|call dealer|dealer number|reach dealer|find dealer)/i.test(t);
+  extracted.wantsInquiry = /(dealer|broker|agent|contact|call me|visit|callback|phone number|schedule visit|talk to|inquiry|enquiry)/i.test(t);
+
+  // 9. Verified request
+  extracted.wantsVerified = /(verified|mda|dma|rera|approved)/i.test(t);
+
+  return extracted;
 }
 
 /**
- * Query real properties from Bhoomi's PostgreSQL database with exact & smart fallback
+ * Search real properties from Bhoomi DB with exact and smart fallbacks
  */
-export async function searchPropertiesForNia(criteria, options = {}) {
-  const { limit = 4, excludeId = null } = options;
+export async function searchPropertiesForNia(state, options = {}) {
+  const { limit = 6, excludeId = null } = options;
 
   if (!process.env.DATABASE_URL) {
-    return { exactCount: 0, properties: [], matchType: "none" };
+    return { properties: [], matchType: "none", count: 0 };
   }
 
   const baseWhere = {
@@ -133,38 +256,42 @@ export async function searchPropertiesForNia(criteria, options = {}) {
     ...(excludeId ? { id: { not: excludeId } } : {}),
   };
 
-  if (criteria.purpose) {
-    baseWhere.purpose = criteria.purpose;
+  if (state.selectedPurpose) {
+    baseWhere.purpose = state.selectedPurpose;
   }
 
-  if (criteria.propertyType) {
-    baseWhere.propertyType = criteria.propertyType;
+  if (state.selectedPropertyType) {
+    baseWhere.propertyType = state.selectedPropertyType;
   }
 
-  if (criteria.bedrooms) {
-    baseWhere.bedrooms = criteria.bedrooms;
+  if (state.selectedBHK && state.selectedBHK > 0) {
+    baseWhere.bedrooms = state.selectedBHK;
   }
 
-  if (criteria.minPrice || criteria.maxPrice) {
+  if (state.selectedFurnishing && state.selectedFurnishing !== "ANY") {
+    baseWhere.furnishing = state.selectedFurnishing;
+  }
+
+  if (state.minPrice || state.maxPrice) {
     baseWhere.price = {};
-    if (criteria.minPrice) baseWhere.price.gte = criteria.minPrice;
-    if (criteria.maxPrice) baseWhere.price.lte = criteria.maxPrice;
+    if (state.minPrice && state.minPrice > 0) baseWhere.price.gte = state.minPrice;
+    if (state.maxPrice && state.maxPrice > 0) baseWhere.price.lte = state.maxPrice;
   }
 
-  // Try exact location first
+  // 1. Exact match with City + Locality
   let exactWhere = { ...baseWhere };
-  if (criteria.city) {
-    exactWhere.city = { contains: criteria.city, mode: "insensitive" };
-  }
-  if (criteria.locality) {
-    exactWhere.area = { contains: criteria.locality, mode: "insensitive" };
+  if (state.selectedLocation) {
+    exactWhere.OR = [
+      { city: { contains: state.selectedLocation, mode: "insensitive" } },
+      { area: { contains: state.selectedLocation, mode: "insensitive" } },
+    ];
   }
 
   let exactMatches = await prisma.listing.findMany({
     where: exactWhere,
     include: {
       photos: { take: 3 },
-      owner: { select: { id: true, name: true, verified: true, role: true } },
+      owner: { select: { id: true, name: true, phone: true, verified: true, role: true } },
     },
     orderBy: { createdAt: "desc" },
     take: limit,
@@ -174,56 +301,156 @@ export async function searchPropertiesForNia(criteria, options = {}) {
     return {
       properties: serializeForClient(exactMatches),
       matchType: "exact",
-      city: criteria.city,
+      location: state.selectedLocation,
       count: exactMatches.length,
     };
   }
 
-  // Fallback 1: City match if locality was too strict
-  if (criteria.city && criteria.locality) {
-    const cityMatches = await prisma.listing.findMany({
-      where: {
-        ...baseWhere,
-        city: { contains: criteria.city, mode: "insensitive" },
-      },
+  // 2. Fallback: Relax price constraint in same location
+  if ((state.minPrice || state.maxPrice) && state.selectedLocation) {
+    const relaxedPriceWhere = { ...baseWhere };
+    delete relaxedPriceWhere.price;
+    relaxedPriceWhere.OR = [
+      { city: { contains: state.selectedLocation, mode: "insensitive" } },
+      { area: { contains: state.selectedLocation, mode: "insensitive" } },
+    ];
+
+    const priceRelaxedMatches = await prisma.listing.findMany({
+      where: relaxedPriceWhere,
       include: {
         photos: { take: 3 },
-        owner: { select: { id: true, name: true, verified: true, role: true } },
+        owner: { select: { id: true, name: true, phone: true, verified: true, role: true } },
       },
       orderBy: { createdAt: "desc" },
       take: limit,
     });
 
-    if (cityMatches.length > 0) {
+    if (priceRelaxedMatches.length > 0) {
       return {
-        properties: serializeForClient(cityMatches),
-        matchType: "same_city",
-        city: criteria.city,
-        count: cityMatches.length,
+        properties: serializeForClient(priceRelaxedMatches),
+        matchType: "price_relaxed",
+        location: state.selectedLocation,
+        count: priceRelaxedMatches.length,
       };
     }
   }
 
-  // Fallback 2: Nearby cities or properties in the same category
-  const fallbackMatches = await prisma.listing.findMany({
-    where: {
-      status: { in: ["APPROVED", "ACTIVE"] },
-      ...(criteria.propertyType ? { propertyType: criteria.propertyType } : {}),
-      ...(criteria.purpose ? { purpose: criteria.purpose } : {}),
-    },
+  // 3. Fallback: Same property type in nearby/all locations
+  const fallbackTypeWhere = {
+    status: { in: ["APPROVED", "ACTIVE"] },
+    ...(state.selectedPurpose ? { purpose: state.selectedPurpose } : {}),
+    ...(state.selectedPropertyType ? { propertyType: state.selectedPropertyType } : {}),
+  };
+
+  const nearbyMatches = await prisma.listing.findMany({
+    where: fallbackTypeWhere,
     include: {
       photos: { take: 3 },
-      owner: { select: { id: true, name: true, verified: true, role: true } },
+      owner: { select: { id: true, name: true, phone: true, verified: true, role: true } },
     },
     orderBy: { createdAt: "desc" },
     take: limit,
   });
 
   return {
-    properties: serializeForClient(fallbackMatches),
-    matchType: fallbackMatches.length > 0 ? "nearby_fallback" : "none",
-    city: criteria.city,
-    count: fallbackMatches.length,
+    properties: serializeForClient(nearbyMatches),
+    matchType: nearbyMatches.length > 0 ? "nearby_fallback" : "none",
+    location: state.selectedLocation,
+    count: nearbyMatches.length,
   };
 }
 
+/**
+ * Find real registered brokers or verified area dealers for a location
+ */
+export async function findDealersForNia(location = "") {
+  if (!process.env.DATABASE_URL) return [];
+
+  const loc = String(location || "").trim();
+
+  // 1. Search users with role = BROKER or AREA_ADMIN
+  let where = {
+    role: { in: ["BROKER", "AREA_ADMIN"] },
+  };
+
+  if (loc) {
+    where.OR = [
+      { adminArea: { contains: loc, mode: "insensitive" } },
+      { preferredCity: { contains: loc, mode: "insensitive" } },
+      { preferredLocation: { contains: loc, mode: "insensitive" } },
+    ];
+  }
+
+  let dealers = await prisma.user.findMany({
+    where,
+    select: {
+      id: true,
+      name: true,
+      role: true,
+      verified: true,
+      brokerAgency: true,
+      brokerBio: true,
+      preferredCity: true,
+      adminArea: true,
+      _count: {
+        select: { listings: true },
+      },
+    },
+    take: 5,
+  });
+
+  // 2. If no dedicated broker records in that specific city, look for verified sellers/owners with active listings in that city
+  if (dealers.length === 0 && loc) {
+    const verifiedOwners = await prisma.user.findMany({
+      where: {
+        verified: true,
+        listings: {
+          some: {
+            city: { contains: loc, mode: "insensitive" },
+            status: { in: ["APPROVED", "ACTIVE"] },
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        verified: true,
+        brokerAgency: true,
+        brokerBio: true,
+        preferredCity: true,
+        adminArea: true,
+        _count: {
+          select: { listings: true },
+        },
+      },
+      take: 4,
+    });
+    dealers = verifiedOwners;
+  }
+
+  // 3. Fallback: Any verified brokers or area admins across the platform
+  if (dealers.length === 0) {
+    dealers = await prisma.user.findMany({
+      where: {
+        role: { in: ["BROKER", "AREA_ADMIN"] },
+      },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        verified: true,
+        brokerAgency: true,
+        brokerBio: true,
+        preferredCity: true,
+        adminArea: true,
+        _count: {
+          select: { listings: true },
+        },
+      },
+      take: 4,
+    });
+  }
+
+  return dealers;
+}
