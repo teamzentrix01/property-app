@@ -85,10 +85,10 @@ export default async function PropertiesPage({ searchParams }) {
         </div>
       </section>
 
-      {/* Two Independent Scrollable Columns Container */}
-      <div className="mx-auto grid max-w-7xl items-start gap-7 px-4 py-6 sm:px-6 lg:h-[calc(100vh-2.5rem)] lg:overflow-hidden lg:grid-cols-[322px_minmax(0,1fr)]">
-        {/* Left Side: Independent Scrollable Filter Panel */}
-        <aside className="hidden lg:block h-full overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Properties Listing Layout */}
+      <div className="mx-auto grid max-w-7xl items-start gap-7 px-4 py-6 sm:px-6 lg:grid-cols-[322px_minmax(0,1fr)]">
+        {/* Left Side: Sticky Filter Panel */}
+        <aside className="hidden lg:block sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-5 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="font-bold text-gray-900">Filters</h2>
             <Link href="/properties" className="text-xs font-bold text-red-600 hover:text-red-700">
@@ -185,8 +185,8 @@ export default async function PropertiesPage({ searchParams }) {
           </form>
         </aside>
 
-        {/* Right Side: Independent Scrollable Properties Section */}
-        <section className="h-full overflow-y-auto overscroll-contain pr-1 sm:pr-2 scrollbar-thin">
+        {/* Right Side: Properties Section */}
+        <section className="pr-1 sm:pr-2">
           {error && <p className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
           <div className="mb-5 flex items-center justify-between">
             <div className="flex gap-2">

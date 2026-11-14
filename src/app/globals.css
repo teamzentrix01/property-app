@@ -60,11 +60,9 @@ html, body {
   font-family: var(--font-body);
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 body { min-width: 320px; }
-main { isolation: isolate; }
 img, video, canvas, svg { max-width: 100%; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button, select { cursor: pointer; }

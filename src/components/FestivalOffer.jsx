@@ -11,7 +11,7 @@ import {
 
 export default function FestivalOffer() {
   return (
-    <section className="w-full bg-white py-14 sm:py-18 lg:py-20">
+    <section className="w-full bg-white py-14 sm:py-10 lg:py-20">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10">
 
         {/* MAIN OFFER BANNER */}
