@@ -43,11 +43,17 @@ export default function PropertyActions({ listing, compact = false, isLoggedIn =
   }, []);
 
   useEffect(() => {
-    fetch("/api/saved", { credentials: "include", cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : { ids: [] }))
-      .then((data) => setSaved((data.ids || []).includes(listing.id)))
-      .catch(() => setSaved(false));
-  }, [listing.id]);
+    if (userLoggedIn === false) {
+      setSaved(false);
+      return;
+    }
+    if (userLoggedIn === true) {
+      fetch("/api/saved", { credentials: "include", cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : { ids: [] }))
+        .then((data) => setSaved((data.ids || []).includes(listing.id)))
+        .catch(() => setSaved(false));
+    }
+  }, [listing.id, userLoggedIn]);
 
   async function save() {
     if (!userLoggedIn) {

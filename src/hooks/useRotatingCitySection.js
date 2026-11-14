@@ -19,7 +19,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 export function useRotatingCitySection({
   initialGroupedData = {},
   categorySlug = null,
-  rotationIntervalMs = 60000,
+  rotationIntervalMs = 5000,
 }) {
   // 1. Extract eligible cities that actually contain at least 1 property
   const eligibleCities = useMemo(() => {
@@ -30,6 +30,7 @@ export function useRotatingCitySection({
 
   const [cityIndex, setCityIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef(null);
 
   const totalCities = eligibleCities.length;
@@ -68,9 +69,21 @@ export function useRotatingCitySection({
     changeCityToIndex(prevIdx);
   }, [cityIndex, totalCities, changeCityToIndex]);
 
-  // Set up 60-second automatic rotation timer
+  // Pause / Resume handlers on mouse hover
+  const pauseRotation = useCallback(() => {
+    setIsPaused(true);
+  }, []);
+
+  const resumeRotation = useCallback(() => {
+    setIsPaused(false);
+  }, []);
+
+  // Set up 5-second automatic rotation timer (pauses when user hovers over section)
   useEffect(() => {
-    if (totalCities <= 1) return;
+    if (totalCities <= 1 || isPaused) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
 
     if (timerRef.current) clearInterval(timerRef.current);
 
@@ -87,7 +100,7 @@ export function useRotatingCitySection({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [totalCities, rotationIntervalMs]);
+  }, [totalCities, rotationIntervalMs, isPaused]);
 
   return {
     activeCity,
@@ -99,5 +112,8 @@ export function useRotatingCitySection({
     setCityByName,
     cityIndex,
     hasMultipleCities: totalCities > 1,
+    pauseRotation,
+    resumeRotation,
+    isPaused,
   };
 }
